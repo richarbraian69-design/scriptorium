@@ -1,0 +1,16 @@
+{
+  "name": "scriptorium",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Estudos: banco de estudos, latim (Familia Romana) e violino, com cronômetro, vocabulário com revisão espaçada e metrônomo.",
+  "main": "servidor.js",
+  "scripts": {
+    "start": "node servidor.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
