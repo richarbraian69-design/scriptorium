@@ -305,6 +305,84 @@ app.post('/api/importar', exigir, exigirAdmin, rota((req, res) => {
   res.json({ ok: true, registros: Object.keys(novos).length });
 }));
 
+/* ---------- Porta do JARVIS: o assistente do Mac acompanha os estudos e anota sem abrir a tela ----------
+ * Liga com a variável JARVIS_TOKEN_SHA256 no Railway: a impressão digital (SHA-256, em hex) da chave que
+ * fica só no Mac do JARVIS. Sem ela, nada disto existe. Os números repetem os "Cálculos" da tela.
+ * De propósito, não apaga nem altera nada: só lê, anota estudo feito e põe item novo no banco. */
+const JARVIS_SHA = String(process.env.JARVIS_TOKEN_SHA256 || '').trim().toLowerCase();
+const JARVIS_HASH = /^[0-9a-f]{64}$/.test(JARVIS_SHA) ? Buffer.from(JARVIS_SHA, 'hex') : null;
+function exigirJarvis(req, res, next) {
+  if (!JARVIS_HASH) return res.status(404).type('text').send('Página não encontrada.');
+  const m = /^Bearer (.+)$/.exec(req.get('Authorization') || '');
+  if (!m || !crypto.timingSafeEqual(crypto.createHash('sha256').update(m[1]).digest(), JARVIS_HASH)) {
+    try { limitarLogin(req); } catch (e) { return res.status(429).json({ erro: e.message }); }
+    falhouLogin(req);
+    return res.status(401).json({ erro: 'Chave do JARVIS inválida.' });
+  }
+  next();
+}
+const CAPS = ['Imperium Romanum', 'Familia Romana', 'Puer improbus', 'Dominus et servi', 'Villa et hortus', 'Via Latina', 'Puella et rosa', 'Taberna Romana', 'Pastor et oves', 'Bestiae et homines', 'Corpus humanum', 'Miles Romanus', 'Annus et menses', 'Novus dies', 'Magister et discipuli', 'Tempestas', 'Numeri difficiles', 'Litterae Latinae', 'Maritus et uxor', 'Parentes', 'Pugna discipulorum', 'Cave canem', 'Epistula magistri', 'Puer aegrotus', 'Theseus et Minotaurus', 'Daedalus et Icarus', 'Res rusticae', 'Pericula maris', 'Navigare necesse est', 'Convivium', 'Inter pocula', 'Classis Romana', 'Exercitus Romanus', 'De arte poetica', 'Ars grammatica'];
+const PARTES = [['l1', 'Lectio I'], ['l2', 'Lectio II'], ['l3', 'Lectio III'], ['gram', 'Grammatica Latina'], ['pa', 'Pensum A'], ['pb', 'Pensum B'], ['pc', 'Pensum C']];
+const AREAS = ['trabalho', 'intelectual', 'religioso', 'outros'], TIPOS = ['video', 'livro', 'artigo', 'curso', 'tema', 'outro'];
+function somaDias(iso, n) { const [y, m, d] = iso.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10); }
+function segundaDe(iso) { const [y, m, d] = iso.split('-').map(Number); return somaDias(iso, -((new Date(Date.UTC(y, m - 1, d)).getUTCDay() + 6) % 7)); }
+function colecao(col) { const l = []; for (const p in db.docs) if (p.startsWith(col + '/')) l.push(Object.assign({}, db.docs[p].d, { id: p.slice(col.length + 1) })); return l; }
+const docDe = p => (db.docs[p] || {}).d || null;
+const somaMin = l => l.reduce((t, s) => t + s.minutos, 0);
+function estudos() {
+  return { sess: colecao('sessoes').map(s => Object.assign(s, { minutos: Number(s.minutos) || 0 })), banco: colecao('banco'), vocab: colecao('vocab'),
+    lat: docDe('estado/latim') || { atual: 1, feitos: {} }, vio: docDe('estado/violino') || { exercicios: [] }, ger: docDe('estado/geral') || { metaLatim: 5, metaViolino: 5 } };
+}
+const jarvis = express.Router();
+jarvis.use(exigirJarvis);
+jarvis.get('/resumo', (req, res) => {
+  const e = estudos(), hoje = hojeNoFuso(), seg = segundaDe(hoje), dias = {};
+  e.sess.forEach(s => { dias[s.data] = 1; });
+  let d = dias[hoje] ? hoje : somaDias(hoje, -1), seq = 0; while (dias[d]) { seq++; d = somaDias(d, -1); }
+  const de = (p, f) => e.sess.filter(s => s.pratica === p && f(s));
+  const cap = Math.max(1, Math.min(35, Number(e.lat.atual) || 1)), feitos = (e.lat.feitos || {})[String(cap)] || {}, prox = PARTES.find(p => !feitos[p[0]]);
+  const hist = id => e.sess.flatMap(s => (s.itens || []).filter(i => i.ex === id).map(i => ({ data: s.data, bpm: i.bpm }))).sort((a, b) => a.data.localeCompare(b.data));
+  const fila = e.banco.filter(b => b.status === 'fila' || b.status === 'estudando'), ultRev = e.ger.ultimaRevisao;
+  res.json({ hoje, sequenciaDias: seq,
+    latim: { minutosHoje: somaMin(de('latim', s => s.data === hoje)), metaDia: Number(e.ger.metaLatim) || 5, minutosSemana: somaMin(de('latim', s => s.data >= seg)),
+      capitulo: cap, nome: CAPS[cap - 1], partesFeitas: PARTES.filter(p => feitos[p[0]]).length, partesTotal: PARTES.length, proximaParte: prox ? prox[1] : null,
+      vocabParaRevisar: e.vocab.filter(v => (v.proxima || hoje) <= hoje).length, vocabTotal: e.vocab.length },
+    violino: { minutosHoje: somaMin(de('violino', s => s.data === hoje)), metaDia: Number(e.ger.metaViolino) || 5, minutosSemana: somaMin(de('violino', s => s.data >= seg)),
+      exercicios: (e.vio.exercicios || []).filter(x => x.ativo !== false).map(x => { const h = hist(x.id), b = h.filter(i => i.bpm); return { nome: x.nome, foco: x.foco || '', bpmMeta: x.bpmMeta || null, ultimoBpm: b.length ? b[b.length - 1].bpm : null, ultimoTreino: h.length ? h[h.length - 1].data : null }; }) },
+    banco: { naFila: e.banco.filter(b => b.status === 'fila').length, estudando: e.banco.filter(b => b.status === 'estudando').length,
+      daSemana: e.banco.filter(b => b.semana && b.status !== 'concluido' && b.status !== 'arquivado').map(b => b.titulo || b.link),
+      revisaoPendente: fila.length > 0 && (!ultRev || somaDias(ultRev, 7) <= hoje) },
+    ultimasSessoes: e.sess.sort((a, b) => (b.data + (b.criado || '')).localeCompare(a.data + (a.criado || ''))).slice(0, 6).map(s => ({ data: s.data, pratica: s.pratica, minutos: s.minutos, notas: s.notas || '' })) });
+});
+jarvis.get('/banco', (req, res) => {
+  const q = req.query, st = ['fila', 'estudando', 'concluido', 'arquivado'].includes(q.status) ? q.status : null, busca = normNome(q.busca || '');
+  const l = estudos().banco.filter(b => (st ? b.status === st : b.status !== 'arquivado') && (!q.area || b.area === q.area) && (!busca || normNome((b.titulo || '') + ' ' + (b.link || '')).includes(busca)))
+    .sort((a, b) => String(b.criado || '').localeCompare(String(a.criado || '')));
+  res.json({ total: l.length, itens: l.slice(0, 80).map(b => ({ titulo: b.titulo, link: b.link || '', area: b.area, tipo: b.tipo, prioridade: b.prioridade, status: b.status, semana: !!b.semana })) });
+});
+jarvis.post('/sessoes', rota((req, res) => {
+  const b = req.body || {}, pratica = b.pratica, minutos = parseInt(b.minutos, 10), data = b.data ? String(b.data) : hojeNoFuso();
+  if (!['latim', 'violino'].includes(pratica)) throw new Erro('Prática: latim ou violino.');
+  if (!(minutos > 0 && minutos <= 600)) throw new Erro('Minutos entre 1 e 600.');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) throw new Erro('Data no formato AAAA-MM-DD.');
+  const s = { pratica, data, minutos, notas: String(b.notas || '').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 500), criado: new Date().toISOString(), via: 'jarvis' };
+  if (pratica === 'latim') { s.cap = Math.max(1, Math.min(35, parseInt(b.cap, 10) || Number((docDe('estado/latim') || {}).atual) || 1)); s.partes = []; }
+  else s.itens = [];
+  escrever(caminho('sessoes', novoId('j')), s, 'jarvis');
+  res.json({ ok: true, sessao: s });
+}));
+jarvis.post('/banco', rota((req, res) => {
+  const b = req.body || {}, link = String(b.link || '').trim().slice(0, 500), titulo = String(b.titulo || '').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 200);
+  if (!titulo && !link) throw new Erro('Diga o título ou o link do estudo.');
+  if (link && !/^https?:\/\//.test(link)) throw new Erro('O link precisa começar com http.');
+  const tipo = TIPOS.includes(b.tipo) ? b.tipo : /youtu\.?be|vimeo|instagram|tiktok/.test(link) ? 'video' : link ? 'artigo' : 'tema';
+  const item = { titulo, link, area: AREAS.includes(b.area) ? b.area : 'intelectual', tipo, prioridade: ['alta', 'media', 'baixa'].includes(b.prioridade) ? b.prioridade : 'media',
+    status: 'fila', notas: '', semana: false, criado: hojeNoFuso(), via: 'jarvis' };
+  escrever(caminho('banco', novoId('j')), item, 'jarvis');
+  res.json({ ok: true, item });
+}));
+app.use('/api/jarvis', jarvis);
+
 app.use((req, res) => res.status(404).type('text').send('Página não encontrada.'));
 
 app.listen(PORTA, () => {

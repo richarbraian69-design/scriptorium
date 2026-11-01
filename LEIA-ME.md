@@ -21,3 +21,12 @@ Troque `publico/index.html` (ou `servidor.js`) no GitHub e faça o commit. O Rai
 ## Rodar no computador
 
 Node.js 20 ou mais novo: `npm install` e `npm start`, depois abra <http://localhost:3000>.
+
+## Porta do JARVIS (assistente do Mac)
+
+O JARVIS acompanha os estudos direto pelo servidor, nas rotas `/api/jarvis/...`, sem abrir a tela.
+
+- A chave fica só no `.env` do JARVIS, como `SCRIPTORIUM_TOKEN`. No Railway vai apenas a impressão digital dela, na variável `JARVIS_TOKEN_SHA256` (SHA-256 em hex; no Mac: `printf %s "CHAVE" | shasum -a 256`). Sem a variável, as rotas não existem.
+- Ele lê o resumo (sequência de dias, minutos de latim e violino, capítulo, vocabulário a revisar, banco) e pode anotar um estudo feito ou pôr um item novo no banco. Não apaga nem altera nada.
+- O que ele anota aparece com "via: jarvis" e pode ser apagado pela tela.
+- Para desligar, apague a variável `JARVIS_TOKEN_SHA256`.
