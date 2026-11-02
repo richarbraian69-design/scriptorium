@@ -369,7 +369,7 @@ textarea.campo{min-height:70px;resize:vertical}
 .captura,.ferr,.forma,.cron{border-color:transparent}
 .saudacao{font-family:var(--f-serif);font-weight:400;font-size:clamp(2rem,3.4vw,2.75rem);letter-spacing:-.01em;line-height:1.05}
 .saudacao em{font-style:normal;font-size:1em}
-.lit{margin:6px 0 0;display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--tx2)}
+.lit{margin:0;display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--tx2)}
 .lit i{width:9px;height:9px;border-radius:50%;background:var(--ac)}
 .rot{font-size:.95rem;font-weight:600;letter-spacing:0;text-transform:none;color:var(--tx)}
 .rot .n{margin-left:8px;font-size:.75rem;font-weight:500;color:var(--tx2);background:var(--sup-2);padding:1px 8px;border-radius:999px}
@@ -400,7 +400,10 @@ textarea.campo{min-height:70px;resize:vertical}
 .banner{border:0;min-height:130px;padding:20px clamp(20px,3vw,30px);--banner:var(--painel);--banner-tx:var(--tx);--banner-tx2:var(--tx2);box-shadow:0 1px 2px rgba(20,20,18,.05)}
 .banner blockquote{font-size:clamp(1.25rem,2vw,1.5rem)}
 .banner .trad{color:var(--tx)}
-.banner .btn{background:var(--ac);color:var(--ac-sobre)}
+.banner .btn{background:var(--ac);color:var(--ac-sobre);margin-top:0}
+.banner .acoes{margin-top:6px}
+.banner .seg{background:var(--sup)}
+.banner .seg button{padding:4px 10px;font-size:.82rem}
 .banner-prog{background:var(--sup-2)}
 .banner-prog i{background:var(--ac)}
 .banner-arte{width:min(34%,240px);bottom:-18px;right:24px}
@@ -520,7 +523,7 @@ body.em-sala{overflow:hidden}
   </aside>
   <main class="principal">
     <div class="topo">
-      <div><h1 class="saudacao" id="saudacao">Bom dia, <em>Richar</em></h1><p class="lit" id="lit"></p></div>
+      <p class="lit" id="lit"></p>
       <div class="topo-dir">
         <span class="data-hoje" id="data-hoje"></span>
         <button class="btn btn-escuro" data-act="anotar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Anotar estudo</button>
@@ -858,8 +861,7 @@ document.addEventListener('focusout',function(){ setTimeout(function(){ if(S.ren
 function carregado(){ var o=S.ok; return o.banco&&o.sess&&o.vocab&&o.arqs&&o.lat&&o.vio&&o.ger; }
 function render(){
   aplicarCor();
-  var h=new Date().getHours(), d=new Date();
-  document.getElementById('saudacao').innerHTML=(h<12?'Bom dia':h<18?'Boa tarde':'Boa noite')+', <em>Richar</em>';
+  var d=new Date();
   document.getElementById('data-hoje').textContent=DIAS[d.getDay()]+', '+d.getDate()+' '+MESES[d.getMonth()];
   renderNav();
   var v=document.getElementById('vista');
@@ -883,10 +885,11 @@ function renderNav(){
 
 /* Banner */
 var bannerTimer=null, citIdx=Math.floor(Math.random()*CITACOES.length);
-function citHtml(c){ return '<blockquote lang="la">'+esc(c[0])+'</blockquote><p class="trad">'+esc(c[1])+'</p><p class="autor">'+esc(c[2])+'</p>'; }
+function frasesEmLatim(){ return ger().frases==='la'; }
+function citHtml(c){ return frasesEmLatim() ? '<blockquote lang="la">'+esc(c[0])+'</blockquote><p class="autor">'+esc(c[2])+'</p>' : '<blockquote>'+esc(c[1])+'</blockquote><p class="autor">'+esc(c[2])+'</p>'; }
 function htmlBanner(){
   return '<section class="banner" aria-label="Sentença do dia"><div class="banner-texto"><div class="cit" id="cit">'+citHtml(CITACOES[citIdx%CITACOES.length])+'</div>'+
-    '<button class="btn btn-p" data-act="anotar">Anotar algo para estudar</button></div><div class="banner-arte" aria-hidden="true">'+estante({dias:ultimos12(),label:''})+'</div><div class="banner-prog"><i id="prog"></i></div></section>';
+    '<div class="acoes"><button class="btn btn-p" data-act="anotar">Anotar algo para estudar</button><div class="seg" role="group" aria-label="Idioma das frases"><button data-act="frases" data-f="pt" aria-pressed="'+!frasesEmLatim()+'">Português</button><button data-act="frases" data-f="la" aria-pressed="'+frasesEmLatim()+'">Latim</button></div></div></div><div class="banner-arte" aria-hidden="true">'+estante({dias:ultimos12(),label:''})+'</div><div class="banner-prog"><i id="prog"></i></div></section>';
 }
 function iniciarBanner(){
   clearInterval(bannerTimer);
@@ -1552,6 +1555,7 @@ document.addEventListener('click',function(ev){
     case 'cor': var Gc=ger(); Gc.corApp=Gc.corApp==='ouro'?'lit':'ouro'; S.ger=Gc; salvarGer(); render(); break;
     case 'sair': api('POST','/api/sair').then(function(){ location.href='/'; }, function(){ location.href='/'; }); break;
     case 'anotar': if(S.view!=='hoje' && S.view!=='banco') ir('banco'); var c=document.querySelector('[data-form=captura] input'); if(c){ c.scrollIntoView({block:'center',behavior:'smooth'}); c.focus(); } break;
+    case 'frases': var Gf=ger(); Gf.frases=el.dataset.f; S.ger=Gf; salvarGer(); render(); break;
     case 'areas': S.modal={tipo:'areas'}; renderModal(); break;
     case 'area-apagar': apagarArea(el.dataset.id); break;
     case 'f-arq-area': S.fArqArea=el.dataset.a; render(); break;

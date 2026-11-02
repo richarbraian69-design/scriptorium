@@ -167,7 +167,7 @@ function pagina() { return CABECA + fs.readFileSync(path.join(__dirname, 'public
 const PAGINA = pagina();
 app.get('/', (req, res) => { res.set('Cache-Control', 'no-cache'); res.type('html').send(PAGINA); });
 app.get('/manifest.webmanifest', (req, res) => res.type('application/manifest+json').send(JSON.stringify({
-  name: 'Scriptorium', short_name: 'Scriptorium', start_url: '/', display: 'standalone', background_color: '#f7f7f5', theme_color: '#f7f7f5', lang: 'pt-BR',
+  name: 'Scriptorium', short_name: 'Scriptorium', start_url: '/', display: 'standalone', background_color: '#0f0f0e', theme_color: '#0f0f0e', lang: 'pt-BR',
   icons: [{ src: '/icone-192.png', sizes: '192x192', type: 'image/png' }, { src: '/icone-512.png', sizes: '512x512', type: 'image/png' }, { src: '/icone-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }]
 })));
 app.use(express.static(path.join(__dirname, 'publico'), { index: false, maxAge: '7d' }));
