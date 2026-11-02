@@ -8,20 +8,23 @@ const express = require('express');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const { pipeline } = require('stream');
 
 const PORTA = process.env.PORT || 3000;
 function discoEm(p) { try { return fs.statSync(p).isDirectory() && fs.statSync(p).dev !== fs.statSync(__dirname).dev; } catch (e) { return false; } }
 const DADOS = path.resolve(process.env.SCRIPTORIUM_DADOS || process.env.RAILWAY_VOLUME_MOUNT_PATH || (discoEm('/data') ? '/data' : path.join(__dirname, 'dados')));
 const ARQ = path.join(DADOS, 'scriptorium.json');
 const BACKUPS = path.join(DADOS, 'backups');
+const ARQUIVOS = path.join(DADOS, 'arquivos');
 const FUSO = process.env.FUSO || 'America/Sao_Paulo';
-const COLECOES = new Set(['banco', 'sessoes', 'vocab', 'estado']);
+const COLECOES = new Set(['banco', 'sessoes', 'vocab', 'estado', 'arquivos']);
 const SEG = /^[A-Za-z0-9_\-.~:@+]{1,120}$/;
 const DIAS_SESSAO = 90;
 const COPIAS = 30;
 
 /* ---------- Armazenamento ---------- */
 fs.mkdirSync(BACKUPS, { recursive: true });
+fs.mkdirSync(ARQUIVOS, { recursive: true });
 let db = { usuarios: [], sessoes: {}, docs: {}, apagados: {}, seq: 0 };
 if (fs.existsSync(ARQ)) {
   try { db = Object.assign(db, JSON.parse(fs.readFileSync(ARQ, 'utf8'))); }
@@ -189,6 +192,7 @@ app.get('/diagnostico', (req, res) => {
     'Dados criados em ....... ' + (db.criadoEm || '—'),
     'Contas ................. ' + db.usuarios.length,
     'Registros guardados .... ' + Object.keys(db.docs).length,
+    'Arquivos de estudo ..... ' + (() => { const e = espacoArquivos(); return e.qtd + ' (' + (e.usado / 1048576).toFixed(1) + ' MB)' + (e.total ? ', ' + (e.livre / 1048576).toFixed(0) + ' MB livres de ' + (e.total / 1048576).toFixed(0) + ' MB' : ''); })(),
     'Cópias de segurança .... ' + (backups.length ? backups.length + ' (última: ' + backups[backups.length - 1] + ')' : 'nenhuma ainda'),
     'Servidor ligado em ..... ' + INICIADO.toISOString()
   ].join('\n'));
@@ -199,6 +203,58 @@ app.use('/api', (req, res, next) => { res.set('Cache-Control', 'no-store'); if (
 function exigir(req, res, next) { const u = usuarioDe(req); if (!u) return res.status(401).json({ erro: 'Sua sessão terminou. Entre de novo.' }); req.u = u; next(); }
 function exigirAdmin(req, res, next) { if (!req.u.admin) return res.status(403).json({ erro: 'Só o administrador pode fazer isso.' }); next(); }
 const rota = fn => (req, res) => Promise.resolve().then(() => fn(req, res)).catch(e => { if (!(e instanceof Erro)) console.error(e); res.status(e.status || 500).json({ erro: e instanceof Erro ? e.message : 'Erro no servidor.' }); });
+
+/* Arquivos de estudo: ficam em /data/arquivos, e a ficha de cada um em docs (coleção arquivos).
+ * Só abrem na tela os formatos que o navegador mostra sem risco; o resto é baixado. */
+const TIPO_NA_TELA = /^(application\/pdf|image\/(png|jpeg|gif|webp)|audio\/[\w.+-]+|video\/[\w.+-]+)$/;
+const MAX_ARQUIVO = 2 * 1024 * 1024 * 1024;
+function espacoArquivos() {
+  let usado = 0, qtd = 0;
+  for (const p in db.docs) if (p.startsWith('arquivos/')) { usado += Number(db.docs[p].d.tam) || 0; qtd++; }
+  let total = 0, livre = 0;
+  try { const st = fs.statfsSync(DADOS); total = st.blocks * st.bsize; livre = st.bavail * st.bsize; } catch (e) {}
+  return { usado, qtd, total, livre };
+}
+function apagarArquivoDoDisco(id) { try { fs.unlinkSync(path.join(ARQUIVOS, id)); } catch (e) {} }
+app.get('/api/arquivos/espaco', exigir, (req, res) => res.json(espacoArquivos()));
+app.post('/api/arquivos', exigir, (req, res) => {
+  const tam = parseInt(req.get('Content-Length'), 10);
+  if (!(tam > 0)) return res.status(411).json({ erro: 'Arquivo vazio.' });
+  if (tam > MAX_ARQUIVO) return res.status(413).json({ erro: 'Esse arquivo passa de 2 GB.' });
+  const esp = espacoArquivos();
+  if (esp.total && tam + 10485760 > esp.livre) return res.status(507).json({ erro: 'Não há espaço no disco para esse arquivo.' });
+  let nome = 'arquivo', meta = {};
+  try { nome = decodeURIComponent(req.get('X-Nome') || 'arquivo'); } catch (e) {}
+  try { meta = JSON.parse(decodeURIComponent(req.get('X-Meta') || '%7B%7D')) || {}; } catch (e) {}
+  nome = nome.replace(/[\u0000-\u001f\\/]/g, ' ').trim().slice(0, 200) || 'arquivo';
+  const id = novoId('a'), tmp = path.join(ARQUIVOS, id + '.parte'), saida = fs.createWriteStream(tmp);
+  pipeline(req, saida, err => {
+    if (err || saida.bytesWritten !== tam) {
+      fs.unlink(tmp, () => {});
+      const semEspaco = err && err.code === 'ENOSPC';
+      if (!res.headersSent) res.status(semEspaco ? 507 : 400).json({ erro: semEspaco ? 'Não há espaço no disco para esse arquivo.' : 'O envio foi interrompido. Tente de novo.' });
+      return;
+    }
+    fs.renameSync(tmp, path.join(ARQUIVOS, id));
+    const doc = { nome, tipo: String(req.get('Content-Type') || '').split(';')[0].trim().slice(0, 100), tam, criado: hojeNoFuso(), area: String(meta.area || '').slice(0, 60), item: String(meta.item || '').slice(0, 120), notas: '' };
+    escrever(caminho('arquivos', id), doc, req.u.id);
+    res.json({ id, doc });
+  });
+});
+app.get('/api/arquivos/:id', exigir, (req, res) => {
+  if (!SEG.test(req.params.id)) return res.status(404).type('text').send('Arquivo não encontrado.');
+  const reg = db.docs['arquivos/' + req.params.id], arq = path.join(ARQUIVOS, req.params.id);
+  if (!reg || !fs.existsSync(arq)) return res.status(404).type('text').send('Arquivo não encontrado.');
+  const tipo = String(reg.d.tipo || ''), texto = /^text\//.test(tipo) || /\.(txt|md)$/i.test(reg.d.nome || ''), naTela = !req.query.baixar && (TIPO_NA_TELA.test(tipo) || texto);
+  res.set({ 'Cache-Control': 'private, max-age=86400', 'X-Frame-Options': 'SAMEORIGIN', 'Content-Disposition': (naTela ? 'inline' : 'attachment') + "; filename*=UTF-8''" + encodeURIComponent(reg.d.nome || 'arquivo') });
+  res.set('Content-Type', !naTela ? 'application/octet-stream' : texto ? 'text/plain; charset=utf-8' : tipo);
+  res.sendFile(req.params.id, { root: ARQUIVOS, cacheControl: false }, err => { if (err && !res.headersSent) res.status(err.status || 500).end(); });
+});
+app.delete('/api/arquivos/:id', exigir, rota((req, res) => {
+  const p = caminho('arquivos', req.params.id);
+  apagarArquivoDoDisco(req.params.id);
+  res.json({ seq: db.docs[p] ? escrever(p, null, req.u.id) : db.seq });
+}));
 
 app.use('/api', express.json({ limit: '8mb' }));
 
@@ -280,6 +336,7 @@ app.patch('/api/doc/:col/:id', exigir, rota((req, res) => {
 }));
 app.delete('/api/doc/:col/:id', exigir, rota((req, res) => {
   const p = caminho(req.params.col, req.params.id);
+  if (req.params.col === 'arquivos') apagarArquivoDoDisco(req.params.id);
   res.json({ seq: db.docs[p] ? escrever(p, null, req.u.id) : db.seq });
 }));
 
@@ -323,7 +380,10 @@ function exigirJarvis(req, res, next) {
 }
 const CAPS = ['Imperium Romanum', 'Familia Romana', 'Puer improbus', 'Dominus et servi', 'Villa et hortus', 'Via Latina', 'Puella et rosa', 'Taberna Romana', 'Pastor et oves', 'Bestiae et homines', 'Corpus humanum', 'Miles Romanus', 'Annus et menses', 'Novus dies', 'Magister et discipuli', 'Tempestas', 'Numeri difficiles', 'Litterae Latinae', 'Maritus et uxor', 'Parentes', 'Pugna discipulorum', 'Cave canem', 'Epistula magistri', 'Puer aegrotus', 'Theseus et Minotaurus', 'Daedalus et Icarus', 'Res rusticae', 'Pericula maris', 'Navigare necesse est', 'Convivium', 'Inter pocula', 'Classis Romana', 'Exercitus Romanus', 'De arte poetica', 'Ars grammatica'];
 const PARTES = [['l1', 'Lectio I'], ['l2', 'Lectio II'], ['l3', 'Lectio III'], ['gram', 'Grammatica Latina'], ['pa', 'Pensum A'], ['pb', 'Pensum B'], ['pc', 'Pensum C']];
-const AREAS = ['trabalho', 'intelectual', 'religioso', 'outros'], TIPOS = ['video', 'livro', 'artigo', 'curso', 'tema', 'outro'];
+const AREAS = ['trabalho', 'intelectual', 'religioso', 'outros'];
+function areasValidas() { const a = (docDe('estado/geral') || {}).areas; return Array.isArray(a) && a.length ? a.map(x => x.id) : AREAS; }
+function areaPadrao() { const l = areasValidas(); return l.includes('intelectual') ? 'intelectual' : l[0]; }
+const TIPOS = ['video', 'livro', 'artigo', 'curso', 'tema', 'outro'];
 function somaDias(iso, n) { const [y, m, d] = iso.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10); }
 function segundaDe(iso) { const [y, m, d] = iso.split('-').map(Number); return somaDias(iso, -((new Date(Date.UTC(y, m - 1, d)).getUTCDay() + 6) % 7)); }
 function colecao(col) { const l = []; for (const p in db.docs) if (p.startsWith(col + '/')) l.push(Object.assign({}, db.docs[p].d, { id: p.slice(col.length + 1) })); return l; }
@@ -376,7 +436,7 @@ jarvis.post('/banco', rota((req, res) => {
   if (!titulo && !link) throw new Erro('Diga o título ou o link do estudo.');
   if (link && !/^https?:\/\//.test(link)) throw new Erro('O link precisa começar com http.');
   const tipo = TIPOS.includes(b.tipo) ? b.tipo : /youtu\.?be|vimeo|instagram|tiktok/.test(link) ? 'video' : link ? 'artigo' : 'tema';
-  const item = { titulo, link, area: AREAS.includes(b.area) ? b.area : 'intelectual', tipo, prioridade: ['alta', 'media', 'baixa'].includes(b.prioridade) ? b.prioridade : 'media',
+  const item = { titulo, link, area: areasValidas().includes(b.area) ? b.area : areaPadrao(), tipo, prioridade: ['alta', 'media', 'baixa'].includes(b.prioridade) ? b.prioridade : 'media',
     status: 'fila', notas: '', semana: false, criado: hojeNoFuso(), via: 'jarvis' };
   escrever(caminho('banco', novoId('j')), item, 'jarvis');
   res.json({ ok: true, item });

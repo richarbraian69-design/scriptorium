@@ -243,7 +243,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .check{display:grid;gap:0}
 .ck{display:flex;align-items:center;gap:12px;padding:8px 0;border-top:1px solid var(--linha);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;width:100%}
 .ck:first-child{border-top:0}
-.ck span{flex:1}
+.ck > span:not(.circ){flex:1}
 .ck small{color:var(--tx3);font-size:.8rem}
 .circ{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--tx3);display:grid;place-items:center;color:transparent;flex:none}
 .circ svg{width:12px;height:12px}
@@ -337,7 +337,7 @@ textarea.campo{min-height:70px;resize:vertical}
   .ex .spark-c{display:none}
 }
 /* ===== Visual 2 (igual ao Ora et Labora): cor do tempo litúrgico, menos bordas, mais espaço ===== */
-:root{--ac:#9C7412;--ac-tx:#86620C;--ac-suave:rgba(156,116,18,.12);--ac-sobre:#FFFFFF}
+:root{--ac:#9C7412;--ac-tx:#86620C;--ac-suave:rgba(156,116,18,.12);--ac-sobre:#FFFFFF;--lv-estudo:#5f7f8f}
 :root[data-lit="ouro"],:root[data-lit="branco"]{--ac:#9C7412;--ac-tx:#86620C;--ac-suave:rgba(156,116,18,.12);--ac-sobre:#FFFFFF}
 :root[data-lit="verde"]{--ac:#2F7A4B;--ac-tx:#2A6E43;--ac-suave:rgba(47,122,75,.12);--ac-sobre:#FFFFFF}
 :root[data-lit="roxo"]{--ac:#6B46A8;--ac-tx:#5E3D96;--ac-suave:rgba(107,70,168,.12);--ac-sobre:#FFFFFF}
@@ -425,6 +425,82 @@ textarea.campo{min-height:70px;resize:vertical}
 .ent-aviso{margin:0;padding:10px 12px;border-radius:10px;background:var(--aviso-bg);color:var(--aviso);font-size:.86rem;text-align:left}
 .ent-cit{margin:6px 0 0;color:var(--tx3);font-size:.86rem}
 .ent-cit em{font-family:var(--f-serif);font-size:1.1em;color:var(--tx2)}
+/* Tipos de estudo */
+.tipos-lista{display:grid;gap:8px}
+.tipo-linha{display:grid;grid-template-columns:34px minmax(0,1fr) auto auto;gap:8px;align-items:center}
+.tipo-linha input[type=color]{width:34px;height:34px;padding:2px;border:1px solid var(--linha);border-radius:9px;background:var(--painel);cursor:pointer}
+.tipo-n{font-size:.8rem;color:var(--tx3);white-space:nowrap;font-variant-numeric:tabular-nums}
+.chip.novo{border-style:dashed;color:var(--tx2);background:transparent}
+
+/* Biblioteca */
+.zona-envio{display:grid;justify-items:center;gap:6px;padding:22px 16px;border:1.5px dashed var(--tx3);border-radius:14px;text-align:center;color:var(--tx2);font-size:.92rem;cursor:pointer;background:transparent}
+.zona-envio:hover,.zona-envio.sobre{border-color:var(--ac);color:var(--tx);background:var(--ac-suave)}
+.zona-envio b{color:var(--tx);font-weight:500}
+.zona-envio small{color:var(--tx3)}
+.oculto-arq{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.envios{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:35;width:min(320px,calc(100vw - 32px));display:grid;gap:8px;background:var(--painel);border-radius:14px;box-shadow:var(--sombra);padding:12px 14px}
+.envios[hidden]{display:none}
+.envio{display:grid;gap:4px;font-size:.84rem}
+.envio span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.envio small{color:var(--tx2)}
+
+/* Sala de estudo */
+body.em-sala{overflow:hidden}
+.sala{position:fixed;inset:0;z-index:25;background:var(--bg);display:grid;grid-template-rows:auto minmax(0,1fr);box-shadow:inset 0 3px 0 var(--ac);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.sala[hidden]{display:none}
+.sala-topo{display:flex;align-items:center;gap:10px;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(12px,env(safe-area-inset-left,0px));min-width:0}
+.sala-tit{min-width:0;flex:1;display:grid}
+.sala-tit b{font-family:var(--f-serif);font-weight:400;font-size:1.3rem;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sala-tit small{font-size:.8rem;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sala-tempo{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ac-tx);white-space:nowrap}
+.sala-corpo{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:12px;padding:0 max(12px,env(safe-area-inset-right,0px)) 12px max(12px,env(safe-area-inset-left,0px))}
+.sala-visor{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);background:var(--painel);border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(20,20,18,.05)}
+.sala-abas{grid-row:1;display:flex;gap:4px;overflow-x:auto;padding:8px 10px 0}
+.sala-abas:empty{display:none}
+.sala-abas button{border:0;background:transparent;border-radius:8px;padding:5px 10px;font-size:.84rem;color:var(--tx2);cursor:pointer;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.sala-abas button[aria-pressed="true"]{background:var(--ac-suave);color:var(--ac-tx);font-weight:600}
+.sala-area{grid-row:2;min-width:0;min-height:0;position:relative;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+.sala-area iframe,.sala-area video{width:100%;height:100%;border:0;display:block;background:#000}
+.sala-area iframe.doc{background:#fff}
+.sala-area img{width:100%;height:100%;object-fit:contain}
+.sala-area audio{width:calc(100% - 32px);align-self:center;justify-self:center}
+.sala-aviso{align-self:center;justify-self:center;display:grid;justify-items:center;gap:12px;text-align:center;padding:32px 20px;max-width:440px;color:var(--tx2)}
+.sala-aviso h3{margin:0;font-family:var(--f-serif);font-weight:400;font-size:1.6rem;line-height:1.1;color:var(--tx)}
+.sala-aviso p{margin:0}
+.sala-lado{min-height:0;overflow-y:auto;display:grid;gap:14px;align-content:start;padding:2px}
+.sala-bloco{background:var(--painel);border-radius:16px;padding:14px 16px;display:grid;gap:10px;box-shadow:0 1px 2px rgba(20,20,18,.05)}
+.sala-bloco h4{margin:0;font-weight:600;font-size:.92rem}
+.sala-bloco textarea{min-height:150px}
+.sala-bloco .check .ck{padding:6px 0;font-size:.9rem}
+.ir-chips{display:flex;flex-wrap:wrap;gap:6px}
+.salvo{font-size:.76rem;color:var(--tx3)}
+@media (max-width:600px){
+  .sala-topo{flex-wrap:wrap}
+  .sala-tit{flex:1 1 calc(100% - 46px)}
+  .sala-tempo{margin-right:auto;margin-left:40px}
+}
+@media (max-width:900px){
+  .sala-corpo{grid-template-columns:minmax(0,1fr);grid-template-rows:none;overflow-y:auto;align-content:start}
+  .sala-visor{height:68dvh}
+  .sala-lado{overflow:visible}
+}
+
+/* Leitor de PDF */
+.leitor{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);position:relative}
+.leitor-barra{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;padding:8px 10px}
+.leitor-barra .campo{width:56px;padding:4px 6px;text-align:center;font-variant-numeric:tabular-nums;font-size:.88rem}
+.leitor-barra .de{font-size:.84rem;color:var(--tx2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.leitor-barra .esp{flex:1}
+.leitor-rolo{overflow:auto;background:var(--sup);padding:10px;-webkit-overflow-scrolling:touch}
+.leitor-folha{position:relative;margin:0 auto;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.leitor-folha canvas{display:block}
+.textLayer{position:absolute;inset:0;overflow:hidden;line-height:1;text-size-adjust:none;forced-color-adjust:none;transform-origin:0 0;z-index:2}
+.textLayer span,.textLayer br{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0% 0%}
+.textLayer ::selection{background:rgba(217,162,27,.4);color:transparent}
+.leitor-sum{position:absolute;left:10px;top:48px;z-index:6;width:min(320px,calc(100% - 20px));max-height:calc(100% - 60px);overflow:auto;background:var(--painel);border-radius:12px;box-shadow:var(--sombra);padding:6px;display:grid;gap:1px}
+.leitor-sum button{border:0;background:transparent;text-align:left;padding:6px 10px;border-radius:8px;font-size:.88rem;color:var(--tx);cursor:pointer}
+.leitor-sum button:hover{background:var(--sup)}
+.leitor-sum button.sub{padding-left:24px;color:var(--tx2);font-size:.82rem}
 </style>
 
 <div class="entrada" id="entrada" hidden></div>
@@ -453,6 +529,20 @@ textarea.campo{min-height:70px;resize:vertical}
     <div id="vista"></div>
   </main>
 </div>
+<div class="sala" id="sala" hidden>
+  <header class="sala-topo">
+    <button class="icone-btn" data-act="sala-encerrar" aria-label="Encerrar o estudo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="sala-tit"><b id="sala-titulo"></b><small id="sala-sub"></small></div>
+    <span class="sala-tempo" id="sala-tempo" aria-live="off">0:00</span>
+    <button class="btn btn-claro btn-p" data-act="sala-pausa" id="sala-pausa">Pausar</button>
+    <button class="btn btn-escuro btn-p" data-act="sala-encerrar">Encerrar</button>
+  </header>
+  <div class="sala-corpo">
+    <section class="sala-visor"><div class="sala-abas" id="sala-abas"></div><div class="sala-area" id="sala-area"></div></section>
+    <aside class="sala-lado" id="sala-lado"></aside>
+  </div>
+</div>
+<div class="envios" id="envios" hidden></div>
 <div id="camada"></div>
 
 <script>
@@ -481,7 +571,8 @@ var CITACOES = [
 var CAPS = ['Imperium Romanum','Familia Romana','Puer improbus','Dominus et servi','Villa et hortus','Via Latina','Puella et rosa','Taberna Romana','Pastor et oves','Bestiae et homines','Corpus humanum','Miles Romanus','Annus et menses','Novus dies','Magister et discipuli','Tempestas','Numeri difficiles','Litterae Latinae','Maritus et uxor','Parentes','Pugna discipulorum','Cave canem','Epistula magistri','Puer aegrotus','Theseus et Minotaurus','Daedalus et Icarus','Res rusticae','Pericula maris','Navigare necesse est','Convivium','Inter pocula','Classis Romana','Exercitus Romanus','De arte poetica','Ars grammatica'];
 var PARTES = [['l1','Lectio I'],['l2','Lectio II'],['l3','Lectio III'],['gram','Grammatica Latina'],['pa','Pensum A'],['pb','Pensum B'],['pc','Pensum C']];
 var EXTRAS = [['rel','Releitura'],['voc','Vocabulário']];
-var AREAS = {trabalho:['Trabalho','#3d6a99'],intelectual:['Intelectual','#6b5797'],religioso:['Religioso','#9a6b12'],outros:['Outros','#6d6c67']};
+var AREAS_PADRAO = [{id:'trabalho',nome:'Trabalho',cor:'#3d6a99'},{id:'intelectual',nome:'Intelectual',cor:'#6b5797'},{id:'religioso',nome:'Religioso',cor:'#9a6b12'},{id:'outros',nome:'Outros',cor:'#6d6c67'}];
+var CORES_NOVAS = ['#2f7a4b','#b3322a','#b04f7e','#1f7a8c','#c2701c','#4a5fb0','#7a8b2a','#8c5a3c'];
 var TIPOS = {video:'Vídeo',livro:'Livro',artigo:'Artigo',curso:'Curso',tema:'Tema',outro:'Outro'};
 var PRIOR = {alta:'Alta',media:'Média',baixa:'Baixa'};
 var STATUS = {fila:'Na fila',estudando:'Estudando',concluido:'Concluído',arquivado:'Arquivado'};
@@ -514,6 +605,10 @@ var I = {
   banco:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M4 4h5v16H4zM10 4h4v16h-4zM15.5 5.2l3.9-1 3.6 14.6-3.9 1z"/></svg>',
   latim:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.5C5.5 4 9 4 12 6c3-2 6.5-2 9-.5V19c-2.5-1.5-6-1.5-9 .5-3-2-6.5-2-9-.5z"/><path d="M12 6v13.5"/></svg>',
   violino:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 9.5c-2-.6-4.4.4-5.4 2.4-1.3 2.6.3 4.1-.6 5.5-.8 1.3.1 2.9 1.8 2.5 1.5-.3 2.9.4 5.2-.7 2.1-1 3-3.4 2.4-5.4"/><path d="M8 16l11-11M17 3l4 4M10.5 13.5l-2-2"/></svg>',
+  arquivos:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+  audio:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg>',
+  imagem:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>',
+  ler:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.5C5.5 4 9 4 12 6c3-2 6.5-2 9-.5V19c-2.5-1.5-6-1.5-9 .5-3-2-6.5-2-9-.5z"/><path d="M12 6v13.5"/></svg>',
   x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>',
   estrela:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>',
@@ -529,12 +624,13 @@ var I = {
   tema:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/></svg>',
   outro:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg>'
 };
-var VISTAS = [['hoje','Hoje','hoje'],['banco','Banco de estudos','banco'],['latim','Latim','latim'],['violino','Violino','violino']];
+var SERVIDOR = !!window.SCRIPTORIUM_SERVIDOR;
+var VISTAS = [['hoje','Hoje','hoje'],['banco','Banco de estudos','banco']].concat(SERVIDOR?[['arquivos','Arquivos','arquivos']]:[]).concat([['latim','Latim','latim'],['violino','Violino','violino']]);
 
 /* ---------- Estado ---------- */
 var S = {
-  db:null, semDb:false, ok:{banco:false,sess:false,vocab:false,lat:false,vio:false,ger:false},
-  banco:[], sess:[], vocab:[], lat:null, vio:null, ger:null,
+  db:null, semDb:false, ok:{banco:false,sess:false,vocab:false,arqs:false,lat:false,vio:false,ger:false},
+  banco:[], sess:[], vocab:[], arqs:[], fArqArea:'', espaco:null, lat:null, vio:null, ger:null,
   view:'hoje', fStatus:'fila', fArea:'', busca:'', buscaVoc:'', capVer:null,
   area:lsGet('scr-area')||'intelectual', modal:null, rev:null, confirmar:null, renderPendente:false
 };
@@ -543,6 +639,11 @@ function lat(){ return S.lat || {atual:1, feitos:{}}; }
 function vio(){ return S.vio || {exercicios:[]}; }
 function ger(){ return S.ger || {metaLatim:5, metaViolino:5}; }
 function meta(p){ return (p==='latim'?ger().metaLatim:ger().metaViolino) || 5; }
+function listaAreas(){ var a=ger().areas; return a&&a.length ? a : AREAS_PADRAO; }
+function area(id){ return listaAreas().filter(function(a){ return a.id===id; })[0] || {id:id,nome:'Sem tipo',cor:'#a3a29c'}; }
+function areaSel(){ var l=listaAreas(); return l.some(function(a){ return a.id===S.area; }) ? S.area : l[0].id; }
+function areasObj(){ var o={}; listaAreas().forEach(function(a){ o[a.id]=[a.nome,a.cor]; }); return o; }
+function salvarAreas(l){ var G=ger(); G.areas=l; S.ger=G; salvarGer(); }
 
 /* ---------- Isometria: a estante ---------- */
 function estante(opts){
@@ -588,9 +689,9 @@ function minutosHoje(p){ return soma(S.sess.filter(function(s){ return s.pratica
 function ultimos12(){
   var out=[], h=hoje();
   for(var i=11;i>=0;i--){
-    var d=somaDias(h,-i), l=false, v=false;
-    S.sess.forEach(function(s){ if(s.data===d){ if(s.pratica==='latim') l=true; else if(s.pratica==='violino') v=true; } });
-    out.push(l&&v?'ambos':l?'latim':v?'violino':null);
+    var d=somaDias(h,-i), l=false, v=false, o=false;
+    S.sess.forEach(function(s){ if(s.data===d){ if(s.pratica==='latim') l=true; else if(s.pratica==='violino') v=true; else o=true; } });
+    out.push(l&&v?'ambos':l?'latim':v?'violino':o?'estudo':null);
   }
   return out;
 }
@@ -637,6 +738,7 @@ function conectar(db){
   db.collection('banco').onSnapshot(function(s){ S.banco=lista(s); S.ok.banco=true; pedirRender(); }, erroLer);
   db.collection('sessoes').where('data','>=',somaDias(hoje(),-400)).onSnapshot(function(s){ S.sess=lista(s).map(function(x){ x.minutos=Number(x.minutos)||0; return x; }); S.ok.sess=true; pedirRender(); }, erroLer);
   db.collection('vocab').onSnapshot(function(s){ S.vocab=lista(s); S.ok.vocab=true; pedirRender(); }, erroLer);
+  db.collection('arquivos').onSnapshot(function(s){ S.arqs=lista(s); S.ok.arqs=true; pedirRender(); }, erroLer);
   [['lat','estado/latim'],['vio','estado/violino'],['ger','estado/geral']].forEach(function(p){
     db.doc(p[1]).onSnapshot(function(s){ S[p[0]] = s.exists ? JSON.parse(JSON.stringify(s.data())) : null; S.ok[p[0]]=true; pedirRender(); }, erroLer);
   });
@@ -748,12 +850,12 @@ function aplicarCor(){
 /* ---------- Render ---------- */
 function pedirRender(){
   var a=document.activeElement;
-  if(a && a.closest && a.closest('#vista,#camada') && /INPUT|TEXTAREA|SELECT/.test(a.tagName) && a.type!=='checkbox' && a.type!=='radio'){ S.renderPendente=true; return; }
+  if(a && a.closest && a.closest('#vista,#camada,#sala-lado') && /INPUT|TEXTAREA|SELECT/.test(a.tagName) && a.type!=='checkbox' && a.type!=='radio'){ S.renderPendente=true; return; }
   render();
 }
 document.addEventListener('focusout',function(){ setTimeout(function(){ if(S.renderPendente){ var a=document.activeElement; if(!(a && /INPUT|TEXTAREA|SELECT/.test(a.tagName))){ S.renderPendente=false; render(); } } },0); });
 
-function carregado(){ var o=S.ok; return o.banco&&o.sess&&o.vocab&&o.lat&&o.vio&&o.ger; }
+function carregado(){ var o=S.ok; return o.banco&&o.sess&&o.vocab&&o.arqs&&o.lat&&o.vio&&o.ger; }
 function render(){
   aplicarCor();
   var h=new Date().getHours(), d=new Date();
@@ -762,17 +864,20 @@ function render(){
   renderNav();
   var v=document.getElementById('vista');
   if(!S.semDb && !carregado()){ v.innerHTML='<div class="carregando">'+estante({dias:[],label:'Estante vazia'})+'<p>Abrindo o scriptorium…</p></div>'; return; }
-  var fn={hoje:vHoje,banco:vBanco,latim:vLatim,violino:vViolino}[S.view]||vHoje;
+  var fn={hoje:vHoje,banco:vBanco,arquivos:vArquivos,latim:vLatim,violino:vViolino}[S.view]||vHoje;
   v.innerHTML=(S.semDb?'<div class="faixa" style="max-width:1160px;margin:0 auto 18px"><span>Este painel guarda seus estudos no Claude. Abra o Scriptorium pelo link do artifact, dentro do Claude, para salvar.</span></div>':'')+fn();
   if(S.view==='hoje') iniciarBanner();
+  if(SALA) renderSalaLado();
+  if(!S.modal) document.getElementById('camada').innerHTML='';
 }
 function renderNav(){
   var venc=vocabVencido().length, semana=daSemana().length;
   document.getElementById('nav').innerHTML=VISTAS.map(function(v,i){
     var q='';
     if(v[0]==='banco') q='<span class="qtd">'+filaAtiva().length+'</span>';
+    if(v[0]==='arquivos') q='<span class="qtd">'+S.arqs.length+'</span>';
     if(v[0]==='latim' && venc) q='<span class="qtd rubro">'+venc+'</span>';
-    return (i===2?'<p class="nav-rotulo">Práticas diárias</p>':'')+'<button data-act="ver" data-v="'+v[0]+'" aria-current="'+(S.view===v[0])+'">'+I[v[2]]+'<span>'+v[1]+'</span>'+q+'</button>';
+    return (v[0]==='latim'?'<p class="nav-rotulo">Práticas diárias</p>':'')+'<button data-act="ver" data-v="'+v[0]+'" aria-current="'+(S.view===v[0])+'">'+I[v[2]]+'<span>'+v[1]+'</span>'+q+'</button>';
   }).join('');
 }
 
@@ -802,12 +907,12 @@ function vHoje(){
     '<div><b>'+(feitas===2?'Dia completo':feitas===1?'Falta uma prática':'Práticas de hoje')+'</b><span>'+(minutosHoje('latim')+minutosHoje('violino'))+' de '+(meta('latim')+meta('violino'))+' min</span></div></div>';
   var lado='<aside class="lado"><div class="numeros">'+anel+
     '<div class="num"><small>Dias seguidos</small><b>'+seq+'</b><span>'+(seq===1?'dia':'dias')+' com estudo, sem falhar</span></div>'+
-    '<div class="num"><small>Nesta semana</small><b>'+minutosSemana()+' min</b><span>latim '+minutosSemana('latim')+' · violino '+minutosSemana('violino')+'</span></div>'+
+    '<div class="num"><small>Nesta semana</small><b>'+minutosSemana()+' min</b><span>latim '+minutosSemana('latim')+' · violino '+minutosSemana('violino')+(minutosSemana('estudo')?' · outros '+minutosSemana('estudo'):'')+'</span></div>'+
     '<div class="num'+(venc?' rubro':'')+'"><small>Vocabulário</small><b>'+venc+'</b><span>'+(venc===1?'palavra para revisar':'palavras para revisar')+'</span></div>'+
     '<div class="num"><small>Banco de estudos</small><b>'+filaAtiva().length+'</b><span>'+(filaAtiva().length===1?'item na fila':'itens na fila')+'</span></div>'+
   '</div><div class="est-card"><div class="est-topo"><p class="est-tit">A <em>estante</em></p><span class="est-n">'+n12+'/12 dias</span></div>'+
     '<div class="est-arte">'+estante({dias:d12,label:'Estante com '+n12+' livros nos últimos 12 dias'})+'</div>'+
-    '<div class="legenda"><span><i class="ponto" style="--t:var(--lv-latim)"></i>Latim</span><span><i class="ponto" style="--t:var(--lv-violino)"></i>Violino</span><span><i class="ponto" style="--t:var(--lv-ambos)"></i>Os dois</span></div>'+
+    '<div class="legenda"><span><i class="ponto" style="--t:var(--lv-latim)"></i>Latim</span><span><i class="ponto" style="--t:var(--lv-violino)"></i>Violino</span><span><i class="ponto" style="--t:var(--lv-ambos)"></i>Os dois</span><span><i class="ponto" style="--t:var(--lv-estudo)"></i>Outro estudo</span></div>'+
     '<p class="est-txt">Cada livro é um dia dos últimos 12 em que você estudou. Hoje é o último livro da prateleira de baixo.</p></div></aside>';
 
   var semana=daSemana();
@@ -827,6 +932,7 @@ function blocoCron(p){
       '<button class="btn btn-claro btn-p" data-act="cron-pausa">'+(T.rodando?I.pausa+'Pausar':I.play+'Continuar')+'</button>'+
       '<button class="btn btn-claro btn-p" data-act="cron-parar">Encerrar</button></div></div>';
   }
+  if(p==='latim' && SERVIDOR) return '<div class="acoes"><button class="btn btn-escuro" data-act="sala-latim">'+I.ler+'Estudar agora</button><button class="btn btn-claro" data-act="sessao" data-p="latim">Registrar</button></div>';
   return '<div class="acoes"><button class="btn btn-escuro" data-act="cron" data-p="'+p+'">'+I.play+'Começar '+meta(p)+' min</button><button class="btn btn-claro" data-act="sessao" data-p="'+p+'">Registrar</button></div>';
 }
 function cardLatim(){
@@ -860,11 +966,11 @@ function faixaRevisao(){
 }
 function captura(k){
   return '<form class="captura" data-form="captura"><div class="captura-linha"><input class="campo" name="texto" id="cap-'+k+'" autocomplete="off" placeholder="Cole um link ou escreva o que quer estudar" aria-label="O que estudar"><button class="btn btn-escuro" type="submit">Anotar</button></div>'+
-    '<div class="chips" role="group" aria-label="Área">'+Object.keys(AREAS).map(function(a){ return '<button type="button" class="chip" data-act="area" data-a="'+a+'" aria-pressed="'+(S.area===a)+'"><span class="ponto" style="--t:'+AREAS[a][1]+'"></span>'+AREAS[a][0]+'</button>'; }).join('')+'</div></form>';
+    '<div class="chips" role="group" aria-label="Tipo de estudo">'+listaAreas().map(function(a){ return '<button type="button" class="chip" data-act="area" data-a="'+esc(a.id)+'" aria-pressed="'+(areaSel()===a.id)+'"><span class="ponto" style="--t:'+esc(a.cor)+'"></span>'+esc(a.nome)+'</button>'; }).join('')+'<button type="button" class="chip novo" data-act="areas">+ Novo tipo</button></div></form>';
 }
 
 /* ---------- Vista: Banco ---------- */
-function tagArea(a){ var x=AREAS[a]||AREAS.outros; return '<span class="tag" style="--t:'+x[1]+'">'+x[0]+'</span>'; }
+function tagArea(a){ var x=area(a); return '<span class="tag" style="--t:'+esc(x.cor)+'">'+esc(x.nome)+'</span>'; }
 function hostDe(u){ try{ return new URL(u).hostname.replace(/^www\./,''); }catch(e){ return u; } }
 function linhaItem(b){
   var feito=b.status==='concluido'||b.status==='arquivado';
@@ -874,10 +980,12 @@ function linhaItem(b){
       (b.status!=='fila'?'<span class="pill'+(b.status==='estudando'?' aviso':b.status==='concluido'?' ok':'')+'">'+STATUS[b.status]+'</span>':'')+
       (b.prioridade==='alta'?'<span class="pill rubro">Prioridade alta</span>':'')+
       (b.link?'<a href="'+esc(b.link)+'" target="_blank" rel="noopener">'+esc(hostDe(b.link))+'</a>':'')+
+      (SERVIDOR&&anexosDe(b.id).length?'<span>'+anexosDe(b.id).length+' '+(anexosDe(b.id).length===1?'arquivo':'arquivos')+'</span>':'')+(minutosItem(b.id)?'<span>'+minutosItem(b.id)+' min estudados</span>':'')+
       '<span>'+quando(b.criado||hoje())+'</span></div></div>'+
-    '<div class="it-acoes">'+(feito?'':'<button class="icone-btn estrela'+(b.semana?' on':'')+'" data-act="semana" data-id="'+esc(b.id)+'" aria-label="'+(b.semana?'Tirar desta semana':'Estudar nesta semana')+'" title="'+(b.semana?'Tirar desta semana':'Estudar nesta semana')+'">'+I.estrela+'</button>')+
+    '<div class="it-acoes">'+(SERVIDOR?'<button class="icone-btn" data-act="sala-item" data-id="'+esc(b.id)+'" aria-label="Estudar agora" title="Estudar agora">'+I.play+'</button>':'')+(feito?'':'<button class="icone-btn estrela'+(b.semana?' on':'')+'" data-act="semana" data-id="'+esc(b.id)+'" aria-label="'+(b.semana?'Tirar desta semana':'Estudar nesta semana')+'" title="'+(b.semana?'Tirar desta semana':'Estudar nesta semana')+'">'+I.estrela+'</button>')+
       (prox?'<button class="icone-btn" data-act="status" data-id="'+esc(b.id)+'" data-s="'+prox[0]+'" aria-label="'+prox[1]+'" title="'+prox[1]+'">'+(prox[0]==='concluido'?I.check:I.avancar)+'</button>':'')+'</div></div>';
 }
+function chipsFiltro(act,atual){ return '<button class="chip" data-act="'+act+'" data-a="" aria-pressed="'+(!atual)+'">Todos os tipos</button>'+listaAreas().map(function(a){ return '<button class="chip" data-act="'+act+'" data-a="'+esc(a.id)+'" aria-pressed="'+(atual===a.id)+'"><span class="ponto" style="--t:'+esc(a.cor)+'"></span>'+esc(a.nome)+'</button>'; }).join(''); }
 function vBanco(){
   var cont={fila:0,estudando:0,concluido:0,arquivado:0};
   S.banco.forEach(function(b){ if(cont[b.status]!=null) cont[b.status]++; });
@@ -886,13 +994,13 @@ function vBanco(){
   var ordP={alta:0,media:1,baixa:2};
   itens.sort(function(a,b){ return (b.semana?1:0)-(a.semana?1:0) || (ordP[a.prioridade]||1)-(ordP[b.prioridade]||1) || String(b.criado||'').localeCompare(String(a.criado||'')); });
   var seg=[['fila','Na fila'],['estudando','Estudando'],['concluido','Concluídos'],['arquivado','Arquivados'],['todos','Todos']].map(function(s){ return '<button data-act="f-status" data-s="'+s[0]+'" aria-pressed="'+(S.fStatus===s[0])+'">'+s[1]+(s[0]!=='todos'?'<small>'+cont[s[0]]+'</small>':'')+'</button>'; }).join('');
-  var chips='<button class="chip" data-act="f-area" data-a="" aria-pressed="'+(!S.fArea)+'">Todas as áreas</button>'+Object.keys(AREAS).map(function(a){ return '<button class="chip" data-act="f-area" data-a="'+a+'" aria-pressed="'+(S.fArea===a)+'"><span class="ponto" style="--t:'+AREAS[a][1]+'"></span>'+AREAS[a][0]+'</button>'; }).join('');
+  var chips=chipsFiltro('f-area',S.fArea)+'<button class="chip novo" data-act="areas">Gerenciar tipos</button>';
   var corpo = itens.length ? '<div class="painel">'+itens.map(linhaItem).join('')+'</div>' :
     '<div class="painel"><p class="vazio">'+(S.banco.length?'Nada aqui com esses filtros.':'<em>O banco está vazio.</em> Quando vir um vídeo, um livro ou lembrar de um tema, cole o link ou escreva uma frase no campo acima. Organizar fica para a revisão da semana.')+'</p></div>';
   return '<div class="pagina"><div><p class="rot">Banco de estudos</p><h2 class="h2">Tudo o que você quer <em>estudar um dia</em></h2><p class="intro">Anote rápido e organize depois. A estrela leva o item para a tela Hoje. A seta avança o status: na fila, estudando, concluído.</p></div>'+
     captura('b')+(revisaoPendente()?faixaRevisao():'')+
     '<section class="secao"><div class="secao-topo"><div class="seg" role="group" aria-label="Status">'+seg+'</div><input class="campo" id="busca-banco" style="max-width:240px" placeholder="Buscar" value="'+esc(S.busca)+'" data-busca="banco" aria-label="Buscar no banco"></div>'+
-    '<div class="chips" role="group" aria-label="Filtrar por área">'+chips+'</div>'+corpo+'</section></div>';
+    '<div class="chips" role="group" aria-label="Filtrar por tipo de estudo">'+chips+'</div>'+corpo+'</section></div>';
 }
 
 /* ---------- Vista: Latim ---------- */
@@ -911,7 +1019,7 @@ function vLatim(){
     }).join('');
   }).join('');
   var hist=sessDe('latim').slice().sort(ordemSess).slice(0,12);
-  return '<div class="pagina"><div><p class="rot">Latim</p><h2 class="h2" lang="la">Familia Romana</h2><p class="intro">Lingua Latina per se illustrata, de Hans Ørberg. Cada capítulo tem três lectiones, a Grammatica Latina e os Pensa A, B e C.</p></div>'+
+  return '<div class="pagina"><div><p class="rot">Latim</p><h2 class="h2" lang="la">Familia Romana</h2><p class="intro">Lingua Latina per se illustrata, de Hans Ørberg. Cada capítulo tem três lectiones, a Grammatica Latina e os Pensa A, B e C.</p>'+(SERVIDOR?'<div class="acoes" style="margin-top:12px"><button class="btn btn-escuro" data-act="sala-latim" data-n="'+n+'">'+I.ler+'Estudar o capítulo '+romano(n)+'</button></div>':'')+'</div>'+
     '<section class="secao"><div class="secao-topo"><p class="rot">Os 35 capítulos</p><p class="nota">Você está no <b>'+romano(L.atual)+'</b>. Toque num capítulo para ver as partes.</p></div><div class="caps">'+caps+'</div></section>'+
     '<div class="duas"><article class="cartao"><h4>Capitulum '+romano(n)+' · <em lang="la">'+esc(CAPS[n-1])+'</em>'+(n===L.atual?'<span class="pill rubro">Atual</span>':'')+'</h4><div class="check">'+check+'</div>'+
       '<div class="acoes">'+(n===L.atual && n<35?'<button class="btn '+(completo?'btn-escuro':'btn-claro')+' btn-p" data-act="avancar-cap">Concluir e ir para o '+romano(n+1)+'</button>':'')+
@@ -965,7 +1073,7 @@ function botaoApagar(col,id){
 }
 
 /* ---------- Modais ---------- */
-function abrirSessao(p,min){ S.modal={tipo:'sessao',p:p,min:min||meta(p)}; renderModal(); }
+function abrirSessao(p,min,ctx){ S.modal={tipo:'sessao',p:p,min:min||meta(p),ctx:ctx||null}; renderModal(); }
 function renderModal(){
   var c=document.getElementById('camada'), m=S.modal;
   if(!m){ c.innerHTML=''; return; }
@@ -975,13 +1083,16 @@ function renderModal(){
   else if(m.tipo==='item') html=modalItem(m);
   else if(m.tipo==='ex') html=modalEx(m);
   else if(m.tipo==='rev') html=modalRev();
+  else if(m.tipo==='areas') html=modalAreas();
+  else if(m.tipo==='arq') html=modalArq(m);
   c.innerHTML='<div class="veu" data-act="fechar-fora"><div class="folha" role="dialog" aria-modal="true">'+html+'</div></div>';
   var f=c.querySelector('[autofocus]'); if(f) f.focus();
 }
 function topoModal(t){ return '<div class="folha-topo"><h3>'+t+'</h3><button class="icone-btn" data-act="fechar" aria-label="Fechar">'+I.x+'</button></div>'; }
 function modalSessao(m){
   var corpo='';
-  if(m.p==='latim'){
+  if(m.p==='estudo'){ corpo='<p class="nota">'+esc((m.ctx&&m.ctx.titulo)||'')+'</p>'; }
+  else if(m.p==='latim'){
     var n=lat().atual, f=feitosCap(n);
     corpo='<label>Capítulo<input class="campo num" name="cap" id="s-cap" inputmode="numeric" value="'+n+'"></label>'+
       '<div class="rotulo">O que você fez<div class="chips">'+PARTES.concat(EXTRAS).map(function(p){ return '<label class="chip"><input type="checkbox" name="parte" value="'+p[0]+'"'+(p[0]===(proximaParte(n)||[])[0]?' checked':'')+' style="accent-color:var(--tx)">'+p[1]+(f[p[0]]?' ✓':'')+'</label>'; }).join('')+'</div></div>';
@@ -991,10 +1102,10 @@ function modalSessao(m){
       return '<div><label class="marcar"><input type="checkbox" name="ex" value="'+esc(e.id)+'"'+(foco.indexOf(e.id)>=0?' checked':'')+'>'+esc(e.nome)+'</label><input class="campo num" name="bpm-'+esc(e.id)+'" id="s-bpm-'+esc(e.id)+'" inputmode="numeric" placeholder="—" aria-label="bpm de '+esc(e.nome)+'"'+(MET.on?' value="'+MET.bpm+'"':'')+'><input class="campo num" name="reps-'+esc(e.id)+'" id="s-reps-'+esc(e.id)+'" inputmode="numeric" placeholder="—" aria-label="Repetições de '+esc(e.nome)+'"></div>';
     }).join('')+'</div></div>' : '<p class="nota">Cadastre exercícios na página Violino para registrar cada um.</p>';
   }
-  return topoModal('Registrar <em>'+(m.p==='latim'?'latim':'violino')+'</em>')+
+  return topoModal('Registrar <em>'+(m.p==='latim'?'latim':m.p==='violino'?'violino':'estudo')+'</em>')+
     '<form class="forma" data-form="sessao" style="background:transparent;border:0;padding:0"><div class="campos"><label>Data<input class="campo" type="date" name="data" id="s-data" value="'+hoje()+'"></label><label>Minutos<input class="campo num" name="min" id="s-min" inputmode="numeric" value="'+m.min+'"></label></div>'+corpo+
-    '<label>Observações<textarea class="campo" name="notas" id="s-notas" placeholder="'+(m.p==='latim'?'Dúvidas, frases difíceis, o que reler':'O que melhorou, o que travou')+'"></textarea></label>'+
-    '<div class="acoes"><button class="btn btn-escuro" type="submit">Salvar</button><button class="btn btn-claro" type="button" data-act="fechar">Cancelar</button></div></form>';
+    '<label>Observações<textarea class="campo" name="notas" id="s-notas" placeholder="'+(m.p==='latim'?'Dúvidas, frases difíceis, o que reler':m.p==='violino'?'O que melhorou, o que travou':'O que ficou para a próxima vez')+'"></textarea></label>'+
+    '<div class="acoes"><button class="btn btn-escuro" type="submit">Salvar</button><button class="btn btn-claro" type="button" data-act="fechar">'+(m.ctx?'Não registrar':'Cancelar')+'</button></div></form>';
 }
 function modalItem(m){
   var b=S.banco.filter(function(x){ return x.id===m.id; })[0]; if(!b){ S.modal=null; return ''; }
@@ -1002,10 +1113,10 @@ function modalItem(m){
   return topoModal('Item do <em>banco</em>')+
     '<form class="forma" data-form="item" style="background:transparent;border:0;padding:0"><div class="campos"><label class="largo">Título<input class="campo" name="titulo" id="i-titulo" value="'+esc(b.titulo)+'" placeholder="Do que se trata" autofocus></label>'+
     '<label class="largo">Link<input class="campo" name="link" id="i-link" value="'+esc(b.link||'')+'" placeholder="https://"></label>'+
-    '<label>Área'+sel('area',AREAS,b.area)+'</label><label>Tipo'+sel('tipo',TIPOS,b.tipo)+'</label><label>Prioridade'+sel('prioridade',PRIOR,b.prioridade||'media')+'</label><label>Status'+sel('status',STATUS,b.status)+'</label>'+
+    '<label>Tipo de estudo'+sel('area',areasObj(),b.area)+'</label><label>Formato'+sel('tipo',TIPOS,b.tipo)+'</label><label>Prioridade'+sel('prioridade',PRIOR,b.prioridade||'media')+'</label><label>Status'+sel('status',STATUS,b.status)+'</label>'+
     '<label class="largo">Observações<textarea class="campo" name="notas" id="i-notas" placeholder="Por que guardei, em que minuto do vídeo, o que quero aprender">'+esc(b.notas||'')+'</textarea></label>'+
     '<label class="marcar largo"><input type="checkbox" name="semana"'+(b.semana?' checked':'')+'>Estudar nesta semana</label></div>'+
-    '<div class="acoes"><button class="btn btn-escuro" type="submit">Salvar</button><button class="btn btn-claro" type="button" data-act="fechar">Cancelar</button><span style="flex:1"></span>'+botaoApagar('banco',b.id)+'</div></form>';
+    '<div class="acoes"><button class="btn btn-escuro" type="submit">Salvar</button>'+(SERVIDOR?'<button class="btn btn-claro" type="button" data-act="sala-item" data-id="'+esc(b.id)+'">Estudar agora</button>':'')+'<button class="btn btn-claro" type="button" data-act="fechar">Cancelar</button><span style="flex:1"></span>'+botaoApagar('banco',b.id)+'</div></form>';
 }
 function modalEx(m){
   var e=m.id ? (vio().exercicios||[]).filter(function(x){ return x.id===m.id; })[0] : {nome:'',foco:'',bpmMeta:null,ativo:true};
@@ -1030,19 +1141,351 @@ function modalRev(){
       '<p class="pt oculto">Pense no significado…</p><button class="btn btn-escuro" data-act="rev-mostrar" autofocus>Mostrar resposta</button>')+'</div>';
 }
 
+
+/* ---------- Tipos de estudo: criar, editar e apagar ---------- */
+function usoArea(id){ return S.banco.filter(function(b){ return b.area===id; }).length + S.arqs.filter(function(a){ return a.area===id; }).length; }
+function modalAreas(){
+  var l=listaAreas();
+  return topoModal('Tipos de <em>estudo</em>')+'<div class="tipos-lista">'+l.map(function(a){
+    var n=usoArea(a.id), k='area/'+a.id, outro=(l.filter(function(x){ return x.id!==a.id; })[0]||{}).nome;
+    return '<div class="tipo-linha"><input type="color" id="ar-c-'+esc(a.id)+'" value="'+esc(a.cor)+'" data-area-cor="'+esc(a.id)+'" aria-label="Cor de '+esc(a.nome)+'">'+
+      '<input class="campo" id="ar-n-'+esc(a.id)+'" value="'+esc(a.nome)+'" data-area-nome="'+esc(a.id)+'" maxlength="40" aria-label="Nome do tipo"><span class="tipo-n">'+n+' '+(n===1?'item':'itens')+'</span>'+
+      (l.length<2?'<span></span>':S.confirmar===k?'<button class="btn btn-p btn-claro perigo" data-act="area-apagar" data-id="'+esc(a.id)+'">'+(n?'Mover para '+esc(outro)+' e apagar':'Apagar?')+'</button>':'<button class="icone-btn" data-act="area-pre" data-k="'+esc(k)+'" aria-label="Apagar '+esc(a.nome)+'">'+I.lixo+'</button>')+'</div>';
+  }).join('')+'</div><form class="captura-linha" data-form="area-nova"><input class="campo" name="nome" id="ar-novo" maxlength="40" placeholder="Novo tipo, como Música ou Idiomas" required autocomplete="off" aria-label="Nome do novo tipo"><button class="btn btn-escuro" type="submit">Criar</button></form><div class="acoes"><button class="btn btn-claro" data-act="fechar">Pronto</button></div>';
+}
+function copiaAreas(){ return listaAreas().map(function(a){ return {id:a.id,nome:a.nome,cor:a.cor}; }); }
+function addArea(form){
+  var nome=form.querySelector('[name=nome]').value.trim(); if(!nome) return;
+  var l=copiaAreas();
+  if(l.some(function(a){ return a.nome.toLowerCase()===nome.toLowerCase(); })){ toast('Já existe um tipo com esse nome.'); return; }
+  var usadas=l.map(function(a){ return a.cor; }), cor=CORES_NOVAS.filter(function(c){ return usadas.indexOf(c)<0; })[0]||CORES_NOVAS[l.length%CORES_NOVAS.length];
+  var id='t'+uid(); l.push({id:id,nome:nome,cor:cor}); salvarAreas(l);
+  S.area=id; lsSet('scr-area',id);
+  if(document.activeElement) document.activeElement.blur();
+  renderModal(); render(); var i=document.getElementById('ar-novo'); if(i) i.focus();
+  toast('Tipo <em>'+esc(nome)+'</em> criado');
+}
+function apagarArea(id){
+  var l=copiaAreas().filter(function(a){ return a.id!==id; }); if(!l.length) return;
+  var destino=l[0].id;
+  S.banco.forEach(function(b){ if(b.area===id){ b.area=destino; gravar('banco/'+b.id,b); } });
+  S.arqs.forEach(function(a){ if(a.area===id){ a.area=destino; gravar('arquivos/'+a.id,a); } });
+  salvarAreas(l); if(S.fArea===id) S.fArea=''; if(S.fArqArea===id) S.fArqArea='';
+  S.confirmar=null; renderModal(); render();
+}
+document.addEventListener('change',function(ev){
+  var el=ev.target, d=el.dataset||{};
+  if(d.areaNome||d.areaCor){
+    var id=d.areaNome||d.areaCor, l=copiaAreas(), a=l.filter(function(x){ return x.id===id; })[0]; if(!a) return;
+    if(d.areaNome){ var v=el.value.trim(); if(!v){ el.value=a.nome; return; } a.nome=v; } else a.cor=el.value;
+    salvarAreas(l); render(); return;
+  }
+  if(el.type==='file' && el.dataset.envio!==undefined && el.files && el.files.length){
+    var extra={area:el.dataset.area||'', item:el.dataset.item||''}, livro=el.dataset.livro==='1';
+    Array.prototype.slice.call(el.files).forEach(function(f){ enviarArquivo(f,extra,livro); });
+    el.value='';
+  }
+});
+
+/* ---------- Arquivos: enviar, listar, editar ---------- */
+function fmtTam(b){ b=Number(b)||0; if(b<1048576) return Math.max(1,Math.round(b/1024))+' KB'; if(b<1073741824) return (b/1048576).toFixed(b<104857600?1:0).replace('.',',')+' MB'; return (b/1073741824).toFixed(1).replace('.',',')+' GB'; }
+function tipoVisor(a){ var t=String(a.tipo||''), n=String(a.nome||'').toLowerCase(); if(t==='application/pdf'||/\.pdf$/.test(n)) return 'pdf'; if(/^video\//.test(t)) return 'video'; if(/^audio\//.test(t)) return 'audio'; if(/^image\/(png|jpeg|gif|webp)$/.test(t)) return 'imagem'; if(/^text\//.test(t)||/\.(txt|md)$/.test(n)) return 'texto'; return 'outro'; }
+function iconeArq(a){ return {pdf:I.artigo,video:I.video,audio:I.audio,imagem:I.imagem,texto:I.artigo,outro:I.outro}[tipoVisor(a)]; }
+function anexosDe(id){ return S.arqs.filter(function(a){ return a.item===id; }); }
+function minutosItem(id){ return soma(S.sess.filter(function(s){ return s.item===id; }),function(s){ return s.minutos; }); }
+function urlArq(id){ return '/api/arquivos/'+encodeURIComponent(id); }
+function carregarEspaco(){ if(!SERVIDOR||!S.usuario) return; api('GET','/api/arquivos/espaco').then(function(e){ S.espaco=e; if(S.view==='arquivos') pedirRender(); }).catch(function(){}); }
+var ENVIOS=[];
+function desenharEnvios(){
+  var el=document.getElementById('envios'); if(!el) return;
+  el.hidden=!ENVIOS.length;
+  el.innerHTML=ENVIOS.map(function(e){ return '<div class="envio"><span>'+esc(e.nome)+'</span><div class="barra"><i style="width:'+e.pct+'%"></i></div><small>'+(e.pct>=100?'Finalizando…':e.pct+'% de '+fmtTam(e.tam))+'</small></div>'; }).join('');
+}
+window.addEventListener('beforeunload',function(ev){ if(ENVIOS.length){ ev.preventDefault(); ev.returnValue=''; } });
+function enviarArquivo(file,extra,livro){
+  if(!SERVIDOR) return;
+  var e={nome:file.name,tam:file.size,pct:0}; ENVIOS.push(e); desenharEnvios();
+  function fim(){ ENVIOS.splice(ENVIOS.indexOf(e),1); desenharEnvios(); }
+  var x=new XMLHttpRequest();
+  x.open('POST','/api/arquivos');
+  x.setRequestHeader('X-Scriptorium','1');
+  x.setRequestHeader('Content-Type',file.type||'application/octet-stream');
+  x.setRequestHeader('X-Nome',encodeURIComponent(file.name));
+  x.setRequestHeader('X-Meta',encodeURIComponent(JSON.stringify(extra||{})));
+  x.upload.onprogress=function(p){ if(p.lengthComputable){ e.pct=Math.floor(p.loaded/p.total*100); desenharEnvios(); } };
+  x.onload=function(){
+    fim(); var j={}; try{ j=JSON.parse(x.responseText); }catch(err){}
+    if(x.status<200||x.status>=300){ toast('Não enviei '+esc(file.name), j.erro||'Tente de novo.'); return; }
+    var doc=j.doc; doc.id=j.id; if(!S.arqs.some(function(a){ return a.id===j.id; })) S.arqs.push(doc);
+    carregarEspaco(); toast('Arquivo guardado', file.name);
+    if(livro){ var L=lat(); L.livro=j.id; S.lat=L; salvarLat(); }
+    if(SALA && (livro || (SALA.tipo==='item' && extra.item===SALA.id))){ SALA.fonte='arq:'+j.id; renderVisor(); }
+    render();
+  };
+  x.onerror=function(){ fim(); toast('Não enviei '+esc(file.name),'A conexão caiu. Tente de novo.'); };
+  x.send(file);
+}
+function botaoEnviar(rot,attrs,cls){
+  return '<label class="btn '+(cls||'btn-claro')+' btn-p" style="display:inline-flex;color:inherit">'+rot+'<input class="oculto-arq" type="file" data-envio '+(attrs||'')+'></label>';
+}
+function vArquivos(){
+  var l=S.arqs.filter(function(a){ return !S.fArqArea || a.area===S.fArqArea; }).sort(function(a,b){ return String(b.criado||'').localeCompare(String(a.criado||'')) || String(a.nome).localeCompare(b.nome); });
+  var e=S.espaco, esp=e?fmtTam(e.usado)+' guardados'+(e.total?' · '+fmtTam(e.livre)+' livres no disco':''):'';
+  var linhas=l.map(function(a){
+    var it=a.item?S.banco.filter(function(b){ return b.id===a.item; })[0]:null, livro=lat().livro===a.id;
+    return '<div class="it"><span class="it-tipo">'+iconeArq(a)+'</span><div class="it-t" data-act="sala-arq" data-id="'+esc(a.id)+'"><b>'+esc(a.nome)+'</b><div class="it-meta">'+(a.area?tagArea(a.area):'')+(livro?'<span class="pill rubro">Livro de latim</span>':'')+(it?'<span>'+esc(it.titulo||hostDe(it.link)||'Item do banco')+'</span>':'')+'<span>'+fmtTam(a.tam)+'</span>'+(a.pagina?'<span>parou na página '+a.pagina+'</span>':'')+'</div></div>'+
+      '<div class="it-acoes"><button class="icone-btn" data-act="sala-arq" data-id="'+esc(a.id)+'" aria-label="Abrir" title="Abrir">'+I.play+'</button><button class="icone-btn" data-act="editar-arq" data-id="'+esc(a.id)+'" aria-label="Editar '+esc(a.nome)+'" title="Editar">'+I.editar+'</button></div></div>';
+  }).join('');
+  return '<div class="pagina"><div><p class="rot">Arquivos</p><h2 class="h2">Sua <em>biblioteca</em></h2><p class="intro">PDFs, vídeos, áudios e imagens ficam guardados aqui e abrem dentro do Scriptorium, com notas ao lado. O app lembra a página onde você parou em cada PDF.</p></div>'+
+    '<label class="zona-envio" id="zona-envio"><b>Escolha arquivos ou arraste para cá</b><small>PDF, vídeo MP4, áudio, imagem e texto abrem na tela. Outros formatos ficam para baixar.</small><input class="oculto-arq" type="file" multiple data-envio data-area="'+esc(S.fArqArea)+'"></label>'+
+    '<section class="secao"><div class="secao-topo"><div class="chips" role="group" aria-label="Filtrar por tipo de estudo">'+chipsFiltro('f-arq-area',S.fArqArea)+'</div><p class="nota">'+esc(esp)+'</p></div>'+
+    '<div class="painel">'+(linhas||'<p class="vazio">'+(S.arqs.length?'Nenhum arquivo desse tipo.':'<em>A biblioteca está vazia.</em> Comece pelo PDF de um livro ou pela apostila de um curso.')+'</p>')+'</div></section></div>';
+}
+['dragover','dragleave','drop'].forEach(function(t){ document.addEventListener(t,function(ev){
+  var z=ev.target.closest&&ev.target.closest('#zona-envio'); if(!z) return;
+  ev.preventDefault(); z.classList.toggle('sobre',t==='dragover');
+  if(t==='drop' && ev.dataTransfer.files.length) Array.prototype.slice.call(ev.dataTransfer.files).forEach(function(f){ enviarArquivo(f,{area:S.fArqArea},false); });
+}); });
+function modalArq(m){
+  var a=S.arqs.filter(function(x){ return x.id===m.id; })[0]; if(!a){ S.modal=null; return ''; }
+  var itens=S.banco.filter(function(b){ return b.status==='fila'||b.status==='estudando'||b.id===a.item; });
+  var k='arq/'+a.id;
+  return topoModal('Editar <em>arquivo</em>')+'<form class="forma" data-form="arq" style="background:transparent;border:0;padding:0"><div class="campos"><label class="largo">Nome<input class="campo" name="nome" id="q-nome" value="'+esc(a.nome)+'" required maxlength="200"></label>'+
+    '<label>Tipo de estudo<select class="campo" name="area" id="q-area"><option value="">Sem tipo</option>'+listaAreas().map(function(x){ return '<option value="'+esc(x.id)+'"'+(x.id===a.area?' selected':'')+'>'+esc(x.nome)+'</option>'; }).join('')+'</select></label>'+
+    '<label>Item do banco<select class="campo" name="item" id="q-item"><option value="">Nenhum</option>'+itens.map(function(b){ return '<option value="'+esc(b.id)+'"'+(b.id===a.item?' selected':'')+'>'+esc(b.titulo||hostDe(b.link)||'Sem título')+'</option>'; }).join('')+'</select></label></div>'+
+    '<div class="acoes"><button class="btn btn-escuro" type="submit">Salvar</button><a class="btn btn-claro" href="'+urlArq(a.id)+'?baixar=1">Baixar</a><button class="btn btn-claro" type="button" data-act="fechar">Cancelar</button><span style="flex:1"></span>'+
+    (S.confirmar===k?'<button class="btn btn-p btn-claro perigo" type="button" data-act="apagar-arq" data-id="'+esc(a.id)+'">Apagar de vez?</button>':'<button class="icone-btn" type="button" data-act="arq-pre" data-k="'+esc(k)+'" aria-label="Apagar arquivo">'+I.lixo+'</button>')+'</div></form>';
+}
+function salvarArq(f){
+  var a=S.arqs.filter(function(x){ return x.id===S.modal.id; })[0]; if(!a) return;
+  a.nome=f.get('nome').trim()||a.nome; a.area=f.get('area'); a.item=f.get('item');
+  gravar('arquivos/'+a.id,a); S.modal=null; renderModal(); toast('Arquivo salvo'); render();
+}
+function apagarArq(id){
+  S.arqs=S.arqs.filter(function(x){ return x.id!==id; });
+  var L=lat(); if(L.livro===id){ delete L.livro; S.lat=L; salvarLat(); }
+  api('DELETE',urlArq(id)).then(carregarEspaco).catch(function(e){ toast('Não consegui apagar',e.message); });
+  S.modal=null; S.confirmar=null; renderModal(); toast('Arquivo apagado'); render();
+}
+
+/* ---------- Leitor de PDF (pdf.js guardado no próprio app) ---------- */
+var LEITOR=null, promessaPdf=null;
+function carregarPdfjs(){
+  if(promessaPdf) return promessaPdf;
+  promessaPdf=new Promise(function(ok,nao){ var sc=document.createElement('script'); sc.src='/vendor/pdfjs-3.11.174/pdf.min.js'; sc.onload=function(){ window.pdfjsLib.GlobalWorkerOptions.workerSrc='/vendor/pdfjs-3.11.174/pdf.worker.min.js'; ok(window.pdfjsLib); }; sc.onerror=function(){ promessaPdf=null; nao(new Error('script')); }; document.head.appendChild(sc); });
+  return promessaPdf;
+}
+function criarLeitor(el,url,inicio,aoMudar,aoAbrir){
+  el.innerHTML='<div class="leitor"><div class="leitor-barra"><button class="icone-btn" data-l="sum" aria-label="Sumário" title="Sumário"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg></button><button class="icone-btn" data-l="ant" aria-label="Página anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button><input class="campo" data-l="num" inputmode="numeric" aria-label="Página"><span class="de" data-l="tot"></span><button class="icone-btn" data-l="prox" aria-label="Próxima página"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button><span class="esp"></span><button class="icone-btn" data-l="menos" aria-label="Diminuir">−</button><button class="icone-btn" data-l="mais" aria-label="Aumentar">+</button></div><div class="leitor-rolo"><div class="leitor-folha"><canvas></canvas><div class="textLayer"></div></div></div></div>';
+  var q=function(s){ return el.querySelector(s); }, rolo=q('.leitor-rolo'), folha=q('.leitor-folha'), cv=q('canvas'), tx=q('.textLayer'), num=q('[data-l=num]');
+  var L={pag:Math.max(1,inicio||1), total:0, zoom:1, doc:null, ir:ir, fechar:fechar}, tarefa=null, vivo=true, desenhando=0, obs=null, sumEl=null;
+  function fechar(){ vivo=false; if(obs) obs.disconnect(); if(tarefa){ try{ tarefa.cancel(); }catch(e){} } if(L.doc){ try{ L.doc.destroy(); }catch(e){} } el.innerHTML=''; }
+  function ir(n){ if(!L.doc) { L.pag=n; return; } n=Math.max(1,Math.min(L.total,Math.round(n)||1)); if(n===L.pag && cv.width>0) return; L.pag=n; desenhar(true); if(aoMudar) aoMudar(n,L.total); }
+  async function desenhar(topo){
+    if(!vivo||!L.doc) return;
+    var meu=++desenhando; num.value=L.pag;
+    if(tarefa){ try{ tarefa.cancel(); }catch(e){} tarefa=null; }
+    var pg=await L.doc.getPage(L.pag); if(!vivo||meu!==desenhando) return;
+    var base=pg.getViewport({scale:1}), larg=Math.max(120,Math.min(rolo.clientWidth-20,860)), esc1=larg/base.width*L.zoom, vp=pg.getViewport({scale:esc1}), dpr=Math.min(window.devicePixelRatio||1,2.5), vpr=pg.getViewport({scale:esc1*dpr});
+    cv.width=Math.floor(vpr.width); cv.height=Math.floor(vpr.height); cv.style.width=Math.floor(vp.width)+'px'; cv.style.height=Math.floor(vp.height)+'px';
+    folha.style.width=Math.floor(vp.width)+'px'; folha.style.height=Math.floor(vp.height)+'px';
+    tx.innerHTML=''; tx.style.setProperty('--scale-factor',esc1);
+    if(topo) rolo.scrollTop=0;
+    tarefa=pg.render({canvasContext:cv.getContext('2d'),viewport:vpr});
+    try{ await tarefa.promise; }catch(e){ return; }
+    if(!vivo||meu!==desenhando) return;
+    try{ var ct=await pg.getTextContent(); if(!vivo||meu!==desenhando) return; window.pdfjsLib.renderTextLayer({textContentSource:ct,container:tx,viewport:vp,textDivs:[]}); }catch(e){}
+  }
+  function fecharSum(){ if(sumEl){ sumEl.remove(); sumEl=null; } }
+  async function abrirSum(){
+    if(sumEl){ fecharSum(); return; }
+    var o=null; try{ o=await L.doc.getOutline(); }catch(e){}
+    sumEl=document.createElement('div'); sumEl.className='leitor-sum';
+    if(!o||!o.length){ sumEl.innerHTML='<p class="nota" style="padding:8px 10px">Este PDF não tem sumário.</p>'; q('.leitor').appendChild(sumEl); return; }
+    var itens=[]; function junta(l,sub){ l.forEach(function(x){ itens.push({t:String(x.title||'').trim(),d:x.dest,sub:sub}); if(x.items&&x.items.length&&!sub) junta(x.items,true); }); } junta(o,false);
+    sumEl.innerHTML=itens.map(function(x,i){ return '<button data-i="'+i+'" class="'+(x.sub?'sub':'')+'">'+esc(x.t)+'</button>'; }).join('');
+    sumEl.addEventListener('click',async function(ev){ var b=ev.target.closest('button'); if(!b) return; var d=itens[Number(b.dataset.i)].d; try{ if(typeof d==='string') d=await L.doc.getDestination(d); var n=await L.doc.getPageIndex(d[0])+1; ir(n); }catch(e){} fecharSum(); });
+    q('.leitor').appendChild(sumEl);
+  }
+  q('.leitor-barra').addEventListener('click',function(ev){ var b=ev.target.closest('[data-l]'); if(!b) return; var k=b.dataset.l;
+    if(k==='ant') ir(L.pag-1); if(k==='prox') ir(L.pag+1); if(k==='sum') abrirSum();
+    if(k==='mais'){ L.zoom=Math.min(3,L.zoom+0.2); desenhar(); } if(k==='menos'){ L.zoom=Math.max(0.5,L.zoom-0.2); desenhar(); } });
+  num.addEventListener('change',function(){ ir(Number(num.value)); });
+  rolo.addEventListener('click',fecharSum);
+  carregarPdfjs().then(function(lib){
+    return lib.getDocument({url:url,disableAutoFetch:true,rangeChunkSize:1048576,verbosity:0}).promise;
+  }).then(function(doc){
+    if(!vivo){ doc.destroy(); return; }
+    L.doc=doc; L.total=doc.numPages; L.pag=Math.min(L.pag,L.total); q('[data-l=tot]').textContent='de '+L.total;
+    desenhar(true); if(aoAbrir) aoAbrir(L);
+    var lg=rolo.clientWidth, t=null;
+    if(window.ResizeObserver){ obs=new ResizeObserver(function(){ if(rolo.clientWidth===lg) return; lg=rolo.clientWidth; clearTimeout(t); t=setTimeout(function(){ desenhar(); },200); }); obs.observe(rolo); }
+  }).catch(function(){ if(vivo) el.innerHTML='<div class="sala-aviso"><h3>Não consegui abrir o PDF</h3><p>Confira a internet e tente de novo.</p><a class="btn btn-claro" href="'+url+'?baixar=1">Baixar o arquivo</a></div>'; });
+  return L;
+}
+/* Selecionar uma palavra no livro já preenche o campo do vocabulário. */
+document.addEventListener('selectionchange',function(){
+  if(!SALA||SALA.tipo!=='latim') return;
+  var sel=document.getSelection(); if(!sel||sel.isCollapsed||!sel.anchorNode) return;
+  var base=sel.anchorNode.nodeType===1?sel.anchorNode:sel.anchorNode.parentElement; if(!base||!base.closest||!base.closest('.textLayer')) return;
+  var t=sel.toString().replace(/\s+/g,' ').trim(), c=document.getElementById('sala-voc-lat');
+  if(c && t && t.length<=60) c.value=t;
+});
+
+/* ---------- Mapa do livro: o PDF do Familia Romana, de 332 páginas ---------- */
+var LIVRO={paginas:332,caps:[[9,12,13],[15,19,19],[21,25,26],[28,32,32],[34,39,41],[43,47,48],[50,54,54],[56,61,64],[65,68,69],[71,76,77],[79,84,86],[87,93,95],[97,103,103],[105,110,110],[112,117,118],[120,126,127],[128,134,135],[137,145,145],[147,153,155],[156,162,163],[165,171,172],[174,179,179],[181,187,187],[189,193,195],[197,203,203],[205,211,211],[213,220,222],[224,231,232],[234,242,242],[244,250,251],[253,261,261],[263,272,273],[275,282,284],[286,294,296],[298,307,307]],extras:[['Declinações',309],['Calendário',314],['Índice de palavras',315],['Índice gramatical',328]]};
+function livroMapeado(){ return !!(LEITOR && LEITOR.total===LIVRO.paginas); }
+function capDaPagina(p){ var c=0; LIVRO.caps.forEach(function(x,i){ if(p>=x[0]) c=i+1; }); return p>=309?0:c; }
+
+/* ---------- Sala de estudo ---------- */
+var SALA=null, salaTick=null, travaSala=null, chaveFontes='';
+function abrirSala(o){
+  if(!SERVIDOR) return;
+  if(SALA) fecharVisor();
+  if(T) cronParar(true);
+  SALA={tipo:o.tipo,id:o.id||null,cap:o.cap||null,fonte:null,ini:Date.now(),acum:0,rodando:true,alvo:o.tipo==='latim'?meta('latim')*60:0,tocou:false};
+  prepararSom();
+  document.body.classList.add('em-sala'); document.getElementById('sala').hidden=false;
+  try{ if(navigator.wakeLock) navigator.wakeLock.request('screen').then(function(l){ travaSala=l; }).catch(function(){}); }catch(e){}
+  clearInterval(salaTick); salaTick=setInterval(tickSala,500); tickSala();
+  document.getElementById('sala-pausa').textContent='Pausar';
+  renderVisor(); renderSalaLado(true);
+}
+function tempoSala(){ return SALA ? SALA.acum+(SALA.rodando?(Date.now()-SALA.ini)/1000:0) : 0; }
+function tickSala(){
+  if(!SALA) return;
+  var t=Math.floor(tempoSala()), el=document.getElementById('sala-tempo');
+  if(el) el.textContent=Math.floor(t/60)+':'+pad(t%60)+(SALA.alvo?' / '+Math.round(SALA.alvo/60)+' min':'');
+  if(SALA.alvo && !SALA.tocou && t>=SALA.alvo){ SALA.tocou=true; sino(); toast('Meta de hoje alcançada','Continue se quiser. O tempo segue contando.'); }
+}
+function pausarSala(){ if(!SALA) return; if(SALA.rodando){ SALA.acum=tempoSala(); SALA.rodando=false; } else { SALA.ini=Date.now(); SALA.rodando=true; } document.getElementById('sala-pausa').textContent=SALA.rodando?'Pausar':'Continuar'; tickSala(); }
+function fecharVisor(){ salvarPosicao(); if(LEITOR){ LEITOR.fechar(); LEITOR=null; } var a=document.getElementById('sala-area'); if(a) a.innerHTML=''; }
+function encerrarSala(){
+  if(!SALA) return;
+  flushNota();
+  var min=Math.round(tempoSala()/60), s=SALA, ctx=null;
+  if(s.tipo==='item'){ var b=S.banco.filter(function(x){ return x.id===s.id; })[0]; ctx={item:s.id,titulo:b?(b.titulo||hostDe(b.link)):'Estudo',area:b?b.area:''}; }
+  if(s.tipo==='arquivo'){ var a=S.arqs.filter(function(x){ return x.id===s.id; })[0]; ctx={arquivo:s.id,item:a&&a.item||'',titulo:a?a.nome:'Estudo',area:a?a.area:''}; }
+  fecharVisor(); clearInterval(salaTick); SALA=null;
+  try{ if(travaSala) travaSala.release(); }catch(e){} travaSala=null;
+  document.getElementById('sala').hidden=true; document.getElementById('sala-lado').innerHTML=''; document.body.classList.remove('em-sala');
+  render();
+  if(min>=1){ if(s.tipo==='latim') abrirSessao('latim',min); else abrirSessao('estudo',min,ctx); }
+}
+function fontesSala(){
+  if(!SALA) return [];
+  if(SALA.tipo==='arquivo'){ var a=S.arqs.filter(function(x){ return x.id===SALA.id; })[0]; return a?[{k:'arq:'+a.id,rot:a.nome,arq:a}]:[]; }
+  if(SALA.tipo==='latim'){ var l=S.arqs.filter(function(x){ return x.id===lat().livro; })[0]; return l?[{k:'arq:'+l.id,rot:l.nome,arq:l}]:[]; }
+  var b=S.banco.filter(function(x){ return x.id===SALA.id; })[0], out=[]; if(!b) return out;
+  if(b.link) out.push({k:'link',rot:b.tipo==='video'?'Vídeo':hostDe(b.link),link:b.link});
+  anexosDe(b.id).forEach(function(a){ out.push({k:'arq:'+a.id,rot:a.nome,arq:a}); });
+  return out;
+}
+/* Sites que permitem assistir ou ler dentro de outra página. */
+function urlEmbutir(u){
+  var m;
+  if((m=u.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([\w-]{6,})/))){ var t=u.match(/[?&](?:t|start)=(\d+)/); return 'https://www.youtube-nocookie.com/embed/'+m[1]+'?rel=0'+(t?'&start='+t[1]:''); }
+  if((m=u.match(/youtube\.com\/playlist\?(?:.*&)?list=([\w-]+)/))) return 'https://www.youtube-nocookie.com/embed/videoseries?list='+m[1];
+  if((m=u.match(/vimeo\.com\/(?:video\/)?(\d+)(?:\/(\w+))?/))) return 'https://player.vimeo.com/video/'+m[1]+(m[2]?'?h='+m[2]:'');
+  if((m=u.match(/drive\.google\.com\/file\/d\/([\w-]+)/))) return 'https://drive.google.com/file/d/'+m[1]+'/preview';
+  if((m=u.match(/docs\.google\.com\/(document|presentation|spreadsheets)\/d\/([\w-]+)/))) return 'https://docs.google.com/'+m[1]+'/d/'+m[2]+'/preview';
+  return null;
+}
+function renderVisor(){
+  if(!SALA) return;
+  salvarPosicao(); if(LEITOR){ LEITOR.fechar(); LEITOR=null; }
+  var f=fontesSala(), area=document.getElementById('sala-area'), abas=document.getElementById('sala-abas');
+  chaveFontes=f.map(function(x){ return x.k; }).join('|');
+  var at=f.filter(function(x){ return x.k===SALA.fonte; })[0]||f[0]; SALA.fonte=at?at.k:null;
+  abas.innerHTML=f.length>1?f.map(function(x){ return '<button data-act="sala-fonte" data-f="'+esc(x.k)+'" aria-pressed="'+(x===at)+'" title="'+esc(x.rot)+'">'+esc(x.rot)+'</button>'; }).join(''):'';
+  var titulo=document.getElementById('sala-titulo'), sub=document.getElementById('sala-sub');
+  if(SALA.tipo==='latim'){ titulo.textContent='Familia Romana'; sub.textContent='Capitulum '+romano(SALA.cap)+' · '+CAPS[SALA.cap-1]; }
+  else if(SALA.tipo==='item'){ var b=S.banco.filter(function(x){ return x.id===SALA.id; })[0]; titulo.textContent=b?(b.titulo||hostDe(b.link)||'Estudo'):'Estudo'; sub.textContent=b?area_nome(b.area):''; }
+  else { titulo.textContent=at?at.rot:'Arquivo'; sub.textContent=at&&at.arq?area_nome(at.arq.area):''; }
+  if(!at){ area.innerHTML=SALA.tipo==='latim'?'<div class="sala-aviso"><h3>Falta só o livro</h3><p>Envie o PDF do Familia Romana uma vez. Ele fica guardado no seu Scriptorium e abre aqui, no capítulo em que você está.</p>'+botaoEnviar('Enviar o PDF do livro','accept="application/pdf" data-livro="1" data-area="intelectual"','btn-escuro')+'</div>':'<div class="sala-aviso"><h3>Nada para abrir ainda</h3><p>Anexe um arquivo ao lado, ou edite o item e cole o link da aula. Você também pode só escrever suas notas.</p></div>'; return; }
+  if(at.link){
+    var em=urlEmbutir(at.link);
+    area.innerHTML=em?'<iframe src="'+esc(em)+'" title="'+esc(at.rot)+'" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write" allowfullscreen></iframe>':'<div class="sala-aviso"><h3>Este site não abre aqui dentro</h3><p>'+esc(hostDe(at.link))+' não permite ser exibido em outra página. Abra em uma nova aba e use este lado para as notas e o tempo.</p><a class="btn btn-escuro" href="'+esc(at.link)+'" target="_blank" rel="noopener">Abrir em nova aba</a></div>';
+    return;
+  }
+  var a=at.arq, tv=tipoVisor(a), u=urlArq(a.id);
+  if(tv==='pdf'){
+    var ini=a.pagina||1;
+    if(SALA.tipo==='latim'){ var cp=LIVRO.caps[SALA.cap-1], prox=LIVRO.caps[SALA.cap]; if(!a.pagina || a.pagina<cp[0] || (prox&&a.pagina>=prox[0])) ini=cp[0]; }
+    LEITOR=criarLeitor(area,u,ini,function(n,total){ posicaoMudou(a.id,{pagina:n,paginas:total}); },function(){ renderSalaLado(true); });
+  }
+  else if(tv==='video'){ area.innerHTML='<video controls playsinline preload="metadata" src="'+u+'"></video>'; ligarMidia(area.querySelector('video'),a); }
+  else if(tv==='audio'){ area.innerHTML='<audio controls preload="metadata" src="'+u+'"></audio>'; ligarMidia(area.querySelector('audio'),a); }
+  else if(tv==='imagem') area.innerHTML='<img src="'+u+'" alt="'+esc(a.nome)+'">';
+  else if(tv==='texto') area.innerHTML='<iframe class="doc" src="'+u+'" title="'+esc(a.nome)+'"></iframe>';
+  else area.innerHTML='<div class="sala-aviso"><h3>Este formato não abre aqui</h3><p>O navegador não mostra arquivos assim dentro da página. Baixe para abrir no programa certo.</p><a class="btn btn-escuro" href="'+u+'?baixar=1">Baixar '+esc(a.nome)+'</a></div>';
+}
+function area_nome(id){ return id?area(id).nome:''; }
+function ligarMidia(m,a){
+  m.addEventListener('loadedmetadata',function(){ if(a.tempo && a.tempo<m.duration-5) m.currentTime=a.tempo; });
+  m.addEventListener('timeupdate',function(){ posicaoMudou(a.id,{tempo:Math.floor(m.currentTime)}); });
+  m.addEventListener('pause',salvarPosicao);
+  m.addEventListener('error',function(){ var z=m.parentNode; if(z&&m.error&&m.error.code>=3) z.innerHTML='<div class="sala-aviso"><h3>Este vídeo não toca no navegador</h3><p>O formato do arquivo não é aceito aqui. MP4 costuma funcionar em todos os aparelhos.</p><a class="btn btn-escuro" href="'+urlArq(a.id)+'?baixar=1">Baixar o arquivo</a></div>'; });
+}
+var posPend=null, posT=null;
+function posicaoMudou(id,dados){ posPend={id:id,dados:Object.assign(posPend&&posPend.id===id?posPend.dados:{},dados)}; clearTimeout(posT); posT=setTimeout(salvarPosicao,dados.tempo!=null?10000:900); if(SALA&&SALA.tipo==='latim'&&dados.pagina&&livroMapeado()){ var c=capDaPagina(dados.pagina); if(c&&c!==SALA.cap){ SALA.cap=c; document.getElementById('sala-sub').textContent='Capitulum '+romano(c)+' · '+CAPS[c-1]; renderSalaLado(); } } }
+function salvarPosicao(){ clearTimeout(posT); if(!posPend) return; var p=posPend; posPend=null; var a=S.arqs.filter(function(x){ return x.id===p.id; })[0]; if(!a) return; Object.assign(a,p.dados); gravar('arquivos/'+a.id,a); }
+/* Notas salvam sozinhas enquanto se digita. */
+var notaT=null, notaEl=null;
+function notaDigitada(el){ notaEl=el; var s=document.getElementById('nota-salvo'); if(s) s.textContent='Salvando…'; clearTimeout(notaT); notaT=setTimeout(flushNota,700); }
+function flushNota(){
+  clearTimeout(notaT); if(!notaEl) return; var el=notaEl, v=el.value, k=el.dataset.nota, id=el.dataset.id; notaEl=null;
+  if(k==='item'){ var b=S.banco.filter(function(x){ return x.id===id; })[0]; if(b){ b.notas=v; gravar('banco/'+b.id,b); } }
+  if(k==='arquivo'){ var a=S.arqs.filter(function(x){ return x.id===id; })[0]; if(a){ a.notas=v; gravar('arquivos/'+a.id,a); } }
+  if(k==='latim'){ var L=lat(); L.notas=L.notas||{}; L.notas[id]=v; S.lat=L; salvarLat(); }
+  var s=document.getElementById('nota-salvo'); if(s) s.textContent='Salvo';
+}
+function renderSalaLado(forcar){
+  if(!SALA) return;
+  var lado=document.getElementById('sala-lado'), at=document.activeElement;
+  if(!forcar && at && lado.contains(at) && /INPUT|TEXTAREA|SELECT/.test(at.tagName)){ S.renderPendente=true; return; }
+  if(fontesSala().map(function(x){ return x.k; }).join('|')!==chaveFontes) renderVisor();
+  if(notaEl) flushNota();
+  var vl=document.getElementById('sala-voc-lat'), vp=document.getElementById('sala-voc-pt'), guarda=vl?[vl.value,vp?vp.value:'']:null;
+  lado.innerHTML={item:ladoItem,arquivo:ladoArquivo,latim:ladoLatim}[SALA.tipo]();
+  if(guarda){ vl=document.getElementById('sala-voc-lat'); vp=document.getElementById('sala-voc-pt'); if(vl) vl.value=guarda[0]; if(vp) vp.value=guarda[1]; }
+}
+function blocoNotas(k,id,valor,rot,dica){ return '<section class="sala-bloco"><h4>'+rot+'</h4><textarea class="campo" id="nota-'+esc(k)+'" data-nota="'+esc(k)+'" data-id="'+esc(id)+'" placeholder="'+esc(dica)+'" aria-label="'+esc(rot)+'">'+esc(valor||'')+'</textarea><span class="salvo" id="nota-salvo">Salva sozinha enquanto você escreve</span></section>'; }
+function ladoItem(){
+  var b=S.banco.filter(function(x){ return x.id===SALA.id; })[0]; if(!b) return '<section class="sala-bloco"><p class="nota">Este item foi apagado.</p></section>';
+  var feito=b.status==='concluido', min=minutosItem(b.id);
+  return blocoNotas('item',b.id,b.notas,'Notas','O que aprendi, com minhas palavras. Em que minuto parei.')+
+    '<section class="sala-bloco"><h4>Materiais</h4><p class="nota">'+(anexosDe(b.id).length?anexosDe(b.id).length+' '+(anexosDe(b.id).length===1?'arquivo anexado':'arquivos anexados'):'Nenhum arquivo anexado')+(min?' · '+min+' min estudados':'')+'</p><div class="acoes">'+botaoEnviar('Anexar arquivo','data-item="'+esc(b.id)+'" data-area="'+esc(b.area||'')+'"')+(b.link?'<a class="btn btn-claro btn-p" href="'+esc(b.link)+'" target="_blank" rel="noopener">Abrir o link</a>':'')+'</div></section>'+
+    (feito?'':'<section class="sala-bloco"><button class="btn btn-claro" data-act="sala-concluir">Marcar como concluído</button></section>');
+}
+function ladoArquivo(){
+  var a=S.arqs.filter(function(x){ return x.id===SALA.id; })[0]; if(!a) return '<section class="sala-bloco"><p class="nota">Este arquivo foi apagado.</p></section>';
+  return blocoNotas('arquivo',a.id,a.notas,'Notas','O que aprendi, com minhas palavras.')+'<section class="sala-bloco"><div class="acoes"><a class="btn btn-claro btn-p" href="'+urlArq(a.id)+'?baixar=1">Baixar</a><button class="btn btn-claro btn-p" data-act="editar-arq" data-id="'+esc(a.id)+'">Editar</button></div></section>';
+}
+function ladoLatim(){
+  var n=SALA.cap, f=feitosCap(n), venc=vocabVencido().length, ch=LIVRO.caps[n-1], map=livroMapeado();
+  var irs=map?'<div class="ir-chips">'+'<button class="chip" data-act="ir-pag" data-p="'+ch[0]+'">Início</button><button class="chip" data-act="ir-pag" data-p="'+ch[1]+'">Grammatica</button><button class="chip" data-act="ir-pag" data-p="'+ch[2]+'">Pensa</button>'+LIVRO.extras.map(function(x){ return '<button class="chip" data-act="ir-pag" data-p="'+x[1]+'">'+x[0]+'</button>'; }).join('')+'</div>':(lat().livro?'<p class="nota">Use o sumário do leitor para navegar.</p>':'');
+  var nav='<div class="acoes">'+(n>1?'<button class="btn btn-claro btn-p" data-act="sala-cap" data-n="'+(n-1)+'">← '+romano(n-1)+'</button>':'')+(n<35?'<button class="btn btn-claro btn-p" data-act="sala-cap" data-n="'+(n+1)+'">'+romano(n+1)+' →</button>':'')+(n===lat().atual&&n<35&&!proximaParte(n)?'<button class="btn btn-escuro btn-p" data-act="avancar-cap">Concluir e ir para o '+romano(n+1)+'</button>':'')+'</div>';
+  return '<section class="sala-bloco"><h4>Capitulum '+romano(n)+' · <em lang="la" style="font-family:var(--f-serif);font-weight:400;font-size:1.1em">'+esc(CAPS[n-1])+'</em></h4>'+irs+
+      '<div class="check">'+PARTES.map(function(p){ return '<button class="ck'+(f[p[0]]?' on':'')+'" data-act="parte" data-n="'+n+'" data-p="'+p[0]+'"><span class="circ">'+I.check+'</span><span>'+p[1]+'</span></button>'; }).join('')+'</div>'+nav+'</section>'+
+    '<section class="sala-bloco"><h4>Nova palavra</h4><p class="nota">Selecione uma palavra no livro e ela aparece aqui.</p><form data-form="vocab" style="display:grid;gap:8px"><input class="campo" name="latim" id="sala-voc-lat" lang="la" placeholder="via, -ae f." autocomplete="off" required aria-label="Latim"><input class="campo" name="pt" id="sala-voc-pt" placeholder="estrada, caminho" autocomplete="off" required aria-label="Português"><input type="hidden" name="cap" value="'+n+'"><div class="acoes"><button class="btn btn-claro btn-p" type="submit">Adicionar</button>'+(venc?'<button class="btn btn-claro btn-p" type="button" data-act="revisar">Revisar '+venc+'</button>':'')+'</div></form></section>'+
+    blocoNotas('latim',String(n),(lat().notas||{})[n],'Caderno do capítulo','Respostas dos Pensa, dúvidas, frases para reler.')+
+    (lat().livro?'':'<section class="sala-bloco"><p class="nota">O livro ainda não foi enviado.</p></section>');
+}
+
 /* ---------- Toast ---------- */
 var toastT=null;
 function toast(t,sub){ var c=document.getElementById('toast'); if(!c){ c=document.createElement('div'); c.id='toast'; document.body.appendChild(c); } c.className='toast'; c.setAttribute('role','status'); c.innerHTML='<span>'+t+'</span>'+(sub?'<small>'+esc(sub)+'</small>':''); clearTimeout(toastT); toastT=setTimeout(function(){ c.remove(); },3600); }
 
 /* ---------- Ações ---------- */
-function ir(v){ S.view=v; S.capVer=null; S.confirmar=null; try{ history.replaceState(null,'','#'+v); }catch(e){} render(); window.scrollTo(0,0); }
+function ir(v){ S.view=v; S.capVer=null; S.confirmar=null; if(v==='arquivos') carregarEspaco(); try{ history.replaceState(null,'','#'+v); }catch(e){} render(); window.scrollTo(0,0); }
 function anotar(texto){
   texto=texto.trim(); if(!texto) return;
   var m=texto.match(/https?:\/\/\S+/), link=m?m[0]:'', titulo=texto.replace(link,'').trim();
   var tipo = /youtu\.?be|vimeo|instagram|tiktok/.test(link) ? 'video' : link ? 'artigo' : 'tema';
-  var item={titulo:titulo, link:link, area:S.area, tipo:tipo, prioridade:'media', status:'fila', notas:'', semana:false, criado:hoje()};
+  var item={titulo:titulo, link:link, area:areaSel(), tipo:tipo, prioridade:'media', status:'fila', notas:'', semana:false, criado:hoje()};
   var id=uid(); item.id=id; S.banco.push(item); gravar('banco/'+id,item);
-  toast('Anotado no <em>banco</em>', AREAS[S.area][0]+(link&&!titulo?' · toque no item para dar um título':''));
+  toast('Anotado no <em>banco</em>', area(areaSel()).nome+(link&&!titulo?' · toque no item para dar um título':''));
   render();
 }
 function salvarItem(f){
@@ -1054,7 +1497,8 @@ function salvarItem(f){
 function salvarSessao(f){
   var p=S.modal.p, data=f.get('data')||hoje(), s={pratica:p, data:data, minutos:intOu(f.get('min'))||0, notas:f.get('notas').trim(), criado:new Date().toISOString()};
   if(!s.minutos){ toast('Informe quantos minutos você estudou.'); return; }
-  if(p==='latim'){
+  if(p==='estudo'){ var cx=S.modal.ctx||{}; s.titulo=cx.titulo||''; s.area=cx.area||''; if(cx.item) s.item=cx.item; if(cx.arquivo) s.arquivo=cx.arquivo; }
+  else if(p==='latim'){
     var cap=Math.min(35,intOu(f.get('cap'))||lat().atual), partes=f.getAll('parte');
     s.cap=cap; s.partes=partes;
     var L=lat(); L.feitos=L.feitos||{}; var fc=L.feitos[String(cap)]=L.feitos[String(cap)]||{}; var mudou=false;
@@ -1066,7 +1510,7 @@ function salvarSessao(f){
   var id=uid(); s.id=id; S.sess.push(s); gravar('sessoes/'+id,s);
   S.modal=null;
   var completo = minutosHoje('latim')>=meta('latim') && minutosHoje('violino')>=meta('violino');
-  toast(completo?'Hoje está completo. <em>Laus Deo.</em>':'Estudo registrado', s.minutos+' min de '+p);
+  toast(completo?'Hoje está completo. <em>Laus Deo.</em>':'Estudo registrado', s.minutos+' min'+(p==='estudo'?'':' de '+p));
   render();
 }
 function salvarEx(f){
@@ -1100,13 +1544,28 @@ document.addEventListener('click',function(ev){
   var el=ev.target.closest('[data-act]'); if(!el) return;
   var a=el.dataset.act;
   if(a==='fechar-fora'){ if(ev.target===el){ S.modal=null; S.rev=null; renderModal(); render(); } return; }
-  if(a!=='pre-apagar' && a!=='apagar' && a!=='apagar-ex' && S.confirmar){ S.confirmar=null; }
+  if(a==='area-pre' || a==='arq-pre'){ S.confirmar=el.dataset.k; renderModal(); return; }
+  if(a!=='pre-apagar' && a!=='apagar' && a!=='apagar-ex' && a!=='area-apagar' && a!=='apagar-arq' && S.confirmar){ S.confirmar=null; }
   switch(a){
     case 'ver': ir(el.dataset.v); break;
     case 'tema': mudarTema(); break;
     case 'cor': var Gc=ger(); Gc.corApp=Gc.corApp==='ouro'?'lit':'ouro'; S.ger=Gc; salvarGer(); render(); break;
     case 'sair': api('POST','/api/sair').then(function(){ location.href='/'; }, function(){ location.href='/'; }); break;
     case 'anotar': if(S.view!=='hoje' && S.view!=='banco') ir('banco'); var c=document.querySelector('[data-form=captura] input'); if(c){ c.scrollIntoView({block:'center',behavior:'smooth'}); c.focus(); } break;
+    case 'areas': S.modal={tipo:'areas'}; renderModal(); break;
+    case 'area-apagar': apagarArea(el.dataset.id); break;
+    case 'f-arq-area': S.fArqArea=el.dataset.a; render(); break;
+    case 'editar-arq': S.modal={tipo:'arq',id:el.dataset.id}; renderModal(); break;
+    case 'apagar-arq': apagarArq(el.dataset.id); break;
+    case 'sala-arq': abrirSala({tipo:'arquivo',id:el.dataset.id}); break;
+    case 'sala-item': S.modal=null; renderModal(); abrirSala({tipo:'item',id:el.dataset.id}); break;
+    case 'sala-latim': abrirSala({tipo:'latim',cap:Number(el.dataset.n)||lat().atual}); break;
+    case 'sala-encerrar': encerrarSala(); break;
+    case 'sala-pausa': pausarSala(); break;
+    case 'sala-fonte': SALA.fonte=el.dataset.f; renderVisor(); break;
+    case 'sala-concluir': var bc=S.banco.filter(function(x){return x.id===SALA.id;})[0]; if(bc){ bc.status='concluido'; bc.concluido=hoje(); bc.semana=false; gravar('banco/'+bc.id,bc); toast('Concluído. <em>Deo gratias.</em>'); render(); } break;
+    case 'ir-pag': if(LEITOR) LEITOR.ir(Number(el.dataset.p)); break;
+    case 'sala-cap': SALA.cap=Number(el.dataset.n); if(LEITOR&&livroMapeado()) LEITOR.ir(LIVRO.caps[SALA.cap-1][0]); render(); break;
     case 'area': S.area=el.dataset.a; lsSet('scr-area',S.area); el.parentNode.querySelectorAll('.chip').forEach(function(b){ b.setAttribute('aria-pressed', String(b===el)); }); break;
     case 'f-status': S.fStatus=el.dataset.s; render(); break;
     case 'f-area': S.fArea=el.dataset.a; render(); break;
@@ -1150,16 +1609,20 @@ document.addEventListener('submit',function(ev){
   else if(t==='sessao') salvarSessao(f);
   else if(t==='ex') salvarEx(f);
   else if(t==='vocab') addVocab(f,form);
+  else if(t==='area-nova') addArea(form);
+  else if(t==='arq') salvarArq(f);
 });
 document.addEventListener('input',function(ev){
   var el=ev.target;
   if(el.dataset.busca==='banco'){ S.busca=el.value; atualizarBusca('busca-banco'); }
   else if(el.dataset.busca==='voc'){ S.buscaVoc=el.value; atualizarBusca('busca-voc'); }
   else if(el.hasAttribute('data-bpm-campo')){ var n=Number(el.value); if(n>=30 && n<=240) metBpm(n); }
+  else if(el.dataset.nota) notaDigitada(el);
 });
 function atualizarBusca(id){ var pos=document.getElementById(id).selectionStart; render(); var el=document.getElementById(id); if(el){ el.focus(); try{ el.setSelectionRange(pos,pos); }catch(e){} } }
 document.addEventListener('keydown',function(ev){
   if(ev.key==='Escape' && S.modal){ S.modal=null; S.rev=null; renderModal(); render(); }
+  if(SALA && !S.modal && LEITOR && !/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||'')){ if(ev.key==='ArrowRight'){ ev.preventDefault(); LEITOR.ir(LEITOR.pag+1); } if(ev.key==='ArrowLeft'){ ev.preventDefault(); LEITOR.ir(LEITOR.pag-1); } }
   if(S.modal && S.modal.tipo==='rev' && S.rev && S.rev.i<S.rev.fila.length){
     if(ev.key===' ' && !S.rev.mostrar){ ev.preventDefault(); S.rev.mostrar=true; renderModal(); }
   }
@@ -1235,7 +1698,7 @@ function criarBanco(){
     setInterval(sincronizar,60000);
   }
   return {
-    doc:doc, collection:function(c){ return consulta(c,[]); },
+    doc:doc, collection:function(c){ return consulta(c,[]); }, sincronizar:sincronizar,
     iniciar:function(){ return api('GET','/api/dados').then(function(r){ aplicar(r); pronto=true; notificar(); ouvir(); }); }
   };
 }
@@ -1271,7 +1734,7 @@ function entrar(usuario){
   document.getElementById('entrada').hidden=true; document.getElementById('app').hidden=false;
   document.getElementById('sair-btn').hidden=false;
   render();
-  var db=criarBanco(); conectar(db);
+  var db=criarBanco(); conectar(db); carregarEspaco();
   db.iniciar().catch(function(e){ document.getElementById('vista').innerHTML='<div class="pagina"><div class="carregando"><p>'+esc(e.message||'Não consegui carregar os dados.')+'</p><button class="btn btn-escuro" data-act="recarregar">Tentar de novo</button></div></div>'; });
 }
 function iniciarServidor(){

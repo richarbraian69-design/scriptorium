@@ -6,6 +6,14 @@ Versão de servidor do Scriptorium: banco de estudos, latim (Familia Romana) e v
 - Os dados ficam em `scriptorium.json` no disco do Railway (`/data`), com uma cópia de segurança por dia em `/data/backups` (as últimas 30).
 - O que é salvo num aparelho aparece na hora nos outros que estiverem abertos.
 
+## Arquivos e sala de estudo
+
+- Os arquivos enviados pelo app ficam em `/data/arquivos`, só para quem entra com senha, e nunca vão para o GitHub. As cópias diárias e o `/api/exportar` guardam só as fichas e notas, não os arquivos em si.
+- O espaço é o do volume do Railway. Para guardar vídeos, aumente o volume no painel do Railway.
+- Abrem na tela: PDF (leitor pdf.js em `publico/vendor`), vídeo, áudio, imagem e texto. Outros formatos ficam para baixar.
+- Links do YouTube, Vimeo e Google Drive abrem dentro da sala. Outros sites abrem em nova aba, porque não permitem ser exibidos em outra página.
+- A sala de latim conhece o PDF do Familia Romana de 332 páginas (`LIVRO` em `publico/index.html`). Um PDF com outra paginação abre normalmente, sem os atalhos de capítulo.
+
 ## Railway
 
 1. Serviço ligado a este repositório (Node.js, `npm start`).
