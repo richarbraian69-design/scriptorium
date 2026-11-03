@@ -488,6 +488,12 @@ jarvis.post('/banco', rota((req, res) => {
 }));
 app.use('/api/jarvis', jarvis);
 
+/* Confere a ligação com o Claude uma única vez: a palavra fica guardada e não é consultada de novo. */
+if (claude && !Object.keys(db.dicionario || {}).length) {
+  consultarClaude('via').then(d => { db.dicionario = db.dicionario || {}; if (d.encontrado) { db.dicionario[chaveDic('via')] = d; gravar(); } console.log('[dicionario] teste ok: ' + d.termo + ' = ' + d.significado); })
+    .catch(e => console.error('[dicionario] teste falhou: ' + (e.status || '') + ' ' + e.message));
+}
+
 app.use((req, res) => res.status(404).type('text').send('Página não encontrada.'));
 
 app.listen(PORTA, () => {
