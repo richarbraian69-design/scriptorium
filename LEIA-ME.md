@@ -14,6 +14,10 @@ Versão de servidor do Scriptorium: banco de estudos, latim (Familia Romana) e v
 - Links do YouTube, Vimeo e Google Drive abrem dentro da sala. Outros sites abrem em nova aba, porque não permitem ser exibidos em outra página.
 - A sala de latim conhece o PDF do Familia Romana de 332 páginas (`LIVRO` em `publico/index.html`). Um PDF com outra paginação abre normalmente, sem os atalhos de capítulo.
 
+## Dicionário
+
+Na sala de estudo e na página Latim, digitar uma palavra traz o significado pelo Claude. Precisa de `ANTHROPIC_API_KEY` no Railway; sem ela, o resto do app funciona normalmente. O modelo padrão é `claude-opus-5-5` e muda com `ANTHROPIC_MODELO`. Cada palavra consultada fica guardada no disco e não gasta de novo.
+
 ## Railway
 
 1. Serviço ligado a este repositório (Node.js, `npm start`).

@@ -9,6 +9,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const { pipeline } = require('stream');
+const Anthropic = require('@anthropic-ai/sdk').default;
 
 const PORTA = process.env.PORT || 3000;
 function discoEm(p) { try { return fs.statSync(p).isDirectory() && fs.statSync(p).dev !== fs.statSync(__dirname).dev; } catch (e) { return false; } }
@@ -25,7 +26,7 @@ const COPIAS = 30;
 /* ---------- Armazenamento ---------- */
 fs.mkdirSync(BACKUPS, { recursive: true });
 fs.mkdirSync(ARQUIVOS, { recursive: true });
-let db = { usuarios: [], sessoes: {}, docs: {}, apagados: {}, seq: 0 };
+let db = { usuarios: [], sessoes: {}, docs: {}, apagados: {}, seq: 0, dicionario: {} };
 if (fs.existsSync(ARQ)) {
   try { db = Object.assign(db, JSON.parse(fs.readFileSync(ARQ, 'utf8'))); }
   catch (e) { console.error('Não consegui ler ' + ARQ + '. Corrija ou restaure uma cópia da pasta backups/. Nada foi apagado.', e.message); process.exit(1); }
@@ -193,6 +194,7 @@ app.get('/diagnostico', (req, res) => {
     'Contas ................. ' + db.usuarios.length,
     'Registros guardados .... ' + Object.keys(db.docs).length,
     'Arquivos de estudo ..... ' + (() => { const e = espacoArquivos(); return e.qtd + ' (' + (e.usado / 1048576).toFixed(1) + ' MB)' + (e.total ? ', ' + (e.livre / 1048576).toFixed(0) + ' MB livres de ' + (e.total / 1048576).toFixed(0) + ' MB' : ''); })(),
+    'Dicionário ............. ' + (claude ? 'ligado (' + MODELO_DIC + '), ' + Object.keys(db.dicionario || {}).length + ' palavras guardadas' : 'desligado: falta ANTHROPIC_API_KEY'),
     'Cópias de segurança .... ' + (backups.length ? backups.length + ' (última: ' + backups[backups.length - 1] + ')' : 'nenhuma ainda'),
     'Servidor ligado em ..... ' + INICIADO.toISOString()
   ].join('\n'));
@@ -289,6 +291,49 @@ app.post('/api/senha', exigir, rota((req, res) => {
   for (const t in db.sessoes) if (db.sessoes[t].uid === req.u.id && t !== atual) delete db.sessoes[t];
   gravar(); res.json({ ok: true });
 }));
+/* Dicionário: o Claude explica a palavra; o que já foi consultado fica guardado e não gasta de novo. */
+const MODELO_DIC = process.env.ANTHROPIC_MODELO || 'claude-opus-5-5';
+const claude = process.env.ANTHROPIC_API_KEY ? new Anthropic({ timeout: 30000, maxRetries: 1 }) : null;
+const FORMATO_DIC = { type: 'object', additionalProperties: false, required: ['encontrado', 'idioma', 'termo', 'significado', 'analise', 'exemplo'], properties: {
+  encontrado: { type: 'boolean' }, idioma: { type: 'string' }, termo: { type: 'string' }, significado: { type: 'string' }, analise: { type: 'string' }, exemplo: { type: 'string' } } };
+const PEDIDO_DIC = 'Você é o dicionário de um estudante brasileiro que aprende latim pelo Familia Romana, de Hans Ørberg, e também estuda outros assuntos. Ele digita ou seleciona uma palavra ou expressão, às vezes flexionada, sem mácrons ou com erro de leitura do PDF. Explique em português do Brasil, de forma curta.\n' +
+  'Campos: encontrado (false se não for palavra ou expressão reconhecível; nesse caso deixe os outros campos vazios). idioma (em português, como "Latim"). termo (forma de dicionário; em latim, com enunciado, gênero e mácrons, como "via, viae f." ou "amō, amāre, amāvī, amātum"). significado (os sentidos principais, em poucas palavras). analise (em latim, o que é a forma digitada, como "ablativo singular"; vazio se ela já for a forma de dicionário ou não for latim). exemplo (uma frase latina curta com tradução, se for latim; senão, vazio). Se não tiver certeza de um sentido, diga isso em vez de inventar.';
+function chaveDic(t) { return normNome(t).replace(/\s+/g, ' '); }
+const usoDic = { hora: 0, n: 0 };
+async function consultarClaude(termo) {
+  const r = await claude.beta.messages.create({ model: MODELO_DIC, max_tokens: 2000, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
+    system: PEDIDO_DIC, output_config: { effort: 'low', format: { type: 'json_schema', schema: FORMATO_DIC } }, messages: [{ role: 'user', content: termo }] });
+  if (r.stop_reason === 'refusal') throw new Erro('O Claude não respondeu sobre esse termo.', 422);
+  if (r.stop_reason === 'max_tokens') throw new Erro('A resposta ficou longa demais. Tente uma palavra só.', 422);
+  const bloco = r.content.find(b => b.type === 'text');
+  try { return JSON.parse(bloco.text); } catch (e) { throw new Erro('O Claude respondeu num formato inesperado. Tente de novo.', 502); }
+}
+app.post('/api/significado', exigir, rota(async (req, res) => {
+  const termo = String((req.body || {}).termo || '').replace(/[\u0000-\u001f]/g, ' ').trim();
+  if (!termo) throw new Erro('Digite uma palavra.');
+  if (termo.length > 80) throw new Erro('Consulte uma palavra ou expressão curta.');
+  db.dicionario = db.dicionario || {};
+  const k = chaveDic(termo);
+  if (db.dicionario[k]) return res.json(Object.assign({ guardado: true }, db.dicionario[k]));
+  if (!claude) throw new Erro('O dicionário ainda não foi ligado: falta a chave ANTHROPIC_API_KEY no Railway.', 503);
+  const hora = Math.floor(Date.now() / 3600000);
+  if (usoDic.hora !== hora) { usoDic.hora = hora; usoDic.n = 0; }
+  if (++usoDic.n > 200) throw new Erro('Muitas consultas nesta hora. Espere um pouco.', 429);
+  let d;
+  try { d = await consultarClaude(termo); }
+  catch (e) {
+    if (e instanceof Erro) throw e;
+    console.error('[dicionario] ' + (e.status || '') + ' ' + (e.request_id || '') + ' ' + e.message);
+    if (e.status === 401 || e.status === 403) throw new Erro('A chave ANTHROPIC_API_KEY do Railway foi recusada.', 502);
+    if (e.status === 429) throw new Erro('Muitas consultas seguidas. Tente de novo em instantes.', 429);
+    if (e.status === 404) throw new Erro('O modelo ' + MODELO_DIC + ' não está disponível nessa chave.', 502);
+    if (e.status === 400 && /credit|billing/i.test(e.message || '')) throw new Erro('A conta da API da Anthropic está sem crédito.', 502);
+    throw new Erro('Não consegui falar com o Claude agora. Tente de novo.', 502);
+  }
+  if (d.encontrado) { db.dicionario[k] = d; gravar(); }
+  res.json(d);
+}));
+
 app.get('/api/contas', exigir, (req, res) => res.json({ contas: db.usuarios.map(perfil) }));
 app.post('/api/contas', exigir, exigirAdmin, rota((req, res) => {
   const nome = validarNome(req.body.nome);
