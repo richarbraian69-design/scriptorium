@@ -294,24 +294,27 @@ app.post('/api/senha', exigir, rota((req, res) => {
 /* Dicionário: o Claude explica a palavra; o que já foi consultado fica guardado e não gasta de novo. */
 const MODELO_DIC = process.env.ANTHROPIC_MODELO || 'claude-opus-5-5';
 const claude = process.env.ANTHROPIC_API_KEY ? new Anthropic({ timeout: 30000, maxRetries: 1 }) : null;
-const FORMATO_DIC = { type: 'object', additionalProperties: false, required: ['encontrado', 'idioma', 'termo', 'significado', 'analise', 'exemplo'], properties: {
-  encontrado: { type: 'boolean' }, idioma: { type: 'string' }, termo: { type: 'string' }, significado: { type: 'string' }, analise: { type: 'string' }, exemplo: { type: 'string' } } };
-const PEDIDO_DIC = 'Você é o dicionário de um estudante brasileiro que aprende latim pelo Familia Romana, de Hans Ørberg, e também estuda outros assuntos. Ele digita ou seleciona uma palavra ou expressão, às vezes flexionada, sem mácrons ou com erro de leitura do PDF. Explique em português do Brasil, de forma curta.\n' +
-  'Campos: encontrado (false se não for palavra ou expressão reconhecível; nesse caso deixe os outros campos vazios). idioma (em português, como "Latim"). termo (forma de dicionário; em latim, com enunciado, gênero e mácrons, como "via, viae f." ou "amō, amāre, amāvī, amātum"). significado (os sentidos principais, em poucas palavras). analise (em latim, o que é a forma digitada, como "ablativo singular"; vazio se ela já for a forma de dicionário ou não for latim). exemplo (uma frase latina curta com tradução, se for latim; senão, vazio). Se não tiver certeza de um sentido, diga isso em vez de inventar.';
+const FORMATO_DIC = { type: 'object', additionalProperties: false, required: ['encontrado', 'tipo', 'idioma', 'traducao', 'termo', 'significado', 'analise', 'exemplo'], properties: {
+  encontrado: { type: 'boolean' }, tipo: { type: 'string', enum: ['palavra', 'frase'] }, idioma: { type: 'string' }, traducao: { type: 'string' }, termo: { type: 'string' }, significado: { type: 'string' }, analise: { type: 'string' }, exemplo: { type: 'string' } } };
+const PEDIDO_DIC = 'Você é o dicionário e tradutor de um estudante brasileiro que aprende latim pelo Familia Romana, de Hans Ørberg, e também estuda outros assuntos. Ele digita ou seleciona uma palavra, uma expressão ou uma frase inteira, às vezes sem mácrons, com palavras divididas por hífen no fim da linha ou com erro de leitura do PDF. Responda em português do Brasil, de forma curta.\n' +
+  'Campos comuns: encontrado (false se o texto não for reconhecível; nesse caso deixe os outros campos de texto vazios). tipo ("palavra" para uma palavra ou expressão curta de dicionário; "frase" para uma oração ou trecho). idioma (o idioma do texto, em português, como "Latim").\n' +
+  'Se tipo for "palavra": termo (forma de dicionário; em latim, com enunciado, gênero e mácrons, como "via, viae f." ou "amō, amāre, amāvī, amātum"). significado (os sentidos principais, em poucas palavras). analise (em latim, o que é a forma digitada, como "ablativo singular"; vazio se ela já for a forma de dicionário ou não for latim). exemplo (uma frase latina curta com tradução, se for latim; senão, vazio). traducao vazio.\n' +
+  'Se tipo for "frase": traducao (a tradução completa e natural para o português; se o texto já estiver em português, traduza para o latim). analise (se for latim, até três observações curtas sobre as construções ou palavras mais difíceis; senão, vazio). termo, significado e exemplo vazios.\n' +
+  'Se não tiver certeza de um sentido, diga isso em vez de inventar.';
 function chaveDic(t) { return normNome(t).replace(/\s+/g, ' '); }
 const usoDic = { hora: 0, n: 0 };
 async function consultarClaude(termo) {
   const r = await claude.beta.messages.create({ model: MODELO_DIC, max_tokens: 2000, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
     system: PEDIDO_DIC, output_config: { effort: 'low', format: { type: 'json_schema', schema: FORMATO_DIC } }, messages: [{ role: 'user', content: termo }] });
   if (r.stop_reason === 'refusal') throw new Erro('O Claude não respondeu sobre esse termo.', 422);
-  if (r.stop_reason === 'max_tokens') throw new Erro('A resposta ficou longa demais. Tente uma palavra só.', 422);
+  if (r.stop_reason === 'max_tokens') throw new Erro('A resposta ficou longa demais. Tente um trecho menor.', 422);
   const bloco = r.content.find(b => b.type === 'text');
   try { return JSON.parse(bloco.text); } catch (e) { throw new Erro('O Claude respondeu num formato inesperado. Tente de novo.', 502); }
 }
 app.post('/api/significado', exigir, rota(async (req, res) => {
   const termo = String((req.body || {}).termo || '').replace(/[\u0000-\u001f]/g, ' ').trim();
   if (!termo) throw new Erro('Digite uma palavra.');
-  if (termo.length > 80) throw new Erro('Consulte uma palavra ou expressão curta.');
+  if (termo.length > 800) throw new Erro('Esse trecho é longo demais. Consulte até 800 letras por vez.');
   db.dicionario = db.dicionario || {};
   const k = chaveDic(termo);
   if (db.dicionario[k]) return res.json(Object.assign({ guardado: true }, db.dicionario[k]));
@@ -488,9 +491,10 @@ jarvis.post('/banco', rota((req, res) => {
 }));
 app.use('/api/jarvis', jarvis);
 
-/* Confere a ligação com o Claude uma única vez: a palavra fica guardada e não é consultada de novo. */
-if (claude && !Object.keys(db.dicionario || {}).length) {
-  consultarClaude('via').then(d => { db.dicionario = db.dicionario || {}; if (d.encontrado) { db.dicionario[chaveDic('via')] = d; gravar(); } console.log('[dicionario] teste ok: ' + d.termo + ' = ' + d.significado); })
+/* Confere a tradução com o Claude uma única vez: a frase fica guardada e não é consultada de novo. */
+const FRASE_TESTE = 'Via Appia longa est.';
+if (claude && !(db.dicionario || {})[chaveDic(FRASE_TESTE)]) {
+  consultarClaude(FRASE_TESTE).then(d => { db.dicionario = db.dicionario || {}; if (d.encontrado) { db.dicionario[chaveDic(FRASE_TESTE)] = d; gravar(); } console.log('[dicionario] teste ok: ' + d.tipo + ' = ' + d.traducao); })
     .catch(e => console.error('[dicionario] teste falhou: ' + (e.status || '') + ' ' + e.message));
 }
 

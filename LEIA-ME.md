@@ -16,7 +16,7 @@ Versão de servidor do Scriptorium: banco de estudos, latim (Familia Romana) e v
 
 ## Dicionário
 
-Na sala de estudo e na página Latim, digitar uma palavra traz o significado pelo Claude. Precisa de `ANTHROPIC_API_KEY` no Railway; sem ela, o resto do app funciona normalmente. O modelo padrão é `claude-opus-5-5` e muda com `ANTHROPIC_MODELO`. Cada palavra consultada fica guardada no disco e não gasta de novo.
+Na sala de estudo e na página Latim, digitar uma palavra traz o significado pelo Claude, e uma frase de até 800 letras é traduzida ao apertar Enter. Precisa de `ANTHROPIC_API_KEY` no Railway; sem ela, o resto do app funciona normalmente. O modelo padrão é `claude-opus-5-5` e muda com `ANTHROPIC_MODELO`. Cada palavra consultada fica guardada no disco e não gasta de novo.
 
 ## Railway
 
