@@ -194,7 +194,7 @@ app.get('/diagnostico', (req, res) => {
     'Contas ................. ' + db.usuarios.length,
     'Registros guardados .... ' + Object.keys(db.docs).length,
     'Arquivos de estudo ..... ' + (() => { const e = espacoArquivos(); return e.qtd + ' (' + (e.usado / 1048576).toFixed(1) + ' MB)' + (e.total ? ', ' + (e.livre / 1048576).toFixed(0) + ' MB livres de ' + (e.total / 1048576).toFixed(0) + ' MB' : ''); })(),
-    'Dicionário ............. ' + (claude ? 'ligado (' + MODELO_DIC + '), ' + Object.keys(db.dicionario || {}).length + ' palavras guardadas' : 'desligado: falta ANTHROPIC_API_KEY'),
+    'Dicionário ............. ' + (claude ? 'ligado (' + MODELO_DIC + '), ' + Object.keys(db.dicionario || {}).length + ' palavras guardadas, ' + Object.keys(db.correcoes || {}).length + ' correções' : 'desligado: falta ANTHROPIC_API_KEY'),
     'Cópias de segurança .... ' + (backups.length ? backups.length + ' (última: ' + backups[backups.length - 1] + ')' : 'nenhuma ainda'),
     'Servidor ligado em ..... ' + INICIADO.toISOString()
   ].join('\n'));
@@ -303,14 +303,32 @@ const PEDIDO_DIC = 'Você é o dicionário e tradutor de um estudante brasileiro
   'Se não tiver certeza de um sentido, diga isso em vez de inventar.';
 function chaveDic(t) { return normNome(t).replace(/\s+/g, ' '); }
 const usoDic = { hora: 0, n: 0 };
-async function consultarClaude(termo) {
-  const r = await claude.beta.messages.create({ model: MODELO_DIC, max_tokens: 2000, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
-    system: PEDIDO_DIC, output_config: { effort: 'low', format: { type: 'json_schema', schema: FORMATO_DIC } }, messages: [{ role: 'user', content: termo }] });
+function contarUso() {
+  const hora = Math.floor(Date.now() / 3600000);
+  if (usoDic.hora !== hora) { usoDic.hora = hora; usoDic.n = 0; }
+  if (++usoDic.n > 200) throw new Erro('Muitas consultas nesta hora. Espere um pouco.', 429);
+}
+async function comClaude(fn) {
+  try { return await fn(); }
+  catch (e) {
+    if (e instanceof Erro) throw e;
+    console.error('[claude] ' + (e.status || '') + ' ' + (e.request_id || '') + ' ' + e.message);
+    if (e.status === 401 || e.status === 403) throw new Erro('A chave ANTHROPIC_API_KEY do Railway foi recusada.', 502);
+    if (e.status === 429) throw new Erro('Muitas consultas seguidas. Tente de novo em instantes.', 429);
+    if (e.status === 404) throw new Erro('O modelo ' + MODELO_DIC + ' não está disponível nessa chave.', 502);
+    if (e.status === 400 && /credit|billing/i.test(e.message || '')) throw new Erro('A conta da API da Anthropic está sem crédito.', 502);
+    throw new Erro('Não consegui falar com o Claude agora. Tente de novo.', 502);
+  }
+}
+async function chamarClaude(sistema, conteudo, formato, esforco, maxTokens) {
+  const r = await claude.beta.messages.create({ model: MODELO_DIC, max_tokens: maxTokens, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
+    system: sistema, output_config: { effort: esforco, format: { type: 'json_schema', schema: formato } }, messages: [{ role: 'user', content: conteudo }] });
   if (r.stop_reason === 'refusal') throw new Erro('O Claude não respondeu sobre esse termo.', 422);
   if (r.stop_reason === 'max_tokens') throw new Erro('A resposta ficou longa demais. Tente um trecho menor.', 422);
   const bloco = r.content.find(b => b.type === 'text');
   try { return JSON.parse(bloco.text); } catch (e) { throw new Erro('O Claude respondeu num formato inesperado. Tente de novo.', 502); }
 }
+function consultarClaude(termo) { return chamarClaude(PEDIDO_DIC, termo, FORMATO_DIC, 'low', 2000); }
 app.post('/api/significado', exigir, rota(async (req, res) => {
   const termo = String((req.body || {}).termo || '').replace(/[\u0000-\u001f]/g, ' ').trim();
   if (!termo) throw new Erro('Digite uma palavra.');
@@ -319,21 +337,31 @@ app.post('/api/significado', exigir, rota(async (req, res) => {
   const k = chaveDic(termo);
   if (db.dicionario[k]) return res.json(Object.assign({ guardado: true }, db.dicionario[k]));
   if (!claude) throw new Erro('O dicionário ainda não foi ligado: falta a chave ANTHROPIC_API_KEY no Railway.', 503);
-  const hora = Math.floor(Date.now() / 3600000);
-  if (usoDic.hora !== hora) { usoDic.hora = hora; usoDic.n = 0; }
-  if (++usoDic.n > 200) throw new Erro('Muitas consultas nesta hora. Espere um pouco.', 429);
-  let d;
-  try { d = await consultarClaude(termo); }
-  catch (e) {
-    if (e instanceof Erro) throw e;
-    console.error('[dicionario] ' + (e.status || '') + ' ' + (e.request_id || '') + ' ' + e.message);
-    if (e.status === 401 || e.status === 403) throw new Erro('A chave ANTHROPIC_API_KEY do Railway foi recusada.', 502);
-    if (e.status === 429) throw new Erro('Muitas consultas seguidas. Tente de novo em instantes.', 429);
-    if (e.status === 404) throw new Erro('O modelo ' + MODELO_DIC + ' não está disponível nessa chave.', 502);
-    if (e.status === 400 && /credit|billing/i.test(e.message || '')) throw new Erro('A conta da API da Anthropic está sem crédito.', 502);
-    throw new Erro('Não consegui falar com o Claude agora. Tente de novo.', 502);
-  }
+  contarUso();
+  const d = await comClaude(() => consultarClaude(termo));
   if (d.encontrado) { db.dicionario[k] = d; gravar(); }
+  res.json(d);
+}));
+
+/* Correção de exercícios: o Claude confere a resposta e aponta cada erro. */
+const FORMATO_CORRECAO = { type: 'object', additionalProperties: false, required: ['correto', 'resumo', 'erros', 'resposta_corrigida'], properties: {
+  correto: { type: 'boolean' }, resumo: { type: 'string' }, resposta_corrigida: { type: 'string' },
+  erros: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['trecho', 'correcao', 'explicacao'], properties: { trecho: { type: 'string' }, correcao: { type: 'string' }, explicacao: { type: 'string' } } } } } };
+const PEDIDO_CORRECAO = 'Você corrige exercícios de um estudante brasileiro. Na maior parte das vezes são os Pensa do Familia Romana, de Hans Ørberg (completar terminações, completar palavras, responder perguntas em latim ou traduzir), mas podem ser exercícios de outros assuntos. Você recebe a resposta do aluno e, quando houver, o enunciado e o capítulo em que ele está. O texto pode vir sem mácrons ou com erros de leitura do PDF no enunciado.\n' +
+  'Corrija com cuidado e responda em português do Brasil. Não conte como erro a falta de mácrons, a ordem livre das palavras do latim nem uma resposta diferente que também esteja correta. Sem enunciado, avalie se a frase está correta na língua em que foi escrita.\n' +
+  'Campos: correto (true só se não houver nenhum erro). resumo (uma frase curta: diga que está certo, ou quantos erros há e de que tipo). erros (um item por erro: trecho é exatamente o que o aluno escreveu de errado; correcao é a forma certa; explicacao diz por que, em uma ou duas frases, citando a regra, como caso, concordância ou conjugação; lista vazia se estiver certo). resposta_corrigida (a resposta inteira já corrigida; vazio se estiver certa).';
+function limpar(t, max) { return String(t || '').replace(/[\u0000-\u0008\u000b-\u001f]/g, ' ').trim().slice(0, max); }
+app.post('/api/corrigir', exigir, rota(async (req, res) => {
+  const b = req.body || {}, resposta = limpar(b.resposta, 3000), enunciado = limpar(b.enunciado, 3000), contexto = limpar(b.contexto, 200);
+  if (!resposta) throw new Erro('Escreva a sua resposta.');
+  db.correcoes = db.correcoes || {};
+  const k = chaveDic(contexto + '|' + enunciado + '|' + resposta);
+  if (db.correcoes[k]) return res.json(Object.assign({ guardado: true }, db.correcoes[k]));
+  if (!claude) throw new Erro('A correção ainda não foi ligada: falta a chave ANTHROPIC_API_KEY no Railway.', 503);
+  contarUso();
+  const texto = (contexto ? 'Contexto: ' + contexto + '\n\n' : '') + (enunciado ? 'Enunciado:\n' + enunciado + '\n\n' : 'Sem enunciado.\n\n') + 'Resposta do aluno:\n' + resposta;
+  const d = await comClaude(() => chamarClaude(PEDIDO_CORRECAO, texto, FORMATO_CORRECAO, 'medium', 6000));
+  db.correcoes[k] = d; gravar();
   res.json(d);
 }));
 
@@ -493,6 +521,11 @@ app.use('/api/jarvis', jarvis);
 
 /* Confere a tradução com o Claude uma única vez: a frase fica guardada e não é consultada de novo. */
 const FRASE_TESTE = 'Via Appia longa est.';
+if (claude && !(db.correcoes || {})['teste']) {
+  chamarClaude(PEDIDO_CORRECAO, 'Enunciado:\nVia Appia long__ est.\n\nResposta do aluno:\nVia Appia longus est.', FORMATO_CORRECAO, 'medium', 6000)
+    .then(d => { db.correcoes = db.correcoes || {}; db.correcoes.teste = d; gravar(); console.log('[correcao] teste ok: correto=' + d.correto + ' · ' + d.resumo + ' · ' + (d.erros[0] ? d.erros[0].trecho + ' -> ' + d.erros[0].correcao : '')); })
+    .catch(e => console.error('[correcao] teste falhou: ' + (e.status || '') + ' ' + e.message));
+}
 if (claude && !(db.dicionario || {})[chaveDic(FRASE_TESTE)]) {
   consultarClaude(FRASE_TESTE).then(d => { db.dicionario = db.dicionario || {}; if (d.encontrado) { db.dicionario[chaveDic(FRASE_TESTE)] = d; gravar(); } console.log('[dicionario] teste ok: ' + d.tipo + ' = ' + d.traducao); })
     .catch(e => console.error('[dicionario] teste falhou: ' + (e.status || '') + ' ' + e.message));
