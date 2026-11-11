@@ -370,15 +370,16 @@ app.post('/api/corrigir', exigir, rota(async (req, res) => {
  * Texto latino: edição de J. B. Greenough (1900), pela Perseus Digital Library, em publico/eneida. */
 const CLASSES_ENE = ['substantivo', 'adjetivo', 'pronome', 'verbo', 'participio', 'adverbio', 'preposicao', 'conjuncao', 'interjeicao', 'numeral'];
 const CASOS_ENE = ['nominativo', 'genitivo', 'dativo', 'acusativo', 'ablativo', 'vocativo', 'locativo', 'nenhum'];
-const FORMATO_ENEIDA = { type: 'object', additionalProperties: false, required: ['traducao', 'palavras', 'silabas'], properties: {
-  traducao: { type: 'string' },
+const FORMATO_ENEIDA = { type: 'object', additionalProperties: false, required: ['traducao', 'texto_macrons', 'palavras', 'silabas'], properties: {
+  traducao: { type: 'string' }, texto_macrons: { type: 'string' },
   palavras: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['forma', 'lema', 'classe', 'caso', 'detalhe', 'sentido'], properties: {
     forma: { type: 'string' }, lema: { type: 'string' }, classe: { type: 'string', enum: CLASSES_ENE }, caso: { type: 'string', enum: CASOS_ENE }, detalhe: { type: 'string' }, sentido: { type: 'string' } } } },
   silabas: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['texto', 'longa', 'fim_do_pe'], properties: { texto: { type: 'string' }, longa: { type: 'boolean' }, fim_do_pe: { type: 'boolean' } } } } } };
 const PEDIDO_ENEIDA = 'Você ajuda um estudante brasileiro a ler a Eneida de Virgílio em latim, verso a verso. Você recebe o livro, o número do verso, o verso, os versos vizinhos (só como contexto) e a lista numerada das palavras do verso. Responda em português do Brasil. Suas respostas servem de gabarito para o aluno conferir a própria análise, então seja exato.\n' +
   'traducao: tradução fiel e natural só deste verso, levando em conta a frase em que ele está; se o sentido depender de palavras dos versos vizinhos, complete entre colchetes.\n' +
   'palavras: exatamente um item para cada palavra da lista, na mesma ordem. forma: a palavra como está no verso. lema: a forma de dicionário com mácrons (substantivos com genitivo e gênero, como "arma, -ōrum n."; verbos com os tempos primitivos, como "canō, -ere, cecinī, cantum"). classe: a classe da palavra neste verso. Use "participio" para particípios e gerundivos, e "verbo" para formas finitas, infinitivos, gerúndios e supinos. Nomes próprios são "substantivo". Demonstrativos, relativos, interrogativos, possessivos, pessoais, reflexivos e indefinidos são "pronome", mesmo quando acompanham um substantivo. caso: o caso da forma neste verso, para substantivos, adjetivos, pronomes, numerais declinados, particípios, gerundivos, gerúndios e supinos; "nenhum" para as demais. detalhe: a análise completa e curta, como "acusativo plural neutro" ou "3ª pessoa do singular do perfeito do indicativo ativo"; diga com que palavra concorda ou qual é a função quando isso ajudar; se houver enclítica (-que, -ne, -ve), classifique a palavra principal e avise aqui. sentido: o significado da palavra neste verso, em poucas palavras.\n' +
-  'silabas: a escansão do hexâmetro datílico. Um item por sílaba métrica, na ordem. texto: a sílaba como está escrita, sem pontuação; numa elisão, junte a sílaba elidida à seguinte num único item e ponha a parte elidida entre parênteses, como "(um)il". longa: true para sílaba longa. fim_do_pe: true na última sílaba de cada pé. O verso tem seis pés: os cinco primeiros são dátilos (longa, breve, breve) ou espondeus (longa, longa) e o sexto tem duas sílabas, a primeira longa. Se o verso for incompleto ou você não tiver certeza da escansão, devolva a lista vazia.';
+  'texto_macrons: o verso exatamente como está, com a mesma pontuação, mas com mácron em toda vogal longa por natureza (como "Arma virumque canō, Trōiae quī prīmus ab ōrīs"). Serve para uma voz ler o verso com a pronúncia reconstituída.\n' +
+  'silabas: a escansão do hexâmetro datílico. Um item por sílaba métrica, na ordem. texto: a sílaba como está escrita, sem pontuação, com mácron nas vogais longas por natureza; numa elisão, junte a sílaba elidida à seguinte num único item e ponha a parte elidida entre parênteses, como "(um)il". longa: true para sílaba longa. fim_do_pe: true na última sílaba de cada pé. O verso tem seis pés: os cinco primeiros são dátilos (longa, breve, breve) ou espondeus (longa, longa) e o sexto tem duas sílabas, a primeira longa. Se o verso for incompleto ou você não tiver certeza da escansão, devolva a lista vazia.';
 const ROMANOS_ENE = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
 const livrosEneida = {};
 function livroEneida(n) {
@@ -409,7 +410,7 @@ const emCursoEneida = new Map();
 function analiseDoVerso(livro, idx) {
   const k = livro + ':' + livroEneida(livro)[idx][0];
   db.eneida = db.eneida || {};
-  if (db.eneida[k]) return Promise.resolve(db.eneida[k]);
+  if (db.eneida[k] && db.eneida[k].texto_macrons) return Promise.resolve(db.eneida[k]);
   if (emCursoEneida.has(k)) return emCursoEneida.get(k);
   const p = comClaude(() => analisarVerso(livro, idx)).then(d => { db.eneida[k] = d; gravar(); emCursoEneida.delete(k); return d; }, e => { emCursoEneida.delete(k); throw e; });
   emCursoEneida.set(k, p);
@@ -420,7 +421,7 @@ app.post('/api/eneida/analise', exigir, rota(async (req, res) => {
   if (!(livro >= 1 && livro <= 12)) throw new Erro('Livro de 1 a 12.');
   const idx = livroEneida(livro).findIndex(v => v[0] === rot);
   if (idx < 0) throw new Erro('Verso não encontrado.', 404);
-  const k = livro + ':' + rot, guardado = !!(db.eneida || {})[k];
+  const k = livro + ':' + rot, guardado = !!((db.eneida || {})[k] || {}).texto_macrons;
   if (!guardado) {
     if (!claude) throw new Erro('A análise ainda não foi ligada: falta a chave ANTHROPIC_API_KEY no Railway.', 503);
     if (!emCursoEneida.has(k)) contarUso();
@@ -441,7 +442,7 @@ app.get('/api/eneida/canto/:livro/:verso', exigir, rota(async (req, res) => {
   const idx = livroEneida(livro).findIndex(x => x[0] === rot);
   if (idx < 0) throw new Erro('Verso não encontrado.', 404);
   const k = livro + ':' + rot;
-  if (!(db.eneida || {})[k]) {
+  if (!((db.eneida || {})[k] || {}).texto_macrons) {
     if (!claude) throw new Erro('A análise ainda não foi ligada: falta a chave ANTHROPIC_API_KEY no Railway.', 503);
     if (!emCursoEneida.has(k)) contarUso();
   }
@@ -610,14 +611,33 @@ jarvis.post('/banco', rota((req, res) => {
 app.use('/api/jarvis', jarvis);
 
 /* Confere a tradução com o Claude uma única vez: a frase fica guardada e não é consultada de novo. */
-if (claude && !(db.eneida || {})['1:1']) {
-  analiseDoVerso(1, 0).then(d => console.log('[eneida] teste ok: ' + d.traducao + ' · ' + d.palavras.map(p => p.forma + '=' + p.classe + '/' + p.caso).join(' ') + ' · escansão: ' + (d.silabas.length ? d.silabas.map(s => s.texto + (s.longa ? '–' : 'u') + (s.fim_do_pe ? ' |' : '')).join(' ') : 'sem')))
+if (claude && !((db.eneida || {})['1:1'] || {}).texto_macrons) {
+  analiseDoVerso(1, 0).then(d => console.log('[eneida] teste ok: ' + d.texto_macrons + ' · ' + d.traducao + ' · ' + d.palavras.map(p => p.forma + '=' + p.classe + '/' + p.caso).join(' ') + ' · escansão: ' + (d.silabas.length ? d.silabas.map(s => s.texto + (s.longa ? '–' : 'u') + (s.fim_do_pe ? ' |' : '')).join(' ') : 'sem')))
     .catch(e => console.error('[eneida] teste falhou: ' + (e.status || '') + ' ' + e.message));
 }
+/* Fala: a mesma voz lê o verso com a pronúncia reconstituída e as vogais longas marcadas. */
+app.get('/api/eneida/fala/:livro/:verso', exigir, rota(async (req, res) => {
+  const livro = parseInt(req.params.livro, 10), rot = String(req.params.verso || '');
+  if (!(livro >= 1 && livro <= 12)) throw new Erro('Livro de 1 a 12.');
+  const idx = livroEneida(livro).findIndex(x => x[0] === rot);
+  if (idx < 0) throw new Erro('Verso não encontrado.', 404);
+  const k = livro + ':' + rot;
+  let texto = livroEneida(livro)[idx][1];
+  if (((db.eneida || {})[k] || {}).texto_macrons) texto = db.eneida[k].texto_macrons;
+  else if (claude) { if (!emCursoEneida.has(k)) contarUso(); texto = (await analiseDoVerso(livro, idx)).texto_macrons || texto; }
+  const c = modCanto();
+  if (!c) throw new Erro('A voz não está disponível neste servidor.', 503);
+  const marcado = texto !== livroEneida(livro)[idx][1];
+  const arq = path.join(CANTO_DIR, 'fala-v' + c.VERSAO + (marcado ? '' : '-sem') + '-' + livro + '-' + rot + '.wav');
+  if (!fs.existsSync(arq)) { fs.mkdirSync(CANTO_DIR, { recursive: true }); fs.writeFileSync(arq + '.tmp', c.falar(texto)); fs.renameSync(arq + '.tmp', arq); }
+  res.set({ 'Content-Type': 'audio/wav', 'Cache-Control': 'private, max-age=86400' });
+  res.send(fs.readFileSync(arq));
+}));
+
 /* Confere, uma vez, se a voz cantada funciona neste servidor: gera o canto do primeiro verso, se ainda não existir. */
 setTimeout(() => {
   try {
-    const d = (db.eneida || {})['1:1'], c = d && d.silabas && d.silabas.length ? modCanto() : null;
+    const d = (db.eneida || {})['1:1'], c = d && d.texto_macrons && d.silabas && d.silabas.length ? modCanto() : null;
     if (!c) return;
     const arq = path.join(CANTO_DIR, 'v' + c.VERSAO + '-1-1.wav');
     if (fs.existsSync(arq)) return;
