@@ -195,6 +195,7 @@ app.get('/diagnostico', (req, res) => {
     'Registros guardados .... ' + Object.keys(db.docs).length,
     'Arquivos de estudo ..... ' + (() => { const e = espacoArquivos(); return e.qtd + ' (' + (e.usado / 1048576).toFixed(1) + ' MB)' + (e.total ? ', ' + (e.livre / 1048576).toFixed(0) + ' MB livres de ' + (e.total / 1048576).toFixed(0) + ' MB' : ''); })(),
     'Dicionário ............. ' + (claude ? 'ligado (' + MODELO_DIC + '), ' + Object.keys(db.dicionario || {}).length + ' palavras guardadas, ' + Object.keys(db.correcoes || {}).length + ' correções, ' + Object.keys(db.eneida || {}).length + ' versos da Eneida' : 'desligado: falta ANTHROPIC_API_KEY'),
+    'Canto da Eneida ........ ' + (() => { try { return fs.readdirSync(CANTO_DIR).filter(f => f.endsWith('.wav')).length + ' versos cantados guardados'; } catch (e) { return 'nenhum verso cantado ainda'; } })() + (cantoErro ? ' (ERRO: ' + cantoErro + ')' : ''),
     'Cópias de segurança .... ' + (backups.length ? backups.length + ' (última: ' + backups[backups.length - 1] + ')' : 'nenhuma ainda'),
     'Servidor ligado em ..... ' + INICIADO.toISOString()
   ].join('\n'));
@@ -426,6 +427,33 @@ app.post('/api/eneida/analise', exigir, rota(async (req, res) => {
   }
   res.json(Object.assign({ guardado }, await analiseDoVerso(livro, idx)));
 }));
+/* Canto: a voz sintética canta o verso a partir da escansão; o áudio fica guardado no disco. */
+const CANTO_DIR = path.join(DADOS, 'canto');
+let cantoMod = null, cantoErro = '';
+function modCanto() {
+  if (cantoMod || cantoErro) return cantoMod;
+  try { cantoMod = require('./canto'); } catch (e) { cantoErro = e.message; console.error('[canto] não carregou: ' + e.message); }
+  return cantoMod;
+}
+app.get('/api/eneida/canto/:livro/:verso', exigir, rota(async (req, res) => {
+  const livro = parseInt(req.params.livro, 10), rot = String(req.params.verso || '');
+  if (!(livro >= 1 && livro <= 12)) throw new Erro('Livro de 1 a 12.');
+  const idx = livroEneida(livro).findIndex(x => x[0] === rot);
+  if (idx < 0) throw new Erro('Verso não encontrado.', 404);
+  const k = livro + ':' + rot;
+  if (!(db.eneida || {})[k]) {
+    if (!claude) throw new Erro('A análise ainda não foi ligada: falta a chave ANTHROPIC_API_KEY no Railway.', 503);
+    if (!emCursoEneida.has(k)) contarUso();
+  }
+  const d = await analiseDoVerso(livro, idx);
+  if (!d.silabas || !d.silabas.length) throw new Erro('Este verso não tem escansão para cantar.', 422);
+  const c = modCanto();
+  if (!c) throw new Erro('O canto não está disponível neste servidor.', 503);
+  const arq = path.join(CANTO_DIR, 'v' + c.VERSAO + '-' + livro + '-' + rot + '.wav');
+  if (!fs.existsSync(arq)) { fs.mkdirSync(CANTO_DIR, { recursive: true }); fs.writeFileSync(arq + '.tmp', c.cantar(d.silabas)); fs.renameSync(arq + '.tmp', arq); }
+  res.set({ 'Content-Type': 'audio/wav', 'Cache-Control': 'private, max-age=86400', 'X-Tempos': c.tempos(d.silabas).join(',') });
+  res.send(fs.readFileSync(arq));
+}));
 
 app.get('/api/contas', exigir, (req, res) => res.json({ contas: db.usuarios.map(perfil) }));
 app.post('/api/contas', exigir, exigirAdmin, rota((req, res) => {
@@ -586,6 +614,18 @@ if (claude && !(db.eneida || {})['1:1']) {
   analiseDoVerso(1, 0).then(d => console.log('[eneida] teste ok: ' + d.traducao + ' · ' + d.palavras.map(p => p.forma + '=' + p.classe + '/' + p.caso).join(' ') + ' · escansão: ' + (d.silabas.length ? d.silabas.map(s => s.texto + (s.longa ? '–' : 'u') + (s.fim_do_pe ? ' |' : '')).join(' ') : 'sem')))
     .catch(e => console.error('[eneida] teste falhou: ' + (e.status || '') + ' ' + e.message));
 }
+/* Confere, uma vez, se a voz cantada funciona neste servidor: gera o canto do primeiro verso, se ainda não existir. */
+setTimeout(() => {
+  try {
+    const d = (db.eneida || {})['1:1'], c = d && d.silabas && d.silabas.length ? modCanto() : null;
+    if (!c) return;
+    const arq = path.join(CANTO_DIR, 'v' + c.VERSAO + '-1-1.wav');
+    if (fs.existsSync(arq)) return;
+    const t = Date.now(), wav = c.cantar(d.silabas);
+    fs.mkdirSync(CANTO_DIR, { recursive: true }); fs.writeFileSync(arq, wav);
+    console.log('[canto] teste ok: verso 1 cantado em ' + (Date.now() - t) + ' ms, ' + ((wav.length - 44) / 2 / 22050).toFixed(1) + ' s de áudio');
+  } catch (e) { console.error('[canto] teste falhou: ' + e.message); }
+}, 20000);
 const FRASE_TESTE = 'Via Appia longa est.';
 if (claude && !(db.correcoes || {})['teste']) {
   chamarClaude(PEDIDO_CORRECAO, 'Enunciado:\nVia Appia long__ est.\n\nResposta do aluno:\nVia Appia longus est.', FORMATO_CORRECAO, 'medium', 6000)

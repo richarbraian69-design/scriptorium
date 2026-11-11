@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.4.0",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "mespeak": "^2.0.2"
   }
 }

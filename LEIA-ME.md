@@ -23,7 +23,7 @@ Na sala de estudo e na página Latim, digitar uma palavra traz o significado pel
 A sala da Eneida (página Latim) traz os doze livros em latim, em `publico/eneida`. O texto é o da edição de J. B. Greenough (1900), de domínio público, preparado pela Perseus Digital Library.
 
 - **Ler, Traduzir e Pintar:** o Claude analisa cada verso uma única vez (tradução, classe e caso de cada palavra, escansão) e a análise fica guardada no disco. Ela serve de gabarito para a pintura.
-- **Som:** "Ouvir" usa a voz do navegador; "Cantar o ritmo" toca o hexâmetro sílaba por sílaba, a partir da escansão.
+- **Som:** "Ouvir" usa a voz do navegador. "Cantar" toca uma voz sintética que canta o verso: `canto.js` sintetiza cada sílaba com o eSpeak (pacote `mespeak`, licença GPL) na nota e na duração dadas pela escansão. O áudio fica guardado em `/data/canto`.
 - As pinturas e traduções do aluno ficam na coleção `eneida`, uma ficha por verso.
 
 ## Railway
