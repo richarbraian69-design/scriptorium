@@ -18,7 +18,7 @@ const ARQ = path.join(DADOS, 'scriptorium.json');
 const BACKUPS = path.join(DADOS, 'backups');
 const ARQUIVOS = path.join(DADOS, 'arquivos');
 const FUSO = process.env.FUSO || 'America/Sao_Paulo';
-const COLECOES = new Set(['banco', 'sessoes', 'vocab', 'estado', 'arquivos']);
+const COLECOES = new Set(['banco', 'sessoes', 'vocab', 'estado', 'arquivos', 'eneida']);
 const SEG = /^[A-Za-z0-9_\-.~:@+]{1,120}$/;
 const DIAS_SESSAO = 90;
 const COPIAS = 30;
@@ -194,7 +194,7 @@ app.get('/diagnostico', (req, res) => {
     'Contas ................. ' + db.usuarios.length,
     'Registros guardados .... ' + Object.keys(db.docs).length,
     'Arquivos de estudo ..... ' + (() => { const e = espacoArquivos(); return e.qtd + ' (' + (e.usado / 1048576).toFixed(1) + ' MB)' + (e.total ? ', ' + (e.livre / 1048576).toFixed(0) + ' MB livres de ' + (e.total / 1048576).toFixed(0) + ' MB' : ''); })(),
-    'Dicionário ............. ' + (claude ? 'ligado (' + MODELO_DIC + '), ' + Object.keys(db.dicionario || {}).length + ' palavras guardadas, ' + Object.keys(db.correcoes || {}).length + ' correções' : 'desligado: falta ANTHROPIC_API_KEY'),
+    'Dicionário ............. ' + (claude ? 'ligado (' + MODELO_DIC + '), ' + Object.keys(db.dicionario || {}).length + ' palavras guardadas, ' + Object.keys(db.correcoes || {}).length + ' correções, ' + Object.keys(db.eneida || {}).length + ' versos da Eneida' : 'desligado: falta ANTHROPIC_API_KEY'),
     'Cópias de segurança .... ' + (backups.length ? backups.length + ' (última: ' + backups[backups.length - 1] + ')' : 'nenhuma ainda'),
     'Servidor ligado em ..... ' + INICIADO.toISOString()
   ].join('\n'));
@@ -365,6 +365,68 @@ app.post('/api/corrigir', exigir, rota(async (req, res) => {
   res.json(d);
 }));
 
+/* ---------- Eneida: o Claude analisa cada verso uma única vez e a análise fica guardada ----------
+ * Texto latino: edição de J. B. Greenough (1900), pela Perseus Digital Library, em publico/eneida. */
+const CLASSES_ENE = ['substantivo', 'adjetivo', 'pronome', 'verbo', 'participio', 'adverbio', 'preposicao', 'conjuncao', 'interjeicao', 'numeral'];
+const CASOS_ENE = ['nominativo', 'genitivo', 'dativo', 'acusativo', 'ablativo', 'vocativo', 'locativo', 'nenhum'];
+const FORMATO_ENEIDA = { type: 'object', additionalProperties: false, required: ['traducao', 'palavras', 'silabas'], properties: {
+  traducao: { type: 'string' },
+  palavras: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['forma', 'lema', 'classe', 'caso', 'detalhe', 'sentido'], properties: {
+    forma: { type: 'string' }, lema: { type: 'string' }, classe: { type: 'string', enum: CLASSES_ENE }, caso: { type: 'string', enum: CASOS_ENE }, detalhe: { type: 'string' }, sentido: { type: 'string' } } } },
+  silabas: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['texto', 'longa', 'fim_do_pe'], properties: { texto: { type: 'string' }, longa: { type: 'boolean' }, fim_do_pe: { type: 'boolean' } } } } } };
+const PEDIDO_ENEIDA = 'Você ajuda um estudante brasileiro a ler a Eneida de Virgílio em latim, verso a verso. Você recebe o livro, o número do verso, o verso, os versos vizinhos (só como contexto) e a lista numerada das palavras do verso. Responda em português do Brasil. Suas respostas servem de gabarito para o aluno conferir a própria análise, então seja exato.\n' +
+  'traducao: tradução fiel e natural só deste verso, levando em conta a frase em que ele está; se o sentido depender de palavras dos versos vizinhos, complete entre colchetes.\n' +
+  'palavras: exatamente um item para cada palavra da lista, na mesma ordem. forma: a palavra como está no verso. lema: a forma de dicionário com mácrons (substantivos com genitivo e gênero, como "arma, -ōrum n."; verbos com os tempos primitivos, como "canō, -ere, cecinī, cantum"). classe: a classe da palavra neste verso. Use "participio" para particípios e gerundivos, e "verbo" para formas finitas, infinitivos, gerúndios e supinos. Nomes próprios são "substantivo". Demonstrativos, relativos, interrogativos, possessivos, pessoais, reflexivos e indefinidos são "pronome", mesmo quando acompanham um substantivo. caso: o caso da forma neste verso, para substantivos, adjetivos, pronomes, numerais declinados, particípios, gerundivos, gerúndios e supinos; "nenhum" para as demais. detalhe: a análise completa e curta, como "acusativo plural neutro" ou "3ª pessoa do singular do perfeito do indicativo ativo"; diga com que palavra concorda ou qual é a função quando isso ajudar; se houver enclítica (-que, -ne, -ve), classifique a palavra principal e avise aqui. sentido: o significado da palavra neste verso, em poucas palavras.\n' +
+  'silabas: a escansão do hexâmetro datílico. Um item por sílaba métrica, na ordem. texto: a sílaba como está escrita, sem pontuação; numa elisão, junte a sílaba elidida à seguinte num único item e ponha a parte elidida entre parênteses, como "(um)il". longa: true para sílaba longa. fim_do_pe: true na última sílaba de cada pé. O verso tem seis pés: os cinco primeiros são dátilos (longa, breve, breve) ou espondeus (longa, longa) e o sexto tem duas sílabas, a primeira longa. Se o verso for incompleto ou você não tiver certeza da escansão, devolva a lista vazia.';
+const ROMANOS_ENE = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+const livrosEneida = {};
+function livroEneida(n) {
+  if (!livrosEneida[n]) livrosEneida[n] = JSON.parse(fs.readFileSync(path.join(__dirname, 'publico', 'eneida', 'liber-' + n + '.json'), 'utf8')).versos;
+  return livrosEneida[n];
+}
+function palavrasDoVerso(t) { return t.split(/\s+/).map(x => x.replace(/^[^\p{L}]+|[^\p{L}]+$/gu, '')).filter(Boolean); }
+function escansaoValida(sil) {
+  if (!Array.isArray(sil) || sil.length < 12 || sil.length > 17) return false;
+  const pes = []; let pe = [];
+  sil.forEach((s, i) => { pe.push(!!s.longa); if (s.fim_do_pe || i === sil.length - 1) { pes.push(pe); pe = []; } });
+  if (pes.length !== 6) return false;
+  for (let i = 0; i < 5; i++) { const p = pes[i].map(x => (x ? 'L' : 'B')).join(''); if (p !== 'LBB' && p !== 'LL') return false; }
+  return pes[5].length === 2 && pes[5][0];
+}
+async function analisarVerso(livro, idx) {
+  const vs = livroEneida(livro), rot = vs[idx][0], texto = vs[idx][1], palavras = palavrasDoVerso(texto);
+  const antes = vs.slice(Math.max(0, idx - 3), idx).map(v => v[1]).join('\n'), depois = vs.slice(idx + 1, idx + 4).map(v => v[1]).join('\n');
+  const conteudo = 'Eneida, livro ' + ROMANOS_ENE[livro - 1] + ', verso ' + rot + '.\n\n' + (antes ? 'Versos anteriores (contexto):\n' + antes + '\n\n' : '') + 'Verso a analisar:\n' + texto + '\n\n' +
+    (depois ? 'Versos seguintes (contexto):\n' + depois + '\n\n' : '') + 'Palavras do verso (' + palavras.length + '):\n' + palavras.map((p, i) => (i + 1) + '. ' + p).join('\n');
+  const d = await chamarClaude(PEDIDO_ENEIDA, conteudo, FORMATO_ENEIDA, 'medium', 8000);
+  if (!Array.isArray(d.palavras) || d.palavras.length !== palavras.length) throw new Erro('A análise veio incompleta. Tente de novo.', 502);
+  d.palavras.forEach((p, i) => { p.forma = palavras[i]; });
+  if (!escansaoValida(d.silabas)) d.silabas = [];
+  return d;
+}
+const emCursoEneida = new Map();
+function analiseDoVerso(livro, idx) {
+  const k = livro + ':' + livroEneida(livro)[idx][0];
+  db.eneida = db.eneida || {};
+  if (db.eneida[k]) return Promise.resolve(db.eneida[k]);
+  if (emCursoEneida.has(k)) return emCursoEneida.get(k);
+  const p = comClaude(() => analisarVerso(livro, idx)).then(d => { db.eneida[k] = d; gravar(); emCursoEneida.delete(k); return d; }, e => { emCursoEneida.delete(k); throw e; });
+  emCursoEneida.set(k, p);
+  return p;
+}
+app.post('/api/eneida/analise', exigir, rota(async (req, res) => {
+  const livro = parseInt((req.body || {}).livro, 10), rot = String((req.body || {}).verso || '');
+  if (!(livro >= 1 && livro <= 12)) throw new Erro('Livro de 1 a 12.');
+  const idx = livroEneida(livro).findIndex(v => v[0] === rot);
+  if (idx < 0) throw new Erro('Verso não encontrado.', 404);
+  const k = livro + ':' + rot, guardado = !!(db.eneida || {})[k];
+  if (!guardado) {
+    if (!claude) throw new Erro('A análise ainda não foi ligada: falta a chave ANTHROPIC_API_KEY no Railway.', 503);
+    if (!emCursoEneida.has(k)) contarUso();
+  }
+  res.json(Object.assign({ guardado }, await analiseDoVerso(livro, idx)));
+}));
+
 app.get('/api/contas', exigir, (req, res) => res.json({ contas: db.usuarios.map(perfil) }));
 app.post('/api/contas', exigir, exigirAdmin, rota((req, res) => {
   const nome = validarNome(req.body.nome);
@@ -520,6 +582,10 @@ jarvis.post('/banco', rota((req, res) => {
 app.use('/api/jarvis', jarvis);
 
 /* Confere a tradução com o Claude uma única vez: a frase fica guardada e não é consultada de novo. */
+if (claude && !(db.eneida || {})['1:1']) {
+  analiseDoVerso(1, 0).then(d => console.log('[eneida] teste ok: ' + d.traducao + ' · ' + d.palavras.map(p => p.forma + '=' + p.classe + '/' + p.caso).join(' ') + ' · escansão: ' + (d.silabas.length ? d.silabas.map(s => s.texto + (s.longa ? '–' : 'u') + (s.fim_do_pe ? ' |' : '')).join(' ') : 'sem')))
+    .catch(e => console.error('[eneida] teste falhou: ' + (e.status || '') + ' ' + e.message));
+}
 const FRASE_TESTE = 'Via Appia longa est.';
 if (claude && !(db.correcoes || {})['teste']) {
   chamarClaude(PEDIDO_CORRECAO, 'Enunciado:\nVia Appia long__ est.\n\nResposta do aluno:\nVia Appia longus est.', FORMATO_CORRECAO, 'medium', 6000)

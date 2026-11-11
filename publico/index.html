@@ -461,6 +461,62 @@ textarea.campo{min-height:70px;resize:vertical}
 .exs-form > div{grid-template-columns:minmax(0,1fr) 62px 62px 62px!important}
 @media (max-width:560px){.exs-form > div{grid-template-columns:repeat(3,minmax(0,1fr))!important}.exs-form .marcar{grid-column:1/-1}.exs-form .cab span:first-child{display:none}}
 
+/* Eneida */
+.sala.eneida .sala-area{grid-template-rows:auto auto minmax(0,1fr);overflow:hidden}
+.ene-barra{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 14px 6px}
+.ene-barra select.campo{width:auto;padding:5px 8px;font-size:.9rem}
+.ene-barra .campo.num{width:62px;padding:5px 6px;text-align:center;font-size:.9rem}
+.ene-barra .de{font-size:.84rem;color:var(--tx2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ene-quadro{display:grid;gap:14px;align-content:start;padding:8px 18px 18px;max-height:calc(100dvh - 250px);overflow:auto;border-bottom:1px solid var(--linha)}
+.ene-topo{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.ene-num{font-size:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3)}
+.ene-verso{display:flex;flex-wrap:wrap;gap:10px 6px;align-items:flex-start}
+.pal{display:grid;justify-items:center;gap:3px;border:0;background:none;padding:0;cursor:pointer;color:var(--tx)}
+.pal b{font-family:var(--f-serif);font-weight:400;font-size:clamp(1.5rem,2.5vw,2rem);line-height:1.15;padding:2px 8px;border-radius:8px;border:1.5px solid transparent;background:var(--sup)}
+.pal:hover b{background:var(--sup-2)}
+.pal.tem b{background:color-mix(in srgb,var(--k) 24%,transparent);border-color:var(--k)}
+.pal.sel b{border-color:var(--ac);background:var(--ac-suave)}
+.pal.certa b{box-shadow:0 0 0 2.5px var(--ok)}
+.pal.errada b{box-shadow:0 0 0 2.5px var(--alerta)}
+.pal small{font-size:.66rem;font-weight:600;letter-spacing:.07em;min-height:1.1em;color:var(--tx2)}
+.pal small.gl{font-size:.82rem;font-weight:400;letter-spacing:0;max-width:15ch;text-align:center;line-height:1.25}
+.pont{font-family:var(--f-serif);font-size:1.6rem;line-height:1.3;color:var(--tx3);margin-left:-3px}
+.ene-det{display:grid;gap:3px;padding:10px 12px;border-radius:10px;background:var(--sup);font-size:.92rem}
+.ene-det b{font-family:var(--f-serif);font-weight:400;font-size:1.25rem}
+.ene-det > span:first-of-type{color:var(--tx2);font-size:.86rem}
+.ene-det .acoes{margin-top:4px}
+.ene-trad{margin:0;padding:8px 12px;border-left:2px solid var(--ac);font-family:var(--f-serif);font-size:1.25rem;line-height:1.3}
+.paleta{display:grid;gap:8px}
+.paleta-linha{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.paleta-linha > span{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);min-width:50px}
+.tinta{display:inline-flex;align-items:center;gap:6px;border:1.5px solid transparent;background:var(--sup);border-radius:999px;padding:4px 11px;font-size:.84rem;cursor:pointer;color:var(--tx)}
+.tinta i{width:10px;height:10px;border-radius:3px;background:var(--k)}
+.tinta:hover{background:var(--sup-2)}
+.tinta[aria-pressed="true"]{border-color:var(--k,var(--tx));background:color-mix(in srgb,var(--k,var(--tx)) 18%,transparent);font-weight:600}
+.escansao{display:flex;flex-wrap:wrap;gap:4px 0;font-family:var(--f-serif);font-size:1.3rem;line-height:1.2}
+.sil{position:relative;padding:11px 3px 1px;border-radius:5px}
+.sil::before{content:"";position:absolute;left:4px;right:4px;top:3px;height:2.5px;border-radius:2px;background:var(--tx2)}
+.sil.breve::before{left:calc(50% - 5px);right:auto;width:10px;height:5px;top:1px;background:none;border:1.5px solid var(--tx2);border-top:0;border-radius:0 0 7px 7px}
+.sil.fim{margin-right:9px}
+.sil.fim::after{content:"";position:absolute;right:-5px;top:4px;bottom:2px;width:1px;background:var(--tx3)}
+.sil.toca{background:var(--ac-suave);color:var(--ac-tx)}
+.ene-pass{position:relative;overflow:auto;padding:8px 6px 24px;min-height:110px}
+.vl{display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;align-items:baseline;width:100%;border:0;background:none;text-align:left;padding:3px 10px;border-radius:8px;cursor:pointer;color:var(--tx);font-family:var(--f-serif);font-size:1.12rem;line-height:1.35}
+.vl small{font-family:var(--f-ui);font-size:.7rem;color:var(--tx3);text-align:right;font-variant-numeric:tabular-nums}
+.vl:hover{background:var(--sup)}
+.vl.at{background:var(--ac-suave);color:var(--ac-tx)}
+.vl.pint small{color:var(--ac-tx);font-weight:700}
+.vl.pint small::after{content:" •"}
+.ene-cartao{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
+.ene-cartao b{font-family:var(--f-serif);font-weight:400;font-size:1.5rem;line-height:1.1}
+@media (max-width:900px){
+  .sala.eneida .sala-corpo{display:block}
+  .sala.eneida .sala-visor{height:auto;margin-bottom:12px}
+  .sala.eneida .sala-area{display:block}
+  .ene-quadro{max-height:none;padding-inline:14px}
+  .ene-pass{max-height:46dvh}
+}
+
 /* Dicionário */
 .sala-bloco.bloco-dic textarea,.bloco-dic textarea{min-height:40px;resize:none;overflow:hidden;display:block}
 .dic-acoes{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}
@@ -697,8 +753,8 @@ var VISTAS = [['hoje','Hoje','hoje'],['banco','Banco de estudos','banco']].conca
 
 /* ---------- Estado ---------- */
 var S = {
-  db:null, semDb:false, ok:{banco:false,sess:false,vocab:false,arqs:false,lat:false,vio:false,ger:false},
-  banco:[], sess:[], vocab:[], arqs:[], fArqArea:'', espaco:null, lat:null, vio:null, ger:null,
+  db:null, semDb:false, ok:{banco:false,sess:false,vocab:false,arqs:false,ene:false,lat:false,vio:false,ger:false},
+  banco:[], sess:[], vocab:[], arqs:[], ene:{}, fArqArea:'', espaco:null, lat:null, vio:null, ger:null,
   view:'hoje', fStatus:'fila', fArea:'', busca:'', buscaVoc:'', capVer:null,
   area:lsGet('scr-area')||'intelectual', modal:null, rev:null, confirmar:null, renderPendente:false
 };
@@ -818,6 +874,7 @@ function conectar(db){
   db.collection('sessoes').where('data','>=',somaDias(hoje(),-400)).onSnapshot(function(s){ S.sess=lista(s).map(function(x){ x.minutos=Number(x.minutos)||0; return x; }); S.ok.sess=true; pedirRender(); }, erroLer);
   db.collection('vocab').onSnapshot(function(s){ S.vocab=lista(s); S.ok.vocab=true; pedirRender(); }, erroLer);
   db.collection('arquivos').onSnapshot(function(s){ S.arqs=lista(s); S.ok.arqs=true; pedirRender(); }, erroLer);
+  db.collection('eneida').onSnapshot(function(s){ var o={}; lista(s).forEach(function(d){ o[d.id]=d; }); if(typeof eneTradPend!=='undefined'&&eneTradPend&&S.ene[eneTradPend]) o[eneTradPend]=S.ene[eneTradPend]; S.ene=o; S.ok.ene=true; pedirRender(); }, erroLer);
   [['lat','estado/latim'],['vio','estado/violino'],['ger','estado/geral']].forEach(function(p){
     db.doc(p[1]).onSnapshot(function(s){ S[p[0]] = s.exists ? JSON.parse(JSON.stringify(s.data())) : null; S.ok[p[0]]=true; pedirRender(); }, erroLer);
   });
@@ -965,7 +1022,7 @@ function pedirRender(){
 }
 document.addEventListener('focusout',function(){ setTimeout(function(){ if(S.renderPendente){ var a=document.activeElement; if(!(a && /INPUT|TEXTAREA|SELECT/.test(a.tagName))){ S.renderPendente=false; render(); } } },0); });
 
-function carregado(){ var o=S.ok; return o.banco&&o.sess&&o.vocab&&o.arqs&&o.lat&&o.vio&&o.ger; }
+function carregado(){ var o=S.ok; return o.banco&&o.sess&&o.vocab&&o.arqs&&o.ene&&o.lat&&o.vio&&o.ger; }
 function render(){
   conferirIdioma();
   aplicarCor();
@@ -1043,7 +1100,7 @@ function blocoCron(p){
       (T.etapas&&T.i<T.etapas.length-1?'<button class="btn btn-claro btn-p" data-act="cron-prox">Próximo exercício</button>':'')+
       '<button class="btn btn-claro btn-p" data-act="cron-parar">Encerrar</button></div></div>';
   }
-  if(p==='latim' && SERVIDOR) return '<div class="acoes"><button class="btn btn-escuro" data-act="sala-latim">'+I.ler+'Estudar agora</button><button class="btn btn-claro" data-act="sessao" data-p="latim">Registrar</button></div>';
+  if(p==='latim' && SERVIDOR) return '<div class="acoes"><button class="btn btn-escuro" data-act="sala-latim">'+I.ler+'Estudar agora</button><button class="btn btn-claro" data-act="sala-eneida">Eneida</button><button class="btn btn-claro" data-act="sessao" data-p="latim">Registrar</button></div>';
   var tempoIni=p==='violino'&&totalPlano()?totalPlano():meta(p);
   return '<div class="acoes"><button class="btn btn-escuro" data-act="cron" data-p="'+p+'">'+I.play+'Começar '+fmtMin(tempoIni)+' min</button><button class="btn btn-claro" data-act="sessao" data-p="'+p+'">Registrar</button>'+(p==='violino'?'<button class="btn btn-claro" data-act="plano">Ajustar tempos</button>':'')+'</div>';
 }
@@ -1126,13 +1183,14 @@ function vLatim(){
   var vocHtml=Object.keys(porCap).map(Number).sort(function(a,b){ return b-a; }).map(function(c){
     var ws=porCap[c].filter(function(v){ return !q || (v.latim+' '+v.pt).toLowerCase().indexOf(q)>=0; }).sort(function(a,b){ return String(a.latim).localeCompare(b.latim); });
     if(!ws.length) return '';
-    return '<p class="grupo-rot">Capitulum '+romano(c)+' · '+ws.length+'</p>'+ws.map(function(v){
+    return '<p class="grupo-rot">'+(c?'Capitulum '+romano(c):'Aeneis')+' · '+ws.length+'</p>'+ws.map(function(v){
       var cx=''; for(var i=1;i<=6;i++) cx+='<i class="'+(i<=(v.caixa||0)?'on':'')+'"></i>';
       return '<div class="voc"><b lang="la" data-sem-tr>'+esc(v.latim)+'</b><span data-sem-tr>'+esc(v.pt)+'</span><span class="caixas" title="Nível de memória '+(v.caixa||0)+' de 6">'+cx+'</span>'+botaoApagar('vocab',v.id)+'</div>';
     }).join('');
   }).join('');
   var hist=sessDe('latim').slice().sort(ordemSess).slice(0,12);
   return '<div class="pagina"><div><p class="rot">Latim</p><h2 class="h2" lang="la">Familia Romana</h2><p class="intro">Lingua Latina per se illustrata, de Hans Ørberg. Cada capítulo tem três lectiones, a Grammatica Latina e os Pensa A, B e C.</p>'+(SERVIDOR?'<div class="acoes" style="margin-top:12px"><button class="btn btn-escuro" data-act="sala-latim" data-n="'+n+'">'+I.ler+'Estudar o capítulo '+romano(n)+'</button></div>':'')+'</div>'+
+    (SERVIDOR?'<section class="secao"><p class="rot">Eneida</p><div class="painel pad ene-cartao"><div><b lang="la" data-sem-tr>Aeneis</b><p class="nota">Leia, ouça, traduza e pinte os versos de Virgílio.</p><p class="nota" data-sem-tr>'+(L.eneida?'Liber '+romano(L.eneida.livro)+' · versus '+esc(L.eneida.verso):'Liber I · versus 1')+'</p></div><button class="btn btn-escuro" data-act="sala-eneida">'+I.ler+'Ler a Eneida</button></div></section>':'')+
     (SERVIDOR?blocoDic():'')+'<section class="secao"><div class="secao-topo"><p class="rot">Os 35 capítulos</p><p class="nota">Você está no <b>'+romano(L.atual)+'</b>. Toque num capítulo para ver as partes.</p></div><div class="caps">'+caps+'</div></section>'+
     '<div class="duas"><article class="cartao"><h4>Capitulum '+romano(n)+' · <em lang="la">'+esc(CAPS[n-1])+'</em>'+(n===L.atual?'<span class="pill rubro">Atual</span>':'')+'</h4><div class="check">'+check+'</div>'+
       '<div class="acoes">'+(n===L.atual && n<35?'<button class="btn '+(completo?'btn-escuro':'btn-claro')+' btn-p" data-act="avancar-cap">Concluir e ir para o '+romano(n+1)+'</button>':'')+
@@ -1182,7 +1240,8 @@ document.addEventListener('change',function(ev){ if(ev.target.name==='ex') somar
 function ordemSess(a,b){ return (b.data+(b.criado||'')).localeCompare(a.data+(a.criado||'')); }
 function linhaSess(s){
   var det='';
-  if(s.pratica==='latim'){ var ps=(s.partes||[]).map(function(k){ var p=PARTES.concat(EXTRAS).filter(function(x){return x[0]===k;})[0]; return p?p[1]:k; }); det='Cap. '+romano(s.cap||lat().atual)+(ps.length?' · '+ps.join(', '):''); }
+  if(s.pratica==='latim' && s.eneida){ det='Eneida · Liber '+romano(s.eneida.livro)+', v. '+s.eneida.verso; }
+  else if(s.pratica==='latim'){ var ps=(s.partes||[]).map(function(k){ var p=PARTES.concat(EXTRAS).filter(function(x){return x[0]===k;})[0]; return p?p[1]:k; }); det='Cap. '+romano(s.cap||lat().atual)+(ps.length?' · '+ps.join(', '):''); }
   else det=(s.itens||[]).map(function(it){ return nomeEx(it.ex)+(it.minutos?': '+fmtMin(it.minutos)+' min':'')+(it.bpm?' ('+it.bpm+' bpm)':'')+(it.reps?' ×'+it.reps:''); }).join(' · ') || 'Treino livre';
   return '<div class="ss"><div class="ss-t"><span>'+esc(det)+'</span><small>'+nomeDia(new Date(s.data+'T12:00').getDay())+', '+dataCurta(s.data)+(s.notas?' · '+esc(s.notas):'')+'</small></div><span class="ss-min">'+fmtMin(s.minutos)+' min</span>'+botaoApagar('sessoes',s.id)+'</div>';
 }
@@ -1212,6 +1271,7 @@ function topoModal(t){ return '<div class="folha-topo"><h3>'+t+'</h3><button cla
 function modalSessao(m){
   var corpo='';
   if(m.p==='estudo'){ corpo='<p class="nota">'+esc((m.ctx&&m.ctx.titulo)||'')+'</p>'; }
+  else if(m.p==='latim' && m.ctx && m.ctx.eneida){ corpo='<p class="nota">Eneida · Liber '+romano(m.ctx.eneida.livro)+', até o verso '+esc(m.ctx.eneida.verso)+'</p>'; }
   else if(m.p==='latim'){
     var n=lat().atual, f=feitosCap(n);
     corpo='<label>Capítulo<input class="campo num" name="cap" id="s-cap" inputmode="numeric" value="'+n+'"></label>'+
@@ -1258,7 +1318,7 @@ function modalRev(){
   var v=S.vocab.filter(function(x){ return x.id===r.fila[r.i]; })[0];
   if(!v){ r.i++; return modalRev(); }
   return topoModal('Vocabulário · <em>'+(r.i+1)+' de '+r.fila.length+'</em>')+
-    '<div class="flash"><small>Capitulum '+romano(v.cap||1)+'</small><p class="lat" lang="la" data-sem-tr>'+esc(v.latim)+'</p>'+
+    '<div class="flash"><small>'+(v.cap===0?'Aeneis':'Capitulum '+romano(v.cap||1))+'</small><p class="lat" lang="la" data-sem-tr>'+esc(v.latim)+'</p>'+
     (r.mostrar?'<p class="pt" data-sem-tr>'+esc(v.pt)+'</p><div class="acoes"><button class="btn btn-claro" data-act="rev-resp" data-ok="0">Errei</button><button class="btn btn-escuro" data-act="rev-resp" data-ok="1">Acertei</button></div>':
       '<p class="pt oculto">Pense no significado…</p><button class="btn btn-escuro" data-act="rev-mostrar" autofocus>Mostrar resposta</button>')+'</div>';
 }
@@ -1466,7 +1526,8 @@ function abrirSala(o){
   if(!SERVIDOR) return;
   if(SALA) fecharVisor();
   if(T) cronParar(true);
-  SALA={tipo:o.tipo,id:o.id||null,cap:o.cap||null,fonte:null,ini:Date.now(),acum:0,rodando:true,alvo:o.tipo==='latim'?meta('latim')*60:0,tocou:false};
+  SALA={tipo:o.tipo,id:o.id||null,cap:o.cap||null,fonte:null,ini:Date.now(),acum:0,rodando:true,alvo:(o.tipo==='latim'||o.tipo==='eneida')?meta('latim')*60:0,tocou:false};
+  document.getElementById('sala').classList.toggle('eneida',o.tipo==='eneida');
   prepararSom();
   document.body.classList.add('em-sala'); document.getElementById('sala').hidden=false;
   try{ if(navigator.wakeLock) navigator.wakeLock.request('screen').then(function(l){ travaSala=l; }).catch(function(){}); }catch(e){}
@@ -1489,11 +1550,12 @@ function encerrarSala(){
   var min=Math.round(tempoSala()/60), s=SALA, ctx=null;
   if(s.tipo==='item'){ var b=S.banco.filter(function(x){ return x.id===s.id; })[0]; ctx={item:s.id,titulo:b?(b.titulo||hostDe(b.link)):'Estudo',area:b?b.area:''}; }
   if(s.tipo==='arquivo'){ var a=S.arqs.filter(function(x){ return x.id===s.id; })[0]; ctx={arquivo:s.id,item:a&&a.item||'',titulo:a?a.nome:'Estudo',area:a?a.area:''}; }
+  if(s.tipo==='eneida'){ eneParar(); flushEneTrad(); eneSalvarPos(true); }
   fecharVisor(); clearInterval(salaTick); SALA=null;
   try{ if(travaSala) travaSala.release(); }catch(e){} travaSala=null;
   document.getElementById('sala').hidden=true; document.getElementById('sala-lado').innerHTML=''; document.body.classList.remove('em-sala');
   render();
-  if(min>=1){ if(s.tipo==='latim') abrirSessao('latim',min); else abrirSessao('estudo',min,ctx); }
+  if(min>=1){ if(s.tipo==='latim') abrirSessao('latim',min); else if(s.tipo==='eneida') abrirSessao('latim',min,{eneida:{livro:ENE.livro,verso:ENE.versos?eneRot():'1'}}); else abrirSessao('estudo',min,ctx); }
 }
 function fontesSala(){
   if(!SALA) return [];
@@ -1517,6 +1579,7 @@ function urlEmbutir(u){
 function renderVisor(){
   if(!SALA) return;
   salvarPosicao(); if(LEITOR){ LEITOR.fechar(); LEITOR=null; }
+  if(SALA.tipo==='eneida'){ chaveFontes=''; eneAbrir(); return; }
   var f=fontesSala(), area=document.getElementById('sala-area'), abas=document.getElementById('sala-abas');
   chaveFontes=f.map(function(x){ return x.k; }).join('|');
   var at=f.filter(function(x){ return x.k===SALA.fonte; })[0]||f[0]; SALA.fonte=at?at.k:null;
@@ -1561,16 +1624,17 @@ function flushNota(){
   if(k==='item'){ var b=S.banco.filter(function(x){ return x.id===id; })[0]; if(b){ b.notas=v; gravar('banco/'+b.id,b); } }
   if(k==='arquivo'){ var a=S.arqs.filter(function(x){ return x.id===id; })[0]; if(a){ a.notas=v; gravar('arquivos/'+a.id,a); } }
   if(k==='latim'){ var L=lat(); L.notas=L.notas||{}; L.notas[id]=v; S.lat=L; salvarLat(); }
+  if(k==='eneida'){ var Le=lat(); Le.notasEneida=Le.notasEneida||{}; Le.notasEneida[id]=v; S.lat=Le; salvarLat(); }
   var s=document.getElementById('nota-salvo'); if(s) s.textContent='Salvo';
 }
 function renderSalaLado(forcar){
   if(!SALA) return;
   var lado=document.getElementById('sala-lado'), at=document.activeElement;
   if(!forcar && at && lado.contains(at) && /INPUT|TEXTAREA|SELECT/.test(at.tagName)){ S.renderPendente=true; return; }
-  if(fontesSala().map(function(x){ return x.k; }).join('|')!==chaveFontes) renderVisor();
+  if(SALA.tipo!=='eneida' && fontesSala().map(function(x){ return x.k; }).join('|')!==chaveFontes) renderVisor();
   if(notaEl) flushNota();
   var vl=document.getElementById('sala-voc-lat'), vp=document.getElementById('sala-voc-pt'), guarda=vl?[vl.value,vp?vp.value:'']:null;
-  lado.innerHTML={item:ladoItem,arquivo:ladoArquivo,latim:ladoLatim}[SALA.tipo]();
+  lado.innerHTML={item:ladoItem,arquivo:ladoArquivo,latim:ladoLatim,eneida:ladoEneida}[SALA.tipo]();
   if(guarda){ vl=document.getElementById('sala-voc-lat'); vp=document.getElementById('sala-voc-pt'); if(vl) vl.value=guarda[0]; if(vp) vp.value=guarda[1]; }
 }
 function blocoNotas(k,id,valor,rot,dica){ return '<section class="sala-bloco"><h4>'+rot+'</h4><textarea class="campo" id="nota-'+esc(k)+'" data-nota="'+esc(k)+'" data-id="'+esc(id)+'" placeholder="'+esc(dica)+'" aria-label="'+esc(rot)+'">'+esc(valor||'')+'</textarea><span class="salvo" id="nota-salvo">Salva sozinha enquanto você escreve</span></section>'; }
@@ -1599,8 +1663,8 @@ function ladoLatim(){
 
 /* ---------- Idioma: português ou latim, como no Ora et Labora ----------
    Traduz o texto da tela conforme ele aparece. O que você digita (títulos, notas, palavras) fica como está. */
-var LA_DIC={"estudos": "studia", "Hoje": "Hodie", "Banco de estudos": "Thesaurus studiorum", "Arquivos": "Documenta", "Práticas diárias": "Exercitia cotidiana", "Latim": "Latine", "Violino": "Fidicula", "São Tomás de Aquino,": "Sancte Thoma de Aquino,", "padroeiro dos estudantes, rogai por nós.": "patrone studentium, ora pro nobis.", "Configurações": "Optiones", "Sair": "Exire", "Tema: automático": "Species: ex systemate", "Tema: claro": "Modus clarus", "Tema: escuro": "Modus obscurus", "Cor: tempo litúrgico": "Color: tempus liturgicum", "Cor: dourado fixo": "Color: aureus", "Anotar estudo": "Studium notare", "Anotar algo para estudar": "Aliquid studendum notare", "Sentença do dia": "Sententia diei", "Seções": "Partes", "Dias seguidos": "Dies continui", "dias com estudo, sem falhar": "dies studii continui", "dia com estudo, sem falhar": "dies studii continuus", "Nesta semana": "Hac hebdomade", "Vocabulário": "Vocabula", "palavra para revisar": "verbum recolendum", "palavras para revisar": "verba recolenda", "item na fila": "res in ordine", "itens na fila": "res in ordine", "Estante": "Armarium", "Os dois": "Utrumque", "Outro estudo": "Aliud studium", "Cada livro é um dia dos últimos 12 em que você estudou. Hoje é o último livro da prateleira de baixo.": "Quisque liber est dies, ex duodecim ultimis, quo studuisti. Hodiernus est ultimus liber in pluteo inferiore.", "Dia completo": "Dies perfectus", "Falta uma prática": "Unum exercitium restat", "Práticas de hoje": "Exercitia hodierna", "Anotar para estudar depois": "Notare ut postea studeas", "Para esta semana": "Huic hebdomadi", "Ver o banco todo": "Totum thesaurum videre", "Nada escolhido para esta semana. No": "Nihil huic hebdomadi electum. In", "Banco de estudos,": "Thesauro studiorum,", ", marque com a estrela 1 ou 2 itens da fila.": ", stella nota unam aut duas res ex ordine.", "Feito hoje": "Hodie factum", "Próximo:": "Proximum:", "Capítulo completo.": "Caput perfectum.", "antes da leitura.": "ante lectionem.", "Foco de hoje: os dois exercícios treinados há mais tempo.": "Hodie: duo exercitia quae diutius omissa sunt.", "Foco de hoje": "Hodie", "Nenhum exercício cadastrado.": "Nullum exercitium scriptum est.", "Adicionar exercícios": "Exercitia addere", "nunca treinado": "numquam exercitatum", "Afinação em melodia": "Intonatio in melodia", "Mudança de cordas": "Mutatio chordarum", "Posição da mão esquerda": "Positio manus sinistrae", "Pausar": "Sistere", "Continuar": "Pergere", "Encerrar": "Finire", "Registrar": "Scribere", "Estudar agora": "Nunc studere", "Metrônomo": "Metronomum", "Tocar": "Sonare", "Parar": "Sistere", "Nota de referência": "Sonus normae", "Sol": "Sol", "Ré": "Re", "Lá": "La", "Mi": "Mi", "Diminuir 4 batidas": "Quattuor ictus minuere", "Aumentar 4 batidas": "Quattuor ictus augere", "Batidas por minuto": "Ictus in minuta", "Revisão semanal da fila.": "Recognitio ordinis hebdomadalis.", "Você ainda não revisou a fila.": "Ordinem nondum recognovisti.", "Apague o que perdeu o sentido e escolha 1 ou 2 itens para a semana.": "Dele quae non iam prosunt, et unam aut duas res huic hebdomadi elige.", "Abrir a fila": "Ordinem aperire", "Revisão feita": "Recognitio facta", "Anotar": "Notare", "Cole um link ou escreva o que quer estudar": "Nexum insere aut scribe quid studere velis", "O que estudar": "Quid studendum", "Tipo de estudo": "Genus studii", "+ Novo tipo": "+ Novum genus", "Gerenciar tipos": "Genera curare", "Todos os tipos": "Omnia genera", "Trabalho": "Labor", "Intelectual": "Intellectus", "Religioso": "Religio", "Outros": "Alia", "Sem tipo": "Sine genere", "Vídeo": "Pellicula", "Livro": "Liber", "Artigo": "Commentarium", "Curso": "Cursus", "Tema": "Argumentum", "Outro": "Aliud", "Alta": "Alta", "Média": "Media", "Baixa": "Humilis", "Na fila": "In ordine", "Estudando": "In studio", "Concluído": "Perfectum", "Arquivado": "Repositum", "Concluídos": "Perfecta", "Arquivados": "Reposita", "Todos": "Omnia", "Prioridade alta": "Primo loco", "Tirar desta semana": "Ex hac hebdomade tollere", "Estudar nesta semana": "Hac hebdomade studere", "Começar a estudar": "Studere incipere", "Marcar como concluído": "Perfectum notare", "min estudados": "min. studii", "arquivo": "documentum", "arquivos": "documenta", "Tudo o que você quer": "Omnia quae", "estudar um dia": "aliquando studere vis", "Anote rápido e organize depois. A estrela leva o item para a tela Hoje. A seta avança o status: na fila, estudando, concluído.": "Cito nota, postea ordina. Stella rem ad paginam hodiernam fert. Sagitta statum promovet: in ordine, in studio, perfectum.", "Status": "Status", "Buscar": "Quaerere", "Buscar no banco": "In thesauro quaerere", "Nada aqui com esses filtros.": "Nihil his condicionibus invenitur.", "O banco está vazio.": "Thesaurus vacuus est.", "Quando vir um vídeo, um livro ou lembrar de um tema, cole o link ou escreva uma frase no campo acima. Organizar fica para a revisão da semana.": "Cum pelliculam aut librum videris aut argumenti memineris, nexum insere aut sententiam scribe supra. Ordo recognitioni hebdomadali relinquitur.", "Filtrar por tipo de estudo": "Secundum genus studii seligere", "Lingua Latina per se illustrata, de Hans Ørberg. Cada capítulo tem três lectiones, a Grammatica Latina e os Pensa A, B e C.": "Lingua Latina per se illustrata, auctore Hans Ørberg. Quodque caput habet tres lectiones, Grammaticam Latinam et Pensa A, B, C.", "Os 35 capítulos": "XXXV capitula", "Você está no": "Nunc es in capitulo", ". Toque num capítulo para ver as partes.": ". Caput tange ut partes videas.", "Atual": "Nunc", "Registrar estudo": "Studium scribere", "Revisar agora": "Nunc recolere", "palavra para revisar hoje": "verbum hodie recolendum", "palavras para revisar hoje": "verba hodie recolenda", "Português": "Lusitane", "Capítulo": "Caput", "Adicionar palavra": "Verbum addere", "Adicionar": "Addere", "Palavras": "Verba", "Buscar palavra": "Verbum quaerere", "Nenhuma palavra com essa busca.": "Nullum verbum invenitur.", "Nenhuma palavra ainda. Adicione as palavras novas de cada capítulo enquanto lê, como estão na margem do livro.": "Nondum sunt verba. Nova verba cuiusque capituli adde dum legis, ut in margine libri sunt.", "Últimos estudos": "Studia ultima", "Nenhum estudo registrado ainda.": "Nullum studium adhuc scriptum est.", "Treino de": "Exercitatio", "repetição": "repetitionis", "Cada sessão registra quais exercícios você fez e, quando usar metrônomo, a velocidade alcançada. O gráfico de cada exercício mostra essa velocidade ao longo do tempo.": "Quaeque sessio scribit quae exercitia feceris et, si metronomo uteris, celeritatem adeptam. Graphica cuiusque exercitii celeritatem per tempus ostendit.", "Ferramentas": "Instrumenta", "A nota de referência soa contínua enquanto você toca: use com a afinação em melodia para comparar cada nota com a corda solta.": "Sonus normae continuus manet dum canis: eo utere ad intonationem, ut quemque sonum cum chorda libera conferas.", "Exercícios": "Exercitia", "Novo exercício": "Novum exercitium", "Registrar treino": "Exercitationem scribere", "Pausado": "Intermissum", "ainda não treinado": "nondum exercitatum", "último treino": "ultima exercitatio", "vez": "semel", "vezes": "vices", "Nenhum exercício ainda. Cadastre os exercícios da sua rotina.": "Nondum sunt exercitia. Scribe exercitia tua.", "Últimos treinos": "Exercitationes ultimae", "Nenhum treino registrado ainda.": "Nulla exercitatio adhuc scripta est.", "Treino livre": "Exercitatio libera", "latim": "Latine", "violino": "fidicula", "estudo": "studium", "Data": "Dies", "Minutos": "Minutae", "O que você fez": "Quid fecisti", "Releitura": "Relectio", "Exercício": "Exercitium", "Repetições": "Repetitiones", "Cadastre exercícios na página Violino para registrar cada um.": "Exercitia in pagina Fidiculae scribe.", "Observações": "Adnotationes", "Dúvidas, frases difíceis, o que reler": "Dubia, sententiae difficiles, quae relegenda sunt", "O que melhorou, o que travou": "Quid profecit, quid haesit", "O que ficou para a próxima vez": "Quid in proximum relictum est", "Servar": "Servare", "Salvar": "Servare", "Cancelar": "Omittere", "Não registrar": "Non scribere", "Item do": "Res in", "banco": "thesauro", "Título": "Titulus", "Do que se trata": "De quo agitur", "Link": "Nexus", "Formato": "Forma", "Prioridade": "Gradus", "Por que guardei, em que minuto do vídeo, o que quero aprender": "Cur servavi, quo minuto pelliculae, quid discere velim", "Sem título": "Sine titulo", "Editar": "Emendare", "Novo": "Novum", "exercício": "exercitium", "Nome": "Nomen", "Como fazer": "Quomodo fiat", "Ex.: escala de Lá maior em semínimas, arco inteiro": "Exemplum: scala La maior, arcu toto", "Metrônomo alvo (bpm)": "Metronomum propositum (bpm)", "opcional": "si vis", "Na rotina": "In usu", "Apagar": "Delere", "Apagar?": "Delere?", "Apagar exercício": "Exercitium delere", "Revisão": "Recognitio", "concluída": "perfecta", "Vocabulário ·": "Vocabula ·", "Pense no significado…": "Cogita quid significet…", "Mostrar resposta": "Responsum ostendere", "Errei": "Erravi", "Acertei": "Recte", "Fechar": "Claudere", "para rever amanhã.": "cras recolenda.", "Tipos de": "Genera", "estudo.": "studii.", "Tipos": "Genera", "Pronto": "Factum", "Criar": "Creare", "Nome do tipo": "Nomen generis", "Novo tipo, como Música ou Idiomas": "Novum genus, ut Musica aut Linguae", "Nome do novo tipo": "Nomen novi generis", "item": "res", "itens": "res", "Sua": "Tua", "biblioteca": "bibliotheca", "PDFs, vídeos, áudios e imagens ficam guardados aqui e abrem dentro do Scriptorium, com notas ao lado. O app lembra a página onde você parou em cada PDF.": "PDF, pelliculae, soni et imagines hic servantur et intra Scriptorium aperiuntur, adnotationibus iuxta positis. Paginam ubi in quoque PDF constitisti meminit.", "Escolha arquivos ou arraste para cá": "Documenta elige aut huc trahe", "PDF, vídeo MP4, áudio, imagem e texto abrem na tela. Outros formatos ficam para baixar.": "PDF, pellicula MP4, sonus, imago et textus hic aperiuntur. Aliae formae demittuntur.", "Nenhum arquivo desse tipo.": "Nullum documentum huius generis.", "A biblioteca está vazia.": "Bibliotheca vacua est.", "Comece pelo PDF de um livro ou pela apostila de um curso.": "Incipe a PDF libri aut a commentario cursus.", "Livro de latim": "Liber Latinus", "Item do banco": "Res thesauri", "Abrir": "Aperire", "Nenhum": "Nulla", "arquivo.": "documentum.", "Baixar": "Demittere", "Apagar de vez?": "Omnino delere?", "Apagar arquivo": "Documentum delere", "Arquivo": "Documentum", "Editar arquivo": "Documentum emendare", "Encerrar o estudo": "Studium finire", "Sumário": "Index", "Página anterior": "Pagina prior", "Próxima página": "Pagina proxima", "Página": "Pagina", "Aumentar": "Augere", "Este PDF não tem sumário.": "Hic PDF indicem non habet.", "Falta só o livro": "Solus liber deest", "Envie o PDF do Familia Romana uma vez. Ele fica guardado no seu Scriptorium e abre aqui, no capítulo em que você está.": "Mitte semel PDF libri Familia Romana. In Scriptorio tuo servabitur et hic aperietur, in capitulo ubi es.", "Enviar o PDF do livro": "PDF libri mittere", "Nada para abrir ainda": "Nihil adhuc aperiendum", "Anexe um arquivo ao lado, ou edite o item e cole o link da aula. Você também pode só escrever suas notas.": "Documentum adiunge, aut rem emenda et nexum lectionis insere. Licet etiam tantum adnotare.", "Este site não abre aqui dentro": "Hic situs hic non aperitur", "Abra em uma nova aba e use este lado para as notas e o tempo.": "In nova tabella aperi, et hac parte ad adnotationes et tempus utere.", "Abrir em nova aba": "In nova tabella aperire", "Este formato não abre aqui": "Haec forma hic non aperitur", "O navegador não mostra arquivos assim dentro da página. Baixe para abrir no programa certo.": "Navigatrum talia documenta in pagina non ostendit. Demitte ut programmate apto aperias.", "Este vídeo não toca no navegador": "Haec pellicula hic non sonat", "O formato do arquivo não é aceito aqui. MP4 costuma funcionar em todos os aparelhos.": "Haec forma non admittitur. MP4 in omnibus instrumentis fere valet.", "Baixar o arquivo": "Documentum demittere", "Não consegui abrir o PDF": "PDF aperire non potui", "Confira a internet e tente de novo.": "Inspice conexionem et iterum tempta.", "Notas": "Adnotationes", "O que aprendi, com minhas palavras. Em que minuto parei.": "Quid didici, meis verbis. Quo minuto constiti.", "O que aprendi, com minhas palavras.": "Quid didici, meis verbis.", "Salva sozinha enquanto você escreve": "Dum scribis, per se servatur", "Salvando…": "Servatur…", "Salvo": "Servatum", "Materiais": "Materia", "Nenhum arquivo anexado": "Nullum documentum adiunctum", "arquivo anexado": "documentum adiunctum", "arquivos anexados": "documenta adiuncta", "Anexar arquivo": "Documentum adiungere", "Abrir o link": "Nexum aperire", "Este item foi apagado.": "Haec res deleta est.", "Este arquivo foi apagado.": "Hoc documentum deletum est.", "Início": "Initium", "Declinações": "Declinationes", "Calendário": "Calendarium", "Índice de palavras": "Index vocabulorum", "Índice gramatical": "Index grammaticus", "Use o sumário do leitor para navegar.": "Indice lectoris utere ad navigandum.", "Nova palavra": "Novum verbum", "Selecione uma palavra no livro e ela aparece aqui.": "Verbum in libro selige, et hic apparebit.", "Caderno do capítulo": "Commentarius capituli", "Respostas dos Pensa, dúvidas, frases para reler.": "Responsa Pensorum, dubia, sententiae relegendae.", "O livro ainda não foi enviado.": "Liber nondum missus est.", "Abrindo o scriptorium…": "Scriptorium aperitur…", "Estudo registrado": "Studium scriptum", "Hoje está completo.": "Hodie perfectum est.", "Item salvo": "Res servata", "Exercício salvo": "Exercitium servatum", "Exercício apagado": "Exercitium deletum", "Apagado": "Deletum", "Anotado no": "Notatum in", "toque no item para dar um título": "rem tange ut titulum des", "Na lista desta semana": "In indice huius hebdomadis", "Fora da lista desta semana": "Extra indicem huius hebdomadis", "Concluído.": "Perfectum.", "Agora em estudo": "Nunc in studio", "Revisão da fila registrada": "Recognitio ordinis scripta", "Informe quantos minutos você estudou.": "Scribe quot minutas studueris.", "adicionada": "addita", "Tipo": "Genus", "criado": "creatum", "Já existe um tipo com esse nome.": "Genus hoc nomine iam est.", "Arquivo guardado": "Documentum servatum", "Arquivo salvo": "Documentum servatum", "Arquivo apagado": "Documentum deletum", "Finalizando…": "Perficitur…", "Meta de hoje alcançada": "Propositum hodiernum adeptus es", "Continue se quiser. O tempo segue contando.": "Perge si vis. Tempus numerari pergit.", "Não consegui salvar": "Servare non potui", "Tente de novo em instantes.": "Mox iterum tempta.", "Não consegui ler os dados agora": "Data nunc legere non potui", "Recarregue a página em instantes.": "Mox paginam renova.", "Aula": "Lectio", "Primeiro acesso. Crie a sua conta com um nome e uma senha.": "Primus aditus. Nomine et tessera rationem tuam crea.", "Seus estudos: banco, latim e violino.": "Studia tua: thesaurus, Latina, fidicula.", "Senha": "Tessera", "Repita a senha": "Tesseram repete", "Criar conta e entrar": "Rationem creare et intrare", "Entrar": "Intrare", "As duas senhas não são iguais.": "Tesserae non congruunt.", "Nome ou senha incorretos.": "Nomen aut tessera non recta.", "Tentar de novo": "Iterum temptare", "Fiéis Defuntos": "Commemoratio Fidelium Defunctorum", "Todos os Santos": "Omnes Sancti", "Tempo Comum": "Tempus per annum", "Advento": "Adventus", "Tempo do Natal": "Tempus Nativitatis", "Quaresma": "Quadragesima", "Semana Santa": "Hebdomada Sancta", "Tempo Pascal": "Tempus Paschale", "Santa Maria, Mãe de Deus": "Sancta Maria, Mater Dei", "São José": "Sanctus Ioseph", "Anunciação do Senhor": "Annuntiatio Domini", "Natividade de São João Batista": "Nativitas S. Ioannis Baptistae", "São Pedro e São Paulo": "Ss. Petrus et Paulus", "Assunção de Nossa Senhora": "Assumptio B. M. V.", "Nossa Senhora Aparecida": "B. M. V. de Aparecida", "Imaculada Conceição": "Immaculata Conceptio", "Domingo da Páscoa": "Dominica Paschae", "Quarta-feira de Cinzas": "Feria IV Cinerum", "Domingo de Ramos": "Dominica in Palmis", "Sexta-feira da Paixão": "Feria VI in Passione Domini", "Pentecostes": "Pentecostes", "Santíssima Trindade": "Sanctissima Trinitas", "Corpus Christi": "Corpus Christi", "Cristo Rei": "Christus Rex", "cor verde": "color viridis", "cor roxo": "color violaceus", "cor rosa": "color rosaceus", "cor branco (dourado)": "color albus", "cor vermelho": "color ruber", "Ora et Labora": "Ora et Labora", "Dicionário": "Lexicon", "Digite a palavra": "Verbum scribe", "Palavra para consultar": "Verbum quaerendum", "Procurando…": "Quaeritur…", "Não encontrei essa palavra.": "Hoc verbum non inveni.", "Adicionar ao vocabulário": "Ad vocabula addere", "Já está no vocabulário": "Iam in vocabulis est", "Ajustar tempos": "Tempora ordinare", "Próximo exercício": "Exercitium proximum", "Treino de hoje": "Exercitatio hodierna", "Treino de hoje: os dois exercícios treinados há mais tempo.": "Exercitatio hodierna: duo exercitia quae diutius omissa sunt.", "Nenhum exercício tem tempo marcado. Use": "Nullum exercitium tempus habet. Utere", "Tempos do": "Tempora", "treino": "exercitationis", "Escolha quantos minutos fazer de cada exercício. Com zero, o exercício fica fora do treino.": "Elige quot minutas cuique exercitio des. Si nihil, exercitium omittitur.", "Repartir igualmente": "Aequaliter dividere", "Tempos salvos": "Tempora servata", "Min.": "Min.", "Rep.": "Rep.", "Digite uma palavra ou frase": "Verbum aut sententiam scribe", "Palavra ou frase para consultar": "Verbum aut sententia quaerenda", "Enter para traduzir": "Preme Enter ut vertatur", "Traduzir": "Vertere", "Não encontrei esse texto.": "Hunc textum non inveni.", "Consultar": "Quaerere", "Corrigir exercício": "Exercitium corrigere", "Modo": "Modus", "Enunciado (opcional)": "Propositum (si vis)", "Sua resposta": "Responsum tuum", "Copie ou selecione no livro a frase do exercício": "Sententiam exercitii exscribe aut in libro selige", "Escreva aqui a sua resposta": "Responsum tuum hic scribe", "Corrigir": "Corrigere", "Corrigindo…": "Corrigitur…", "Está tudo certo": "Omnia recta sunt", "1 erro": "Unus error", "Resposta corrigida": "Responsum correctum", "Guardar no caderno": "In commentario servare", "Guardado no caderno do capítulo": "In commentario capituli servatum", "⌘ + Enter para corrigir": "⌘ + Enter ut corrigatur", "Ctrl + Enter para corrigir": "Ctrl + Enter ut corrigatur"};
-var LA_REGRAS=[["^(\\d+) erros$", "$1 errores"], ["^Total: ([\\d,]+) min$", "Summa: $1 min."], ["^Treino de ([\\d,]+) min$", "Exercitatio $1 min."], ["^Exercício (\\d+) de (\\d+)$", "Exercitium $1 ex $2"], ["^([\\d,]+) min no total$", "$1 min. in summa"], ["^Minutos de (.+)$", "Minutae: $1"], ["^Menos tempo em (.+)$", "Minus temporis: $1"], ["^Mais tempo em (.+)$", "Plus temporis: $1"], ["^(.+): ([\\d,]+) min$", "$1: $2 min."], ["^Você ainda não revisou a fila\\. Apague o que perdeu o sentido e escolha 1 ou 2 itens para a semana\\.$", "Ordinem nondum recognovisti. Dele quae non iam prosunt, et unam aut duas res huic hebdomadi elige."], ["^Faz (\\d+) dias desde a última\\. Apague o que perdeu o sentido e escolha 1 ou 2 itens para a semana\\.$", "Dies $1 ab ultima recognitione. Dele quae non iam prosunt, et unam aut duas res huic hebdomadi elige."], ["^Nível de memória (\\d+) de (\\d+)$", "Gradus memoriae $1 ex $2"], ["^(\\d+) de (\\d+)$", "$1 ex $2"], ["^bpm de (.+)$", "bpm: $1"], ["^Repetições de (.+)$", "Repetitiones: $1"], ["^([\\d,]+) de ([\\d,]+) min$", "$1 ex $2 min."], ["^de (\\d+)$", "ex $1"], ["^Meta: ([\\d,]+) min$", "Propositum: $1 min."], ["^Começar ([\\d,]+) min$", "Incipere $1 min."], ["^(\\d+)/(\\d+) dias$", "$1/$2 dies"], ["^([\\d,]+)/([\\d,]+) min$", "$1/$2 min."], ["^([\\d,]+) min de latim$", "$1 min. Latine"], ["^([\\d,]+) min de violino$", "$1 min. fidicula"], ["^([\\d,]+) min$", "$1 min."], ["^latim ([\\d,]+)$", "Latine $1"], ["^violino ([\\d,]+)$", "fidicula $1"], ["^outros ([\\d,]+)$", "alia $1"], ["^há (\\d+) dias$", "ante $1 dies"], ["^hoje$", "hodie"], ["^ontem$", "heri"], ["^último treino (.+)$", "ultima exercitatio $1"], ["^último treino$", "ultima exercitatio"], ["^Avançar para o ([IVXL]+)$", "Pergere ad caput $1"], ["^Concluir e ir para o ([IVXL]+)$", "Perficere et ad $1 pergere"], ["^Estudar o capítulo ([IVXL]+)$", "Caput $1 studere"], ["^Estou neste capítulo$", "In hoc capitulo sum"], ["^Revisar (\\d+) palavras?$", "$1 verba recolere"], ["^Revisar (\\d+)$", "$1 recolere"], ["^(\\d+) palavras no total\\.$", "$1 verba in summa."], ["^Revisão espaçada: cada acerto afasta a palavra \\(1, 2, 4, 7, 15, 30, 60 dias\\)\\. Um erro a traz de volta amanhã\\. (\\d+) palavras no total\\.$", "Recognitio spatiata: quodque recte dictum verbum differt (1, 2, 4, 7, 15, 30, 60 dies). Error id cras reducit. $1 verba in summa."], ["^Faz (\\d+) dias desde a última\\.$", "Dies $1 ab ultima."], ["^(\\d+) (?:item|itens)$", "$1 res"], ["^(\\d+) arquivos? anexados?$", "$1 documenta adiuncta"], ["^(\\d+) (?:arquivo|arquivos)$", "$1 documenta"], ["^([\\d,]+) min estudados$", "$1 min. studii"], ["^parou na página (\\d+)$", "constitisti in pagina $1"], ["^(.+) guardados$", "$1 servata"], ["^(.+) livres no disco$", "$1 libera in disco"], ["^(\\d+)% de (.+)$", "$1% ex $2"], ["^Cap\\. ([IVXL]+)$", "Cap. $1"], ["^(\\d+) acertos, (\\d+) para rever amanhã\\.$", "$1 recte, $2 cras recolenda."], ["^Mover para (.+) e apagar$", "Ad $1 movere et delere"], ["^Editar (.+)$", "Emendare: $1"], ["^Apagar (.+)$", "Delere: $1"], ["^Cor de (.+)$", "Color: $1"], ["^Não enviei (.+)$", "Non missum: $1"], ["^Capítulo (.+)$", "Caput $1"], ["^(.+) não permite ser exibido em outra página\\. Abra em uma nova aba e use este lado para as notas e o tempo\\.$", "$1 in alia pagina ostendi non patitur. In nova tabella aperi, et hac parte ad adnotationes et tempus utere."], ["^Estante com (\\d+) livros nos últimos 12 dias$", "Armarium cum $1 libris ultimis duodecim diebus"]].map(function(r){ return [new RegExp(r[0]),r[1]]; });
+var LA_DIC={"estudos": "studia", "Hoje": "Hodie", "Banco de estudos": "Thesaurus studiorum", "Arquivos": "Documenta", "Práticas diárias": "Exercitia cotidiana", "Latim": "Latine", "Violino": "Fidicula", "São Tomás de Aquino,": "Sancte Thoma de Aquino,", "padroeiro dos estudantes, rogai por nós.": "patrone studentium, ora pro nobis.", "Configurações": "Optiones", "Sair": "Exire", "Tema: automático": "Species: ex systemate", "Tema: claro": "Modus clarus", "Tema: escuro": "Modus obscurus", "Cor: tempo litúrgico": "Color: tempus liturgicum", "Cor: dourado fixo": "Color: aureus", "Anotar estudo": "Studium notare", "Anotar algo para estudar": "Aliquid studendum notare", "Sentença do dia": "Sententia diei", "Seções": "Partes", "Dias seguidos": "Dies continui", "dias com estudo, sem falhar": "dies studii continui", "dia com estudo, sem falhar": "dies studii continuus", "Nesta semana": "Hac hebdomade", "Vocabulário": "Vocabula", "palavra para revisar": "verbum recolendum", "palavras para revisar": "verba recolenda", "item na fila": "res in ordine", "itens na fila": "res in ordine", "Estante": "Armarium", "Os dois": "Utrumque", "Outro estudo": "Aliud studium", "Cada livro é um dia dos últimos 12 em que você estudou. Hoje é o último livro da prateleira de baixo.": "Quisque liber est dies, ex duodecim ultimis, quo studuisti. Hodiernus est ultimus liber in pluteo inferiore.", "Dia completo": "Dies perfectus", "Falta uma prática": "Unum exercitium restat", "Práticas de hoje": "Exercitia hodierna", "Anotar para estudar depois": "Notare ut postea studeas", "Para esta semana": "Huic hebdomadi", "Ver o banco todo": "Totum thesaurum videre", "Nada escolhido para esta semana. No": "Nihil huic hebdomadi electum. In", "Banco de estudos,": "Thesauro studiorum,", ", marque com a estrela 1 ou 2 itens da fila.": ", stella nota unam aut duas res ex ordine.", "Feito hoje": "Hodie factum", "Próximo:": "Proximum:", "Capítulo completo.": "Caput perfectum.", "antes da leitura.": "ante lectionem.", "Foco de hoje: os dois exercícios treinados há mais tempo.": "Hodie: duo exercitia quae diutius omissa sunt.", "Foco de hoje": "Hodie", "Nenhum exercício cadastrado.": "Nullum exercitium scriptum est.", "Adicionar exercícios": "Exercitia addere", "nunca treinado": "numquam exercitatum", "Afinação em melodia": "Intonatio in melodia", "Mudança de cordas": "Mutatio chordarum", "Posição da mão esquerda": "Positio manus sinistrae", "Pausar": "Sistere", "Continuar": "Pergere", "Encerrar": "Finire", "Registrar": "Scribere", "Estudar agora": "Nunc studere", "Metrônomo": "Metronomum", "Tocar": "Sonare", "Parar": "Sistere", "Nota de referência": "Sonus normae", "Sol": "Sol", "Ré": "Re", "Lá": "La", "Mi": "Mi", "Diminuir 4 batidas": "Quattuor ictus minuere", "Aumentar 4 batidas": "Quattuor ictus augere", "Batidas por minuto": "Ictus in minuta", "Revisão semanal da fila.": "Recognitio ordinis hebdomadalis.", "Você ainda não revisou a fila.": "Ordinem nondum recognovisti.", "Apague o que perdeu o sentido e escolha 1 ou 2 itens para a semana.": "Dele quae non iam prosunt, et unam aut duas res huic hebdomadi elige.", "Abrir a fila": "Ordinem aperire", "Revisão feita": "Recognitio facta", "Anotar": "Notare", "Cole um link ou escreva o que quer estudar": "Nexum insere aut scribe quid studere velis", "O que estudar": "Quid studendum", "Tipo de estudo": "Genus studii", "+ Novo tipo": "+ Novum genus", "Gerenciar tipos": "Genera curare", "Todos os tipos": "Omnia genera", "Trabalho": "Labor", "Intelectual": "Intellectus", "Religioso": "Religio", "Outros": "Alia", "Sem tipo": "Sine genere", "Vídeo": "Pellicula", "Livro": "Liber", "Artigo": "Commentarium", "Curso": "Cursus", "Tema": "Argumentum", "Outro": "Aliud", "Alta": "Alta", "Média": "Media", "Baixa": "Humilis", "Na fila": "In ordine", "Estudando": "In studio", "Concluído": "Perfectum", "Arquivado": "Repositum", "Concluídos": "Perfecta", "Arquivados": "Reposita", "Todos": "Omnia", "Prioridade alta": "Primo loco", "Tirar desta semana": "Ex hac hebdomade tollere", "Estudar nesta semana": "Hac hebdomade studere", "Começar a estudar": "Studere incipere", "Marcar como concluído": "Perfectum notare", "min estudados": "min. studii", "arquivo": "documentum", "arquivos": "documenta", "Tudo o que você quer": "Omnia quae", "estudar um dia": "aliquando studere vis", "Anote rápido e organize depois. A estrela leva o item para a tela Hoje. A seta avança o status: na fila, estudando, concluído.": "Cito nota, postea ordina. Stella rem ad paginam hodiernam fert. Sagitta statum promovet: in ordine, in studio, perfectum.", "Status": "Status", "Buscar": "Quaerere", "Buscar no banco": "In thesauro quaerere", "Nada aqui com esses filtros.": "Nihil his condicionibus invenitur.", "O banco está vazio.": "Thesaurus vacuus est.", "Quando vir um vídeo, um livro ou lembrar de um tema, cole o link ou escreva uma frase no campo acima. Organizar fica para a revisão da semana.": "Cum pelliculam aut librum videris aut argumenti memineris, nexum insere aut sententiam scribe supra. Ordo recognitioni hebdomadali relinquitur.", "Filtrar por tipo de estudo": "Secundum genus studii seligere", "Lingua Latina per se illustrata, de Hans Ørberg. Cada capítulo tem três lectiones, a Grammatica Latina e os Pensa A, B e C.": "Lingua Latina per se illustrata, auctore Hans Ørberg. Quodque caput habet tres lectiones, Grammaticam Latinam et Pensa A, B, C.", "Os 35 capítulos": "XXXV capitula", "Você está no": "Nunc es in capitulo", ". Toque num capítulo para ver as partes.": ". Caput tange ut partes videas.", "Atual": "Nunc", "Registrar estudo": "Studium scribere", "Revisar agora": "Nunc recolere", "palavra para revisar hoje": "verbum hodie recolendum", "palavras para revisar hoje": "verba hodie recolenda", "Português": "Lusitane", "Capítulo": "Caput", "Adicionar palavra": "Verbum addere", "Adicionar": "Addere", "Palavras": "Verba", "Buscar palavra": "Verbum quaerere", "Nenhuma palavra com essa busca.": "Nullum verbum invenitur.", "Nenhuma palavra ainda. Adicione as palavras novas de cada capítulo enquanto lê, como estão na margem do livro.": "Nondum sunt verba. Nova verba cuiusque capituli adde dum legis, ut in margine libri sunt.", "Últimos estudos": "Studia ultima", "Nenhum estudo registrado ainda.": "Nullum studium adhuc scriptum est.", "Treino de": "Exercitatio", "repetição": "repetitionis", "Cada sessão registra quais exercícios você fez e, quando usar metrônomo, a velocidade alcançada. O gráfico de cada exercício mostra essa velocidade ao longo do tempo.": "Quaeque sessio scribit quae exercitia feceris et, si metronomo uteris, celeritatem adeptam. Graphica cuiusque exercitii celeritatem per tempus ostendit.", "Ferramentas": "Instrumenta", "A nota de referência soa contínua enquanto você toca: use com a afinação em melodia para comparar cada nota com a corda solta.": "Sonus normae continuus manet dum canis: eo utere ad intonationem, ut quemque sonum cum chorda libera conferas.", "Exercícios": "Exercitia", "Novo exercício": "Novum exercitium", "Registrar treino": "Exercitationem scribere", "Pausado": "Intermissum", "ainda não treinado": "nondum exercitatum", "último treino": "ultima exercitatio", "vez": "semel", "vezes": "vices", "Nenhum exercício ainda. Cadastre os exercícios da sua rotina.": "Nondum sunt exercitia. Scribe exercitia tua.", "Últimos treinos": "Exercitationes ultimae", "Nenhum treino registrado ainda.": "Nulla exercitatio adhuc scripta est.", "Treino livre": "Exercitatio libera", "latim": "Latine", "violino": "fidicula", "estudo": "studium", "Data": "Dies", "Minutos": "Minutae", "O que você fez": "Quid fecisti", "Releitura": "Relectio", "Exercício": "Exercitium", "Repetições": "Repetitiones", "Cadastre exercícios na página Violino para registrar cada um.": "Exercitia in pagina Fidiculae scribe.", "Observações": "Adnotationes", "Dúvidas, frases difíceis, o que reler": "Dubia, sententiae difficiles, quae relegenda sunt", "O que melhorou, o que travou": "Quid profecit, quid haesit", "O que ficou para a próxima vez": "Quid in proximum relictum est", "Servar": "Servare", "Salvar": "Servare", "Cancelar": "Omittere", "Não registrar": "Non scribere", "Item do": "Res in", "banco": "thesauro", "Título": "Titulus", "Do que se trata": "De quo agitur", "Link": "Nexus", "Formato": "Forma", "Prioridade": "Gradus", "Por que guardei, em que minuto do vídeo, o que quero aprender": "Cur servavi, quo minuto pelliculae, quid discere velim", "Sem título": "Sine titulo", "Editar": "Emendare", "Novo": "Novum", "exercício": "exercitium", "Nome": "Nomen", "Como fazer": "Quomodo fiat", "Ex.: escala de Lá maior em semínimas, arco inteiro": "Exemplum: scala La maior, arcu toto", "Metrônomo alvo (bpm)": "Metronomum propositum (bpm)", "opcional": "si vis", "Na rotina": "In usu", "Apagar": "Delere", "Apagar?": "Delere?", "Apagar exercício": "Exercitium delere", "Revisão": "Recognitio", "concluída": "perfecta", "Vocabulário ·": "Vocabula ·", "Pense no significado…": "Cogita quid significet…", "Mostrar resposta": "Responsum ostendere", "Errei": "Erravi", "Acertei": "Recte", "Fechar": "Claudere", "para rever amanhã.": "cras recolenda.", "Tipos de": "Genera", "estudo.": "studii.", "Tipos": "Genera", "Pronto": "Factum", "Criar": "Creare", "Nome do tipo": "Nomen generis", "Novo tipo, como Música ou Idiomas": "Novum genus, ut Musica aut Linguae", "Nome do novo tipo": "Nomen novi generis", "item": "res", "itens": "res", "Sua": "Tua", "biblioteca": "bibliotheca", "PDFs, vídeos, áudios e imagens ficam guardados aqui e abrem dentro do Scriptorium, com notas ao lado. O app lembra a página onde você parou em cada PDF.": "PDF, pelliculae, soni et imagines hic servantur et intra Scriptorium aperiuntur, adnotationibus iuxta positis. Paginam ubi in quoque PDF constitisti meminit.", "Escolha arquivos ou arraste para cá": "Documenta elige aut huc trahe", "PDF, vídeo MP4, áudio, imagem e texto abrem na tela. Outros formatos ficam para baixar.": "PDF, pellicula MP4, sonus, imago et textus hic aperiuntur. Aliae formae demittuntur.", "Nenhum arquivo desse tipo.": "Nullum documentum huius generis.", "A biblioteca está vazia.": "Bibliotheca vacua est.", "Comece pelo PDF de um livro ou pela apostila de um curso.": "Incipe a PDF libri aut a commentario cursus.", "Livro de latim": "Liber Latinus", "Item do banco": "Res thesauri", "Abrir": "Aperire", "Nenhum": "Nulla", "arquivo.": "documentum.", "Baixar": "Demittere", "Apagar de vez?": "Omnino delere?", "Apagar arquivo": "Documentum delere", "Arquivo": "Documentum", "Editar arquivo": "Documentum emendare", "Encerrar o estudo": "Studium finire", "Sumário": "Index", "Página anterior": "Pagina prior", "Próxima página": "Pagina proxima", "Página": "Pagina", "Aumentar": "Augere", "Este PDF não tem sumário.": "Hic PDF indicem non habet.", "Falta só o livro": "Solus liber deest", "Envie o PDF do Familia Romana uma vez. Ele fica guardado no seu Scriptorium e abre aqui, no capítulo em que você está.": "Mitte semel PDF libri Familia Romana. In Scriptorio tuo servabitur et hic aperietur, in capitulo ubi es.", "Enviar o PDF do livro": "PDF libri mittere", "Nada para abrir ainda": "Nihil adhuc aperiendum", "Anexe um arquivo ao lado, ou edite o item e cole o link da aula. Você também pode só escrever suas notas.": "Documentum adiunge, aut rem emenda et nexum lectionis insere. Licet etiam tantum adnotare.", "Este site não abre aqui dentro": "Hic situs hic non aperitur", "Abra em uma nova aba e use este lado para as notas e o tempo.": "In nova tabella aperi, et hac parte ad adnotationes et tempus utere.", "Abrir em nova aba": "In nova tabella aperire", "Este formato não abre aqui": "Haec forma hic non aperitur", "O navegador não mostra arquivos assim dentro da página. Baixe para abrir no programa certo.": "Navigatrum talia documenta in pagina non ostendit. Demitte ut programmate apto aperias.", "Este vídeo não toca no navegador": "Haec pellicula hic non sonat", "O formato do arquivo não é aceito aqui. MP4 costuma funcionar em todos os aparelhos.": "Haec forma non admittitur. MP4 in omnibus instrumentis fere valet.", "Baixar o arquivo": "Documentum demittere", "Não consegui abrir o PDF": "PDF aperire non potui", "Confira a internet e tente de novo.": "Inspice conexionem et iterum tempta.", "Notas": "Adnotationes", "O que aprendi, com minhas palavras. Em que minuto parei.": "Quid didici, meis verbis. Quo minuto constiti.", "O que aprendi, com minhas palavras.": "Quid didici, meis verbis.", "Salva sozinha enquanto você escreve": "Dum scribis, per se servatur", "Salvando…": "Servatur…", "Salvo": "Servatum", "Materiais": "Materia", "Nenhum arquivo anexado": "Nullum documentum adiunctum", "arquivo anexado": "documentum adiunctum", "arquivos anexados": "documenta adiuncta", "Anexar arquivo": "Documentum adiungere", "Abrir o link": "Nexum aperire", "Este item foi apagado.": "Haec res deleta est.", "Este arquivo foi apagado.": "Hoc documentum deletum est.", "Início": "Initium", "Declinações": "Declinationes", "Calendário": "Calendarium", "Índice de palavras": "Index vocabulorum", "Índice gramatical": "Index grammaticus", "Use o sumário do leitor para navegar.": "Indice lectoris utere ad navigandum.", "Nova palavra": "Novum verbum", "Selecione uma palavra no livro e ela aparece aqui.": "Verbum in libro selige, et hic apparebit.", "Caderno do capítulo": "Commentarius capituli", "Respostas dos Pensa, dúvidas, frases para reler.": "Responsa Pensorum, dubia, sententiae relegendae.", "O livro ainda não foi enviado.": "Liber nondum missus est.", "Abrindo o scriptorium…": "Scriptorium aperitur…", "Estudo registrado": "Studium scriptum", "Hoje está completo.": "Hodie perfectum est.", "Item salvo": "Res servata", "Exercício salvo": "Exercitium servatum", "Exercício apagado": "Exercitium deletum", "Apagado": "Deletum", "Anotado no": "Notatum in", "toque no item para dar um título": "rem tange ut titulum des", "Na lista desta semana": "In indice huius hebdomadis", "Fora da lista desta semana": "Extra indicem huius hebdomadis", "Concluído.": "Perfectum.", "Agora em estudo": "Nunc in studio", "Revisão da fila registrada": "Recognitio ordinis scripta", "Informe quantos minutos você estudou.": "Scribe quot minutas studueris.", "adicionada": "addita", "Tipo": "Genus", "criado": "creatum", "Já existe um tipo com esse nome.": "Genus hoc nomine iam est.", "Arquivo guardado": "Documentum servatum", "Arquivo salvo": "Documentum servatum", "Arquivo apagado": "Documentum deletum", "Finalizando…": "Perficitur…", "Meta de hoje alcançada": "Propositum hodiernum adeptus es", "Continue se quiser. O tempo segue contando.": "Perge si vis. Tempus numerari pergit.", "Não consegui salvar": "Servare non potui", "Tente de novo em instantes.": "Mox iterum tempta.", "Não consegui ler os dados agora": "Data nunc legere non potui", "Recarregue a página em instantes.": "Mox paginam renova.", "Aula": "Lectio", "Primeiro acesso. Crie a sua conta com um nome e uma senha.": "Primus aditus. Nomine et tessera rationem tuam crea.", "Seus estudos: banco, latim e violino.": "Studia tua: thesaurus, Latina, fidicula.", "Senha": "Tessera", "Repita a senha": "Tesseram repete", "Criar conta e entrar": "Rationem creare et intrare", "Entrar": "Intrare", "As duas senhas não são iguais.": "Tesserae non congruunt.", "Nome ou senha incorretos.": "Nomen aut tessera non recta.", "Tentar de novo": "Iterum temptare", "Fiéis Defuntos": "Commemoratio Fidelium Defunctorum", "Todos os Santos": "Omnes Sancti", "Tempo Comum": "Tempus per annum", "Advento": "Adventus", "Tempo do Natal": "Tempus Nativitatis", "Quaresma": "Quadragesima", "Semana Santa": "Hebdomada Sancta", "Tempo Pascal": "Tempus Paschale", "Santa Maria, Mãe de Deus": "Sancta Maria, Mater Dei", "São José": "Sanctus Ioseph", "Anunciação do Senhor": "Annuntiatio Domini", "Natividade de São João Batista": "Nativitas S. Ioannis Baptistae", "São Pedro e São Paulo": "Ss. Petrus et Paulus", "Assunção de Nossa Senhora": "Assumptio B. M. V.", "Nossa Senhora Aparecida": "B. M. V. de Aparecida", "Imaculada Conceição": "Immaculata Conceptio", "Domingo da Páscoa": "Dominica Paschae", "Quarta-feira de Cinzas": "Feria IV Cinerum", "Domingo de Ramos": "Dominica in Palmis", "Sexta-feira da Paixão": "Feria VI in Passione Domini", "Pentecostes": "Pentecostes", "Santíssima Trindade": "Sanctissima Trinitas", "Corpus Christi": "Corpus Christi", "Cristo Rei": "Christus Rex", "cor verde": "color viridis", "cor roxo": "color violaceus", "cor rosa": "color rosaceus", "cor branco (dourado)": "color albus", "cor vermelho": "color ruber", "Ora et Labora": "Ora et Labora", "Dicionário": "Lexicon", "Digite a palavra": "Verbum scribe", "Palavra para consultar": "Verbum quaerendum", "Procurando…": "Quaeritur…", "Não encontrei essa palavra.": "Hoc verbum non inveni.", "Adicionar ao vocabulário": "Ad vocabula addere", "Já está no vocabulário": "Iam in vocabulis est", "Ajustar tempos": "Tempora ordinare", "Próximo exercício": "Exercitium proximum", "Treino de hoje": "Exercitatio hodierna", "Treino de hoje: os dois exercícios treinados há mais tempo.": "Exercitatio hodierna: duo exercitia quae diutius omissa sunt.", "Nenhum exercício tem tempo marcado. Use": "Nullum exercitium tempus habet. Utere", "Tempos do": "Tempora", "treino": "exercitationis", "Escolha quantos minutos fazer de cada exercício. Com zero, o exercício fica fora do treino.": "Elige quot minutas cuique exercitio des. Si nihil, exercitium omittitur.", "Repartir igualmente": "Aequaliter dividere", "Tempos salvos": "Tempora servata", "Min.": "Min.", "Rep.": "Rep.", "Digite uma palavra ou frase": "Verbum aut sententiam scribe", "Palavra ou frase para consultar": "Verbum aut sententia quaerenda", "Enter para traduzir": "Preme Enter ut vertatur", "Traduzir": "Vertere", "Não encontrei esse texto.": "Hunc textum non inveni.", "Consultar": "Quaerere", "Corrigir exercício": "Exercitium corrigere", "Modo": "Modus", "Enunciado (opcional)": "Propositum (si vis)", "Sua resposta": "Responsum tuum", "Copie ou selecione no livro a frase do exercício": "Sententiam exercitii exscribe aut in libro selige", "Escreva aqui a sua resposta": "Responsum tuum hic scribe", "Corrigir": "Corrigere", "Corrigindo…": "Corrigitur…", "Está tudo certo": "Omnia recta sunt", "1 erro": "Unus error", "Resposta corrigida": "Responsum correctum", "Guardar no caderno": "In commentario servare", "Guardado no caderno do capítulo": "In commentario capituli servatum", "⌘ + Enter para corrigir": "⌘ + Enter ut corrigatur", "Ctrl + Enter para corrigir": "Ctrl + Enter ut corrigatur", "Eneida": "Aeneis", "Ler a Eneida": "Aeneida legere", "Leia, ouça, traduza e pinte os versos de Virgílio.": "Versus Vergilii lege, audi, verte, pinge.", "Ler": "Legere", "Pintar": "Pingere", "Modo de estudo": "Modus studii", "Ouvir": "Audire", "Cantar o ritmo": "Numerum canere", "Mostrar tradução": "Versionem ostendere", "Toque numa palavra para ver o que ela é e o que significa.": "Verbum tange ut videas quid sit et quid significet.", "Analisando o verso… A primeira vez leva alguns segundos.": "Versus excutitur… Primum paulum morae est.", "Tente traduzir cada palavra de cabeça e toque nela para conferir o sentido.": "Quodque verbum memoriter verte, deinde tange ut sensum probes.", "Minha tradução do verso": "Versio mea", "Escreva aqui a sua tradução": "Versionem tuam hic scribe", "Corrigir minha tradução": "Versionem meam corrigere", "Revelar todas": "Omnia aperire", "Classe": "Genus", "Caso": "Casus", "Borracha": "Spongia", "Toque nas palavras para pintar.": "Verba tange ut pingas.", "Escolha uma classe ou um caso e toque nas palavras do verso.": "Genus aut casum elige, deinde verba versus tange.", "Conferir": "Probare", "Limpar": "Purgare", "Tudo certo": "Omnia recta", "Substantivo": "Substantivum", "Adjetivo": "Adiectivum", "Pronome": "Pronomen", "Verbo": "Verbum", "Particípio": "Participium", "Advérbio": "Adverbium", "Preposição": "Praepositio", "Conjunção": "Coniunctio", "Interjeição": "Interiectio", "Numeral": "Numerale", "Nominativo": "Nominativus", "Genitivo": "Genetivus", "Dativo": "Dativus", "Acusativo": "Accusativus", "Ablativo": "Ablativus", "Vocativo": "Vocativus", "Locativo": "Locativus", "Sua leitura": "Lectio tua", "Caderno do livro": "Commentarius libri", "Construções difíceis, dúvidas, versos para decorar.": "Constructiones difficiles, dubia, versus ediscendi.", "As setas do teclado passam de um verso ao outro. A análise de cada verso é feita pelo Claude uma única vez e fica guardada.": "Sagittis claviaturae de versu ad versum transis. Quisque versus semel a Claude excutitur et servatur.", "Abrindo o livro…": "Liber aperitur…", "Verso anterior": "Versus prior", "Próximo verso": "Versus proximus", "Verso": "Versus", "Escolha primeiro uma classe ou um caso.": "Primum genus aut casum elige.", "Escreva a sua tradução.": "Versionem tuam scribe.", "Barra: sílaba longa. Meia-lua: sílaba breve. O som marca o ritmo do hexâmetro para você cantar junto.": "Linea: syllaba longa. Lunula: syllaba brevis. Sonus numerum hexametri signat, ut una canas.", "Este verso não tem escansão disponível. Use o botão Ouvir.": "Huius versus scansio deest. Utere 'Audire'.", "Não consegui abrir o livro. Confira a internet e tente de novo.": "Librum aperire non potui. Inspice conexionem et iterum tempta.", "Este navegador não tem voz para ler o verso.": "Hoc navigatrum vocem non habet.", "Este navegador não deixou tocar som.": "Hoc navigatrum sonum non permisit."};
+var LA_REGRAS=[["^Liber ([IVX]+): (\\d+) versos pintados, (\\d+) conferidos\\.$", "Liber $1: $2 versus picti, $3 probati."], ["^(\\d+) de (\\d+) palavras certas$", "$1 ex $2 verbis recta"], ["^Eneida · Liber ([IVX]+), até o verso (\\S+)$", "Aeneis · Liber $1, usque ad versum $2"], ["^Eneida · Liber ([IVX]+), v\\. (\\S+)$", "Aeneis · Liber $1, v. $2"], ["^(\\d+) erros$", "$1 errores"], ["^Total: ([\\d,]+) min$", "Summa: $1 min."], ["^Treino de ([\\d,]+) min$", "Exercitatio $1 min."], ["^Exercício (\\d+) de (\\d+)$", "Exercitium $1 ex $2"], ["^([\\d,]+) min no total$", "$1 min. in summa"], ["^Minutos de (.+)$", "Minutae: $1"], ["^Menos tempo em (.+)$", "Minus temporis: $1"], ["^Mais tempo em (.+)$", "Plus temporis: $1"], ["^(.+): ([\\d,]+) min$", "$1: $2 min."], ["^Você ainda não revisou a fila\\. Apague o que perdeu o sentido e escolha 1 ou 2 itens para a semana\\.$", "Ordinem nondum recognovisti. Dele quae non iam prosunt, et unam aut duas res huic hebdomadi elige."], ["^Faz (\\d+) dias desde a última\\. Apague o que perdeu o sentido e escolha 1 ou 2 itens para a semana\\.$", "Dies $1 ab ultima recognitione. Dele quae non iam prosunt, et unam aut duas res huic hebdomadi elige."], ["^Nível de memória (\\d+) de (\\d+)$", "Gradus memoriae $1 ex $2"], ["^(\\d+) de (\\d+)$", "$1 ex $2"], ["^bpm de (.+)$", "bpm: $1"], ["^Repetições de (.+)$", "Repetitiones: $1"], ["^([\\d,]+) de ([\\d,]+) min$", "$1 ex $2 min."], ["^de (\\d+)$", "ex $1"], ["^Meta: ([\\d,]+) min$", "Propositum: $1 min."], ["^Começar ([\\d,]+) min$", "Incipere $1 min."], ["^(\\d+)/(\\d+) dias$", "$1/$2 dies"], ["^([\\d,]+)/([\\d,]+) min$", "$1/$2 min."], ["^([\\d,]+) min de latim$", "$1 min. Latine"], ["^([\\d,]+) min de violino$", "$1 min. fidicula"], ["^([\\d,]+) min$", "$1 min."], ["^latim ([\\d,]+)$", "Latine $1"], ["^violino ([\\d,]+)$", "fidicula $1"], ["^outros ([\\d,]+)$", "alia $1"], ["^há (\\d+) dias$", "ante $1 dies"], ["^hoje$", "hodie"], ["^ontem$", "heri"], ["^último treino (.+)$", "ultima exercitatio $1"], ["^último treino$", "ultima exercitatio"], ["^Avançar para o ([IVXL]+)$", "Pergere ad caput $1"], ["^Concluir e ir para o ([IVXL]+)$", "Perficere et ad $1 pergere"], ["^Estudar o capítulo ([IVXL]+)$", "Caput $1 studere"], ["^Estou neste capítulo$", "In hoc capitulo sum"], ["^Revisar (\\d+) palavras?$", "$1 verba recolere"], ["^Revisar (\\d+)$", "$1 recolere"], ["^(\\d+) palavras no total\\.$", "$1 verba in summa."], ["^Revisão espaçada: cada acerto afasta a palavra \\(1, 2, 4, 7, 15, 30, 60 dias\\)\\. Um erro a traz de volta amanhã\\. (\\d+) palavras no total\\.$", "Recognitio spatiata: quodque recte dictum verbum differt (1, 2, 4, 7, 15, 30, 60 dies). Error id cras reducit. $1 verba in summa."], ["^Faz (\\d+) dias desde a última\\.$", "Dies $1 ab ultima."], ["^(\\d+) (?:item|itens)$", "$1 res"], ["^(\\d+) arquivos? anexados?$", "$1 documenta adiuncta"], ["^(\\d+) (?:arquivo|arquivos)$", "$1 documenta"], ["^([\\d,]+) min estudados$", "$1 min. studii"], ["^parou na página (\\d+)$", "constitisti in pagina $1"], ["^(.+) guardados$", "$1 servata"], ["^(.+) livres no disco$", "$1 libera in disco"], ["^(\\d+)% de (.+)$", "$1% ex $2"], ["^Cap\\. ([IVXL]+)$", "Cap. $1"], ["^(\\d+) acertos, (\\d+) para rever amanhã\\.$", "$1 recte, $2 cras recolenda."], ["^Mover para (.+) e apagar$", "Ad $1 movere et delere"], ["^Editar (.+)$", "Emendare: $1"], ["^Apagar (.+)$", "Delere: $1"], ["^Cor de (.+)$", "Color: $1"], ["^Não enviei (.+)$", "Non missum: $1"], ["^Capítulo (.+)$", "Caput $1"], ["^(.+) não permite ser exibido em outra página\\. Abra em uma nova aba e use este lado para as notas e o tempo\\.$", "$1 in alia pagina ostendi non patitur. In nova tabella aperi, et hac parte ad adnotationes et tempus utere."], ["^Estante com (\\d+) livros nos últimos 12 dias$", "Armarium cum $1 libris ultimis duodecim diebus"]].map(function(r){ return [new RegExp(r[0]),r[1]]; });
 function trCoreLa(c){
   if(Object.prototype.hasOwnProperty.call(LA_DIC,c)) return LA_DIC[c];
   if(c.indexOf(' · ')>0) return c.split(' · ').map(function(x){ var y=x.trim(); return y?trCoreLa(y):x; }).join(' · ');
@@ -1693,7 +1757,7 @@ function blocoDic(){
 }
 function repintarBlocoDic(){ document.querySelectorAll('.bloco-dic').forEach(function(b){ b.outerHTML=blocoDic(); }); document.querySelectorAll('[data-auto-alt],[data-dic]').forEach(ajustarAltura); }
 function ajustarAltura(i){ i.style.height='auto'; i.style.height=i.scrollHeight+2+'px'; }
-function contextoEx(){ var c=(SALA&&SALA.tipo==='latim')?SALA.cap:(S.view==='latim'?lat().atual:0); return c?'Familia Romana, capítulo '+romano(c)+' ('+CAPS[c-1]+')':''; }
+function contextoEx(){ if(eneAtiva()) return 'Eneida de Virgílio, livro '+romano(ENE.livro)+', verso '+eneRot(); var c=(SALA&&SALA.tipo==='latim')?SALA.cap:(S.view==='latim'?lat().atual:0); return c?'Familia Romana, capítulo '+romano(c)+' ('+CAPS[c-1]+')':''; }
 function corrigirEx(){
   DIC.resp=String(DIC.resp||'').trim(); if(!DIC.resp){ DIC.corr=null; DIC.msg='Escreva a sua resposta.'; pintarDic(); return; }
   var meu=++dicNum; DIC.esperando=true; DIC.msg=''; DIC.corr=null; pintarDic();
@@ -1701,10 +1765,7 @@ function corrigirEx(){
 }
 function correcaoHtml(){
   var r=DIC.corr; if(!r) return '';
-  var h=r.correto?'<p class="cor-ok">Está tudo certo</p>':'<p class="cor-erro">'+(r.erros.length===1?'1 erro':r.erros.length+' erros')+'</p>';
-  h+='<p class="dic-sig" data-sem-tr>'+esc(r.resumo)+'</p>';
-  (r.erros||[]).forEach(function(e){ h+='<div class="cor-item" data-sem-tr><div><s>'+esc(e.trecho)+'</s> → <b>'+esc(e.correcao)+'</b></div><span>'+esc(e.explicacao)+'</span></div>'; });
-  if(!r.correto && r.resposta_corrigida) h+='<p class="dic-ana">Resposta corrigida</p><p class="cor-final" data-sem-tr>'+esc(r.resposta_corrigida)+'</p>';
+  var h=corpoCorrecao(r);
   if(SALA&&SALA.tipo==='latim') h+='<div class="acoes"><button class="btn btn-claro btn-p" type="button" data-act="cor-caderno">Guardar no caderno</button></div>';
   return h;
 }
@@ -1742,9 +1803,217 @@ function consultarDic(q,ja,auto){
 }
 function dicAdicionar(){
   var r=DIC.res; if(!r||!r.encontrado) return;
-  var cap=(SALA&&SALA.cap)||lat().atual, id=uid(), v={latim:r.termo,pt:r.significado,cap:cap,caixa:0,proxima:hoje(),criado:hoje()};
+  var cap=SALA&&SALA.tipo==='eneida'?0:((SALA&&SALA.cap)||lat().atual), id=uid(), v={latim:r.termo,pt:r.significado,cap:cap,caixa:0,proxima:hoje(),criado:hoje()};
   v.id=id; S.vocab.push(v); gravar('vocab/'+id,v); toast('<em lang="la">'+esc(r.termo)+'</em> adicionada'); pintarDic();
 }
+
+/* ---------- Eneida: ler, ouvir, traduzir e pintar os versos ---------- */
+var CLASSES=[['substantivo','Substantivo','#3d6a99'],['adjetivo','Adjetivo','#2f7a4b'],['pronome','Pronome','#8a5fb5'],['verbo','Verbo','#b3322a'],['participio','Particípio','#c2701c'],['adverbio','Advérbio','#1f7a8c'],['preposicao','Preposição','#9a7413'],['conjuncao','Conjunção','#77756e'],['interjeicao','Interjeição','#b04f7e'],['numeral','Numeral','#7a8b2a']];
+var CASOS=[['nominativo','Nominativo','NOM'],['genitivo','Genitivo','GEN'],['dativo','Dativo','DAT'],['acusativo','Acusativo','AC'],['ablativo','Ablativo','ABL'],['vocativo','Vocativo','VOC'],['locativo','Locativo','LOC']];
+var ENE={livro:1,i:0,versos:null,erro:'',modo:'ler',pincel:null,an:{},ped:{},anErro:{},quer:false,trad:false,revel:{},sel:null,conf:false,esc:false,corr:null,corrEsp:false,corrMsg:''};
+function classeDe(id){ return CLASSES.filter(function(c){ return c[0]===id; })[0]; }
+function casoDe(id){ return CASOS.filter(function(c){ return c[0]===id; })[0]; }
+function eneAtiva(){ return !!(SALA&&SALA.tipo==='eneida'&&ENE.versos); }
+function eneRot(){ return ENE.versos[ENE.i][0]; }
+function eneTexto(){ return ENE.versos[ENE.i][1]; }
+function eneChave(){ return ENE.livro+'-'+ENE.versos[ENE.i][0]; }
+function eneDoc(){ return S.ene[eneChave()] || {p:{}}; }
+function eneTokens(t){ return t.split(/\s+/).filter(Boolean).map(function(x){ var m=/^([^\p{L}]*)(.*?)([^\p{L}]*)$/u.exec(x); return {a:m[1],w:m[2],d:m[3]}; }); }
+function jaNoVocab(l){ l=String(l).toLowerCase(); return S.vocab.some(function(v){ return String(v.latim).toLowerCase()===l; }); }
+function eneAbrir(){
+  var e=lat().eneida||{};
+  document.getElementById('sala-titulo').textContent='Aeneis';
+  document.getElementById('sala-abas').innerHTML='';
+  eneCarregar(e.livro||1,e.verso);
+}
+function eneCarregar(livro,rot){
+  eneParar(); ENE.livro=livro; ENE.versos=null; ENE.erro='';
+  document.getElementById('sala-sub').textContent='P. Vergilius Maro · Liber '+romano(livro);
+  eneEsqueleto();
+  fetch('/eneida/liber-'+livro+'.json').then(function(r){ if(!r.ok) throw new Error('http '+r.status); return r.json(); }).then(function(j){
+    if(!SALA||SALA.tipo!=='eneida'||ENE.livro!==livro) return;
+    ENE.versos=j.versos; var i=0;
+    if(rot!=null) for(var k=0;k<j.versos.length;k++) if(j.versos[k][0]===String(rot)){ i=k; break; }
+    eneEsqueleto(); eneIr(i,rot!=null); renderSalaLado();
+  }).catch(function(e){ console.error(e); if(!SALA||SALA.tipo!=='eneida'||ENE.livro!==livro) return; ENE.versos=null; ENE.erro='Não consegui abrir o livro. Confira a internet e tente de novo.'; eneEsqueleto(); });
+}
+function eneEsqueleto(){
+  var a=document.getElementById('sala-area'); if(!a) return;
+  var sel='<span data-sem-tr><select class="campo" id="ene-livro" aria-label="Liber">'+[1,2,3,4,5,6,7,8,9,10,11,12].map(function(n){ return '<option value="'+n+'"'+(n===ENE.livro?' selected':'')+'>Liber '+romano(n)+'</option>'; }).join('')+'</select></span>';
+  if(!ENE.versos){ a.innerHTML='<div class="ene-barra">'+sel+'</div><div class="sala-aviso"><p>'+(ENE.erro||'Abrindo o livro…')+'</p>'+(ENE.erro?'<button class="btn btn-escuro" data-act="ene-recarregar">Tentar de novo</button>':'')+'</div>'; return; }
+  var seta=function(d){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><path d="'+d+'"/></svg>'; };
+  a.innerHTML='<div class="ene-barra">'+sel+'<button class="icone-btn" data-act="ene-ant" aria-label="Verso anterior">'+seta('M15 18l-6-6 6-6')+'</button><input class="campo num" id="ene-n" inputmode="numeric" aria-label="Verso"><span class="de">de '+esc(ENE.versos[ENE.versos.length-1][0])+'</span><button class="icone-btn" data-act="ene-prox" aria-label="Próximo verso">'+seta('M9 18l6-6-6-6')+'</button></div>'+
+    '<div class="ene-quadro" id="ene-quadro"></div><div class="ene-pass" id="ene-pass" lang="la" data-sem-tr>'+ENE.versos.map(function(v,i){ var d=S.ene[ENE.livro+'-'+v[0]]; return '<button class="vl'+(d&&d.p&&Object.keys(d.p).length?' pint':'')+'" data-act="ene-v" data-i="'+i+'"><small>'+esc(v[0])+'</small><span>'+esc(v[1])+'</span></button>'; }).join('')+'</div>';
+}
+var enePosT=null;
+function eneSalvarPos(ja){
+  clearTimeout(enePosT); if(!ENE.versos) return;
+  var go=function(){ var L=lat(), n={livro:ENE.livro,verso:ENE.versos[ENE.i][0]}; if(L.eneida&&L.eneida.livro===n.livro&&L.eneida.verso===n.verso) return; L.eneida=n; S.lat=L; salvarLat(); };
+  if(ja) go(); else enePosT=setTimeout(go,1500);
+}
+function eneIr(i,semSalvar){
+  if(!ENE.versos) return;
+  i=Math.max(0,Math.min(ENE.versos.length-1,i));
+  eneParar(); flushEneTrad();
+  ENE.i=i; ENE.quer=false; ENE.trad=false; ENE.revel={}; ENE.sel=null; ENE.conf=false; ENE.esc=false; ENE.corr=null; ENE.corrEsp=false; ENE.corrMsg='';
+  var n=document.getElementById('ene-n'); if(n) n.value=eneRot();
+  var p=document.getElementById('ene-pass');
+  if(p){ var at=p.querySelector('.vl.at'); if(at) at.classList.remove('at'); var el=p.children[i]; if(el){ el.classList.add('at'); if(el.offsetTop<p.scrollTop+8||el.offsetTop+el.offsetHeight>p.scrollTop+p.clientHeight-8) p.scrollTop=Math.max(0,el.offsetTop-p.clientHeight/3); } }
+  eneQuadro();
+  if(!semSalvar) eneSalvarPos();
+}
+function eneAnalise(i){
+  var livro=ENE.livro, k=livro+'-'+ENE.versos[i][0];
+  if(ENE.an[k]) return Promise.resolve(ENE.an[k]);
+  if(ENE.ped[k]) return ENE.ped[k];
+  delete ENE.anErro[k];
+  var atual=function(){ return eneAtiva()&&eneChave()===k; };
+  ENE.ped[k]=api('POST','/api/eneida/analise',{livro:livro,verso:ENE.versos[i][0]}).then(function(r){ delete ENE.ped[k]; ENE.an[k]=r; if(atual()) eneQuadro(); return r; },function(e){ delete ENE.ped[k]; ENE.anErro[k]=e.message||'Não consegui analisar o verso.'; if(atual()) eneQuadro(); throw e; });
+  return ENE.ped[k];
+}
+/* Pede a análise do verso atual e já adianta a do seguinte, para a leitura não parar. */
+function eneUsar(){
+  var i=ENE.i, livro=ENE.livro; ENE.quer=true;
+  var p=eneAnalise(i); eneQuadro();
+  return p.then(function(r){ if(eneAtiva()&&ENE.livro===livro&&i+1<ENE.versos.length) eneAnalise(i+1).catch(function(){}); return r; },function(){ return null; });
+}
+function eneResultado(P,an){ return an.palavras.map(function(w,i){ var p=P[i]||{}, okC=p.c===w.classe, okK=w.caso==='nenhum'?!p.k:p.k===w.caso; return {ok:okC&&okK,okC:okC,okK:okK}; }); }
+function corpoCorrecao(r){
+  var h=r.correto?'<p class="cor-ok">Está tudo certo</p>':'<p class="cor-erro">'+(r.erros.length===1?'1 erro':r.erros.length+' erros')+'</p>';
+  h+='<p class="dic-sig" data-sem-tr>'+esc(r.resumo)+'</p>';
+  (r.erros||[]).forEach(function(e){ h+='<div class="cor-item" data-sem-tr><div><s>'+esc(e.trecho)+'</s> → <b>'+esc(e.correcao)+'</b></div><span>'+esc(e.explicacao)+'</span></div>'; });
+  if(!r.correto && r.resposta_corrigida) h+='<p class="dic-ana">Resposta corrigida</p><p class="cor-final" data-sem-tr>'+esc(r.resposta_corrigida)+'</p>';
+  return h;
+}
+function eneQuadro(){
+  var q=document.getElementById('ene-quadro'); if(!q||!ENE.versos) return;
+  var ae=document.activeElement, foco=ae&&q.contains(ae)&&ae.hasAttribute('data-ene-trad')?[ae.selectionStart,ae.selectionEnd]:null;
+  var k=eneChave(), an=ENE.an[k], doc=eneDoc(), P=doc.p||{}, toks=eneTokens(eneTexto()), wi=-1, m=ENE.modo, res=m==='pintar'&&ENE.conf&&an?eneResultado(P,an):null;
+  var h='<div class="ene-topo"><span class="ene-num" data-sem-tr>Liber '+romano(ENE.livro)+' · versus '+esc(eneRot())+'</span><div class="seg" role="group" aria-label="Modo de estudo">'+[['ler','Ler'],['traduzir','Traduzir'],['pintar','Pintar']].map(function(x){ return '<button data-act="ene-modo" data-m="'+x[0]+'" aria-pressed="'+(m===x[0])+'">'+x[1]+'</button>'; }).join('')+'</div></div>';
+  h+='<div class="ene-verso" lang="la" data-sem-tr>'+toks.map(function(t){
+    if(!t.w) return '<span class="pont">'+esc(t.a+t.d)+'</span>';
+    wi++; var p=P[wi]||{}, c=m==='pintar'?classeDe(p.c):null, ks=m==='pintar'?casoDe(p.k):null, cls='pal', sub='';
+    if(c) cls+=' tem';
+    if(m==='pintar'){ sub='<small>'+(ks?ks[2]:'')+'</small>'; if(res) cls+=res[wi].ok?' certa':' errada'; }
+    else { if(ENE.sel===wi) cls+=' sel'; if(m==='traduzir') sub='<small class="gl">'+(ENE.revel[wi]&&an?esc(an.palavras[wi].sentido):'· · ·')+'</small>'; }
+    return (t.a?'<span class="pont">'+esc(t.a)+'</span>':'')+'<button class="'+cls+'" data-act="ene-pal" data-i="'+wi+'"'+(c?' style="--k:'+c[2]+'"':'')+'><b>'+esc(t.w)+'</b>'+sub+'</button>'+(t.d?'<span class="pont">'+esc(t.d)+'</span>':'');
+  }).join('')+'</div>';
+  h+='<div class="acoes"><button class="btn btn-claro btn-p" data-act="ene-ouvir">'+I.play+'Ouvir</button><button class="btn btn-claro btn-p" data-act="ene-ritmo">'+I.audio+'Cantar o ritmo</button></div>';
+  if(ENE.quer&&!an) h+=ENE.anErro[k]?'<p class="dic-msg"><span data-sem-tr>'+esc(ENE.anErro[k])+'</span> <button class="link" data-act="ene-de-novo">Tentar de novo</button></p>':'<p class="dic-msg">Analisando o verso… A primeira vez leva alguns segundos.</p>';
+  if(ENE.esc&&an) h+=an.silabas&&an.silabas.length?'<div class="escansao" lang="la" data-sem-tr>'+an.silabas.map(function(s,i){ return '<span class="sil'+(s.longa?'':' breve')+(s.fim_do_pe&&i<an.silabas.length-1?' fim':'')+'" data-s="'+i+'">'+esc(s.texto)+'</span>'; }).join('')+'</div><p class="nota">Barra: sílaba longa. Meia-lua: sílaba breve. O som marca o ritmo do hexâmetro para você cantar junto.</p>':'<p class="dic-msg">Este verso não tem escansão disponível. Use o botão Ouvir.</p>';
+  if(m!=='pintar'&&ENE.sel!=null&&an&&an.palavras[ENE.sel]&&(m==='ler'||ENE.revel[ENE.sel])){
+    var w=an.palavras[ENE.sel], cw=classeDe(w.classe);
+    h+='<div class="ene-det"><b lang="la" data-sem-tr>'+esc(w.lema)+'</b><span data-sem-tr>'+esc((cw?cw[1]:w.classe)+' · '+w.detalhe)+'</span><span data-sem-tr>'+esc(w.sentido)+'</span><div class="acoes">'+(jaNoVocab(w.lema)?'<span class="dic-msg">Já está no vocabulário</span>':'<button class="btn btn-claro btn-p" data-act="ene-voc">Adicionar ao vocabulário</button>')+'</div></div>';
+  }
+  var trad=ENE.trad&&an?'<p class="ene-trad" data-sem-tr>'+esc(an.traducao)+'</p>':'';
+  if(m==='ler'){
+    h+=trad||'<div class="acoes"><button class="btn btn-claro btn-p" data-act="ene-trad">Mostrar tradução</button></div>';
+    h+='<p class="nota">Toque numa palavra para ver o que ela é e o que significa.</p>';
+  }
+  if(m==='traduzir'){
+    h+='<p class="nota">Tente traduzir cada palavra de cabeça e toque nela para conferir o sentido.</p>';
+    h+='<label>Minha tradução do verso<textarea class="campo" id="ene-minha" data-ene-trad rows="2" maxlength="600" placeholder="Escreva aqui a sua tradução">'+esc(doc.trad||'')+'</textarea></label>';
+    h+='<div class="acoes"><button class="btn btn-escuro btn-p" data-act="ene-corrigir">Corrigir minha tradução</button><button class="btn btn-claro btn-p" data-act="ene-revelar">Revelar todas</button>'+(ENE.trad?'':'<button class="btn btn-claro btn-p" data-act="ene-trad">Mostrar tradução</button>')+'</div>';
+    if(ENE.corrEsp) h+='<p class="dic-msg">Corrigindo…</p>'; else if(ENE.corrMsg) h+='<p class="dic-msg" data-sem-tr>'+esc(ENE.corrMsg)+'</p>'; else if(ENE.corr) h+='<div class="dic-res">'+corpoCorrecao(ENE.corr)+'</div>';
+    h+=trad;
+  }
+  if(m==='pintar'){
+    var pc=ENE.pincel||{};
+    h+='<div class="paleta"><div class="paleta-linha"><span>Classe</span>'+CLASSES.map(function(c){ return '<button class="tinta" data-act="ene-pincel" data-t="c" data-v="'+c[0]+'" style="--k:'+c[2]+'" aria-pressed="'+(pc.t==='c'&&pc.v===c[0])+'"><i></i>'+c[1]+'</button>'; }).join('')+'</div>'+
+      '<div class="paleta-linha"><span>Caso</span>'+CASOS.map(function(c){ return '<button class="tinta" data-act="ene-pincel" data-t="k" data-v="'+c[0]+'" aria-pressed="'+(pc.t==='k'&&pc.v===c[0])+'">'+c[1]+'</button>'; }).join('')+'<button class="tinta" data-act="ene-pincel" data-t="x" data-v="" aria-pressed="'+(pc.t==='x')+'">Borracha</button></div></div>';
+    h+='<p class="nota">'+(ENE.pincel?'Toque nas palavras para pintar.':'Escolha uma classe ou um caso e toque nas palavras do verso.')+'</p>';
+    h+='<div class="acoes"><button class="btn btn-escuro btn-p" data-act="ene-conferir">Conferir</button><button class="btn btn-claro btn-p" data-act="ene-limpar">Limpar</button></div>';
+    if(res){
+      var certas=res.filter(function(r){ return r.ok; }).length;
+      h+='<p class="'+(certas===res.length?'cor-ok':'cor-erro')+'">'+(certas===res.length?'Tudo certo':certas+' de '+res.length+' palavras certas')+'</p>';
+      res.forEach(function(r,i){ if(r.ok) return; var w=an.palavras[i], cw=classeDe(w.classe); h+='<div class="cor-item" data-sem-tr><div><b lang="la">'+esc(w.forma)+'</b> · '+esc((cw?cw[1]:w.classe)+(w.caso!=='nenhum'?', '+w.caso:''))+'</div><span>'+esc(w.detalhe+' · '+w.sentido)+'</span></div>'; });
+    }
+  }
+  q.innerHTML=h;
+  if(foco){ var t=document.getElementById('ene-minha'); if(t){ t.focus(); try{ t.setSelectionRange(foco[0],foco[1]); }catch(e){} } }
+}
+function eneMarcarPintado(){ var p=document.getElementById('ene-pass'), el=p&&p.children[ENE.i], d=S.ene[eneChave()]; if(el) el.classList.toggle('pint',!!(d&&d.p&&Object.keys(d.p).length)); }
+function eneGravarDoc(d){ var k=eneChave(); S.ene[k]=d; gravar('eneida/'+k,d); }
+function eneClicarPalavra(i){
+  if(ENE.modo==='pintar'){
+    var b=ENE.pincel; if(!b){ toast('Escolha primeiro uma classe ou um caso.'); return; }
+    var d=eneDoc(); d.p=d.p||{}; var p=d.p[i]||{};
+    if(b.t==='x') p={}; else if(b.t==='c'){ if(p.c===b.v) delete p.c; else p.c=b.v; } else { if(p.k===b.v) delete p.k; else p.k=b.v; }
+    if(p.c||p.k) d.p[i]=p; else delete d.p[i];
+    delete d.conf; ENE.conf=false; eneGravarDoc(d); eneMarcarPintado(); eneQuadro(); return;
+  }
+  ENE.sel=i; if(ENE.modo==='traduzir') ENE.revel[i]=true;
+  eneUsar();
+}
+function eneConferir(){
+  var k=eneChave(); ENE.conf=true;
+  eneUsar().then(function(an){ if(!an||!eneAtiva()||eneChave()!==k) return; var d=eneDoc(), r=eneResultado(d.p||{},an); d.p=d.p||{}; d.conf={c:r.filter(function(x){ return x.ok; }).length,t:r.length,d:hoje()}; eneGravarDoc(d); renderSalaLado(); });
+}
+function eneLimpar(){ var d=eneDoc(); d.p={}; delete d.conf; ENE.conf=false; eneGravarDoc(d); eneMarcarPintado(); eneQuadro(); }
+var eneTradT=null, eneTradPend=null;
+function eneTradDigitada(el){ var k=eneChave(), d=eneDoc(); d.trad=el.value; S.ene[k]=d; eneTradPend=k; clearTimeout(eneTradT); eneTradT=setTimeout(flushEneTrad,900); }
+function flushEneTrad(){ clearTimeout(eneTradT); if(!eneTradPend) return; var k=eneTradPend; eneTradPend=null; if(S.ene[k]) gravar('eneida/'+k,S.ene[k]); }
+function eneCorrigir(){
+  flushEneTrad(); var k=eneChave(), r=String(eneDoc().trad||'').trim();
+  if(!r){ ENE.corr=null; ENE.corrMsg='Escreva a sua tradução.'; eneQuadro(); return; }
+  ENE.corrEsp=true; ENE.corrMsg=''; eneQuadro();
+  var aqui=function(){ return eneAtiva()&&eneChave()===k; };
+  api('POST','/api/corrigir',{enunciado:'Traduza para o português este verso da Eneida: '+eneTexto(),resposta:r,contexto:'Eneida de Virgílio, livro '+romano(ENE.livro)+', verso '+eneRot()}).then(function(x){ if(!aqui()) return; ENE.corrEsp=false; ENE.corr=x; eneQuadro(); },function(e){ if(!aqui()) return; ENE.corrEsp=false; ENE.corrMsg=e.message; eneQuadro(); });
+}
+function eneVocab(){
+  var an=ENE.an[eneChave()], w=an&&an.palavras[ENE.sel]; if(!w) return;
+  var id=uid(), v={latim:w.lema,pt:w.sentido,cap:0,origem:'Eneida '+romano(ENE.livro)+', '+eneRot(),caixa:0,proxima:hoje(),criado:hoje()};
+  v.id=id; S.vocab.push(v); gravar('vocab/'+id,v); toast('<em lang="la">'+esc(w.lema)+'</em> adicionada'); eneQuadro();
+}
+/* Som: a voz do navegador lê o verso; o "canto" toca o ritmo do hexâmetro, sílaba por sílaba. */
+var eneSom={nos:[],tm:[]};
+function eneParar(){
+  eneSom.tm.forEach(clearTimeout); eneSom.tm=[];
+  eneSom.nos.forEach(function(o){ try{ o.stop(); }catch(e){} }); eneSom.nos=[];
+  try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+  document.querySelectorAll('.sil.toca').forEach(function(e){ e.classList.remove('toca'); });
+}
+function eneOuvir(){
+  eneParar();
+  var sy=window.speechSynthesis; if(!sy||!window.SpeechSynthesisUtterance){ toast('Este navegador não tem voz para ler o verso.'); return; }
+  try{
+    var u=new SpeechSynthesisUtterance(eneTexto().replace(/[—]/g,' ')), vs=sy.getVoices()||[];
+    var v=vs.filter(function(x){ return /^la/i.test(x.lang); })[0]||vs.filter(function(x){ return /^it/i.test(x.lang); })[0];
+    if(v){ u.voice=v; u.lang=v.lang; } else u.lang='it-IT';
+    u.rate=0.8; sy.speak(u);
+  }catch(e){ toast('Este navegador não conseguiu ler o verso.'); }
+}
+function eneRitmo(){
+  var k=eneChave(); ENE.esc=true;
+  if(!prepararSom()) toast('Este navegador não deixou tocar som.');
+  eneUsar().then(function(an){ if(!an||!eneAtiva()||eneChave()!==k||!an.silabas||!an.silabas.length||!actx) return; eneTocar(an.silabas); });
+}
+function eneTocar(sil){
+  eneParar();
+  var u=0.26, t=actx.currentTime+0.08, t0=t, pe=0, pos=0;
+  var limpa=function(){ document.querySelectorAll('.sil.toca').forEach(function(x){ x.classList.remove('toca'); }); };
+  sil.forEach(function(s,i){
+    var ult=i===sil.length-1, dur=(s.longa||ult?2:1)*u, f=ult?196:pos===0?(pe===4?293.66:261.63):220, vol=pos===0?0.2:0.13;
+    var o=actx.createOscillator(), g=actx.createGain(); o.type='triangle'; o.frequency.value=f;
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+0.03); g.gain.setValueAtTime(vol,t+dur-0.07); g.gain.exponentialRampToValueAtTime(0.0001,t+dur-0.005);
+    o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t+dur); eneSom.nos.push(o);
+    eneSom.tm.push(setTimeout(function(){ limpa(); var e=document.querySelector('.sil[data-s="'+i+'"]'); if(e) e.classList.add('toca'); },(t-t0)*1000+80));
+    t+=dur; if(s.fim_do_pe){ pe++; pos=0; } else pos++;
+  });
+  eneSom.tm.push(setTimeout(limpa,(t-t0)*1000+120));
+}
+function ladoEneida(){
+  var pint=0, conf=0, pre=ENE.livro+'-';
+  Object.keys(S.ene).forEach(function(k){ if(k.indexOf(pre)!==0) return; var d=S.ene[k]; if(d.p&&Object.keys(d.p).length) pint++; if(d.conf) conf++; });
+  return blocoDic()+'<section class="sala-bloco"><h4>Sua leitura</h4><p class="nota">Liber '+romano(ENE.livro)+': '+pint+' versos pintados, '+conf+' conferidos.</p><p class="nota">As setas do teclado passam de um verso ao outro. A análise de cada verso é feita pelo Claude uma única vez e fica guardada.</p></section>'+
+    blocoNotas('eneida',String(ENE.livro),(lat().notasEneida||{})[ENE.livro],'Caderno do livro','Construções difíceis, dúvidas, versos para decorar.');
+}
+document.addEventListener('change',function(ev){
+  var el=ev.target;
+  if(el.id==='ene-livro'){ eneSalvarPos(true); eneCarregar(Number(el.value),null); }
+  else if(el.id==='ene-n'&&ENE.versos){ var v=String(el.value).trim(), i=-1; ENE.versos.forEach(function(x,k){ if(i<0&&x[0]===v) i=k; }); if(i>=0) eneIr(i); else el.value=eneRot(); }
+});
+
 
 /* ---------- Toast ---------- */
 var toastT=null;
@@ -1771,6 +2040,7 @@ function salvarSessao(f){
   var p=S.modal.p, data=f.get('data')||hoje(), s={pratica:p, data:data, minutos:numOu(f.get('min'))||0, notas:f.get('notas').trim(), criado:new Date().toISOString()};
   if(!s.minutos){ toast('Informe quantos minutos você estudou.'); return; }
   if(p==='estudo'){ var cx=S.modal.ctx||{}; s.titulo=cx.titulo||''; s.area=cx.area||''; if(cx.item) s.item=cx.item; if(cx.arquivo) s.arquivo=cx.arquivo; }
+  else if(p==='latim' && S.modal.ctx && S.modal.ctx.eneida){ s.eneida=S.modal.ctx.eneida; s.cap=lat().atual; s.partes=[]; }
   else if(p==='latim'){
     var cap=Math.min(35,intOu(f.get('cap'))||lat().atual), partes=f.getAll('parte');
     s.cap=cap; s.partes=partes;
@@ -1838,6 +2108,23 @@ document.addEventListener('click',function(ev){
     case 'sala-item': S.modal=null; renderModal(); abrirSala({tipo:'item',id:el.dataset.id}); break;
     case 'sala-latim': abrirSala({tipo:'latim',cap:Number(el.dataset.n)||lat().atual}); break;
     case 'sala-encerrar': encerrarSala(); break;
+    case 'sala-eneida': abrirSala({tipo:'eneida'}); break;
+    case 'ene-recarregar': eneCarregar(ENE.livro,null); break;
+    case 'ene-ant': eneIr(ENE.i-1); break;
+    case 'ene-prox': eneIr(ENE.i+1); break;
+    case 'ene-v': eneIr(Number(el.dataset.i)); break;
+    case 'ene-modo': ENE.modo=el.dataset.m; ENE.sel=null; eneQuadro(); break;
+    case 'ene-pal': eneClicarPalavra(Number(el.dataset.i)); break;
+    case 'ene-pincel': ENE.pincel=(ENE.pincel&&ENE.pincel.t===el.dataset.t&&ENE.pincel.v===el.dataset.v)?null:{t:el.dataset.t,v:el.dataset.v}; eneQuadro(); break;
+    case 'ene-conferir': eneConferir(); break;
+    case 'ene-limpar': eneLimpar(); break;
+    case 'ene-trad': ENE.trad=true; eneUsar(); break;
+    case 'ene-revelar': if(ENE.versos){ eneTokens(eneTexto()).filter(function(t){ return t.w; }).forEach(function(t,i){ ENE.revel[i]=true; }); eneUsar(); } break;
+    case 'ene-de-novo': eneUsar(); break;
+    case 'ene-ouvir': eneOuvir(); break;
+    case 'ene-ritmo': eneRitmo(); break;
+    case 'ene-voc': eneVocab(); break;
+    case 'ene-corrigir': eneCorrigir(); break;
     case 'sala-pausa': pausarSala(); break;
     case 'sala-fonte': SALA.fonte=el.dataset.f; renderVisor(); break;
     case 'sala-concluir': var bc=S.banco.filter(function(x){return x.id===SALA.id;})[0]; if(bc){ bc.status='concluido'; bc.concluido=hoje(); bc.semana=false; gravar('banco/'+bc.id,bc); toast('Concluído. <em>Deo gratias.</em>'); render(); } break;
@@ -1904,6 +2191,7 @@ document.addEventListener('input',function(ev){
   else if(el.hasAttribute('data-min-ex')) somarMinutosEx();
   else if(el.dataset.nota) notaDigitada(el);
   else if(el.hasAttribute('data-dic')) consultarDic(el.value);
+  else if(el.hasAttribute('data-ene-trad')) eneTradDigitada(el);
   else if(el.hasAttribute('data-ex-enun')){ DIC.enun=el.value; ajustarAltura(el); }
   else if(el.hasAttribute('data-ex-resp')){ DIC.resp=el.value; ajustarAltura(el); }
 });
@@ -1912,6 +2200,7 @@ document.addEventListener('keydown',function(ev){
   if(ev.key==='Enter' && (ev.metaKey||ev.ctrlKey) && ev.target.closest && ev.target.closest('[data-form=corrigir]')){ ev.preventDefault(); var fc=ev.target.closest('form'); DIC.enun=fc.querySelector('[data-ex-enun]').value; DIC.resp=fc.querySelector('[data-ex-resp]').value; corrigirEx(); return; }
   if(ev.key==='Enter' && !ev.shiftKey && ev.target.hasAttribute && ev.target.hasAttribute('data-dic')){ ev.preventDefault(); consultarDic(ev.target.value,true); return; }
   if(ev.key==='Escape' && S.modal){ S.modal=null; S.rev=null; renderModal(); render(); }
+  if(eneAtiva() && !S.modal && !/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||'')){ if(ev.key==='ArrowDown'||ev.key==='ArrowRight'){ ev.preventDefault(); eneIr(ENE.i+1); return; } if(ev.key==='ArrowUp'||ev.key==='ArrowLeft'){ ev.preventDefault(); eneIr(ENE.i-1); return; } }
   if(SALA && !S.modal && LEITOR && !/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||'')){ if(ev.key==='ArrowRight'){ ev.preventDefault(); LEITOR.ir(LEITOR.pag+1); } if(ev.key==='ArrowLeft'){ ev.preventDefault(); LEITOR.ir(LEITOR.pag-1); } }
   if(S.modal && S.modal.tipo==='rev' && S.rev && S.rev.i<S.rev.fila.length){
     if(ev.key===' ' && !S.rev.mostrar){ ev.preventDefault(); S.rev.mostrar=true; renderModal(); }
