@@ -18,6 +18,8 @@ Versão de servidor do Scriptorium: banco de estudos, latim (Familia Romana) e v
 
 Na sala de estudo e na página Latim, digitar uma palavra traz o significado pelo Claude, e uma frase de até 800 letras é traduzida ao apertar Enter. No modo Corrigir exercício, o Claude confere a resposta (com o enunciado, se houver) e aponta cada erro com a explicação. Precisa de `ANTHROPIC_API_KEY` no Railway; sem ela, o resto do app funciona normalmente. O modelo padrão é `claude-opus-5-5` e muda com `ANTHROPIC_MODELO`. Cada palavra consultada fica guardada no disco e não gasta de novo.
 
+Palavras em português também vão para o vocabulário: o Claude busca a definição sozinho. Quando a palavra nomeia algo concreto (objeto, animal, planta, lugar), o servidor pega a foto principal do artigo da Wikipédia indicado pelo Claude e mostra com o link para a página da imagem.
+
 ## Eneida
 
 A sala da Eneida (página Latim) traz os doze livros em latim, em `publico/eneida`. O texto é o da edição de J. B. Greenough (1900), de domínio público, preparado pela Perseus Digital Library.

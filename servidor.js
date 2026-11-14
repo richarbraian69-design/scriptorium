@@ -295,12 +295,14 @@ app.post('/api/senha', exigir, rota((req, res) => {
 /* Dicionário: o Claude explica a palavra; o que já foi consultado fica guardado e não gasta de novo. */
 const MODELO_DIC = process.env.ANTHROPIC_MODELO || 'claude-opus-5-5';
 const claude = process.env.ANTHROPIC_API_KEY ? new Anthropic({ timeout: 30000, maxRetries: 1 }) : null;
-const FORMATO_DIC = { type: 'object', additionalProperties: false, required: ['encontrado', 'tipo', 'idioma', 'traducao', 'termo', 'significado', 'analise', 'exemplo'], properties: {
+const FORMATO_DIC = { type: 'object', additionalProperties: false, required: ['encontrado', 'tipo', 'idioma', 'traducao', 'termo', 'significado', 'analise', 'exemplo', 'concreto', 'artigo_pt', 'artigo_en'], properties: {
+  concreto: { type: 'boolean' }, artigo_pt: { type: 'string' }, artigo_en: { type: 'string' },
   encontrado: { type: 'boolean' }, tipo: { type: 'string', enum: ['palavra', 'frase'] }, idioma: { type: 'string' }, traducao: { type: 'string' }, termo: { type: 'string' }, significado: { type: 'string' }, analise: { type: 'string' }, exemplo: { type: 'string' } } };
 const PEDIDO_DIC = 'Você é o dicionário e tradutor de um estudante brasileiro que aprende latim pelo Familia Romana, de Hans Ørberg, e também estuda outros assuntos. Ele digita ou seleciona uma palavra, uma expressão ou uma frase inteira, às vezes sem mácrons, com palavras divididas por hífen no fim da linha ou com erro de leitura do PDF. Responda em português do Brasil, de forma curta.\n' +
   'Campos comuns: encontrado (false se o texto não for reconhecível; nesse caso deixe os outros campos de texto vazios). tipo ("palavra" para uma palavra ou expressão curta de dicionário; "frase" para uma oração ou trecho). idioma (o idioma do texto, em português, como "Latim").\n' +
   'Se tipo for "palavra": termo (forma de dicionário; em latim, com enunciado, gênero e mácrons, como "via, viae f." ou "amō, amāre, amāvī, amātum"). significado (os sentidos principais, em poucas palavras). analise (em latim, o que é a forma digitada, como "ablativo singular"; vazio se ela já for a forma de dicionário ou não for latim). exemplo (uma frase latina curta com tradução, se for latim; senão, vazio). traducao vazio. Se a palavra for do português, o estudante quer ampliar o vocabulário vernáculo: termo traz a palavra com a classe gramatical (como "vernáculo, adj. e s.m."); significado é uma definição clara e precisa, como num bom dicionário, com os sentidos principais; exemplo é uma frase em português que mostre o uso.\n' +
   'Se tipo for "frase": traducao (a tradução completa e natural para o português; se o texto já estiver em português, traduza para o latim). analise (se for latim, até três observações curtas sobre as construções ou palavras mais difíceis; senão, vazio). termo, significado e exemplo vazios.\n' +
+  'Imagem: concreto é true só se a palavra (em qualquer idioma) nomear algo que se vê e se reconhece numa foto ou desenho: um objeto, uma coisa, um animal, uma planta, um alimento, uma parte do corpo, uma construção ou um lugar físico. Para ideias, ações, qualidades, sentimentos, palavras gramaticais e frases, concreto é false. Quando concreto for true, artigo_pt é o título exato do artigo da Wikipédia em português sobre essa coisa no sentido em questão (como "Ampulheta" ou "Ornitorrinco"), e artigo_en o título exato do artigo da Wikipédia em inglês (como "Hourglass"); senão, os dois vazios.\n' +
   'Se não tiver certeza de um sentido, diga isso em vez de inventar.';
 function chaveDic(t) { return normNome(t).replace(/\s+/g, ' '); }
 const usoDic = { hora: 0, n: 0 };
@@ -330,16 +332,38 @@ async function chamarClaude(sistema, conteudo, formato, esforco, maxTokens) {
   try { return JSON.parse(bloco.text); } catch (e) { throw new Erro('O Claude respondeu num formato inesperado. Tente de novo.', 502); }
 }
 function consultarClaude(termo) { return chamarClaude(PEDIDO_DIC, termo, FORMATO_DIC, 'low', 2000); }
+/* Imagem de coisas concretas: a foto principal do artigo da Wikipédia (Wikimedia Commons). */
+const UA_WIKI = 'Scriptorium/1.0 (app pessoal de estudos; https://scriptorium-production-2a91.up.railway.app)';
+async function imagemWiki(lingua, titulo) {
+  if (!titulo) return null;
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 8000);
+  try {
+    const r = await fetch('https://' + lingua + '.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(titulo.replace(/ /g, '_')) + '?redirect=true', { headers: { 'User-Agent': UA_WIKI, Accept: 'application/json' }, signal: ctl.signal });
+    if (!r.ok) return null;
+    const j = await r.json(), th = j.thumbnail || j.originalimage;
+    if (!th || !th.source || j.type === 'disambiguation') return null;
+    const u = new URL(th.source);
+    if (u.protocol !== 'https:' || !/(^|\.)wikimedia\.org$/.test(u.hostname)) return null;
+    u.search = '';
+    return { url: u.toString(), pagina: ((j.content_urls || {}).desktop || {}).page || 'https://' + lingua + '.wikipedia.org/wiki/' + encodeURIComponent(titulo), titulo: j.title || titulo };
+  } catch (e) { return null; } finally { clearTimeout(t); }
+}
+async function comImagem(d) {
+  if (!d || !d.encontrado || d.tipo !== 'palavra' || !d.concreto) return d;
+  d.imagem = (await imagemWiki('pt', d.artigo_pt)) || (await imagemWiki('en', d.artigo_en)) || null;
+  return d;
+}
+
 app.post('/api/significado', exigir, rota(async (req, res) => {
   const termo = String((req.body || {}).termo || '').replace(/[\u0000-\u001f]/g, ' ').trim();
   if (!termo) throw new Erro('Digite uma palavra.');
   if (termo.length > 800) throw new Erro('Esse trecho é longo demais. Consulte até 800 letras por vez.');
   db.dicionario = db.dicionario || {};
   const k = chaveDic(termo);
-  if (db.dicionario[k]) return res.json(Object.assign({ guardado: true }, db.dicionario[k]));
+  if (db.dicionario[k] && 'concreto' in db.dicionario[k]) return res.json(Object.assign({ guardado: true }, db.dicionario[k]));
   if (!claude) throw new Erro('O dicionário ainda não foi ligado: falta a chave ANTHROPIC_API_KEY no Railway.', 503);
   contarUso();
-  const d = await comClaude(() => consultarClaude(termo));
+  const d = await comImagem(await comClaude(() => consultarClaude(termo)));
   if (d.encontrado) { db.dicionario[k] = d; gravar(); }
   res.json(d);
 }));
@@ -647,6 +671,10 @@ setTimeout(() => {
   } catch (e) { console.error('[canto] teste falhou: ' + e.message); }
 }, 20000);
 const FRASE_TESTE = 'Via Appia longa est.';
+if (claude && !(((db.dicionario || {})[chaveDic('ampulheta')]) || {}).concreto) {
+  consultarClaude('ampulheta').then(comImagem).then(d => { db.dicionario = db.dicionario || {}; if (d.encontrado) { db.dicionario[chaveDic('ampulheta')] = d; gravar(); } console.log('[imagem] teste ok: ' + d.termo + ' · concreto=' + d.concreto + ' · ' + (d.imagem ? d.imagem.url : 'sem imagem')); })
+    .catch(e => console.error('[imagem] teste falhou: ' + (e.status || '') + ' ' + e.message));
+}
 if (claude && !(db.correcoes || {})['teste']) {
   chamarClaude(PEDIDO_CORRECAO, 'Enunciado:\nVia Appia long__ est.\n\nResposta do aluno:\nVia Appia longus est.', FORMATO_CORRECAO, 'medium', 6000)
     .then(d => { db.correcoes = db.correcoes || {}; db.correcoes.teste = d; gravar(); console.log('[correcao] teste ok: correto=' + d.correto + ' · ' + d.resumo + ' · ' + (d.erros[0] ? d.erros[0].trecho + ' -> ' + d.erros[0].correcao : '')); })
