@@ -22,7 +22,9 @@ Palavras em português também vão para o vocabulário: o Claude busca a defini
 
 ## Educação clássica
 
-A seção Educação clássica é um mapa de estudos do Trivium e do Quadrivium: 25 obras (de Platão a Clark & Jain) em seis etapas, com três formatos de mapa (a questão, linha do tempo e as sete artes), ficha de cada obra (situação, posição na questão, perguntas-guia, síntese conferida pelo Claude, conceitos que viram flashcards), uma quaestio disputata, um cofre de citações e o caderno do fundador. O catálogo fica em `OBRAS_CLS` no `publico/index.html`; o que o aluno escreve fica na coleção `classica`.
+A seção Educação clássica é um mapa de estudos do Trivium e do Quadrivium: 64 obras, dos gregos aos documentos da Igreja sobre educação, em sete etapas, com três formatos de mapa (a questão, linha do tempo e as sete artes), ficha de cada obra (textos para ler, situação, posição na questão, perguntas-guia, síntese conferida pelo Claude, conceitos que viram flashcards), uma quaestio disputata, um cofre de citações e o caderno do fundador. O catálogo fica em `OBRAS_CLS` e os textos de cada obra em `FONTES_CLS`, no `publico/index.html`; o que o aluno escreve fica na coleção `classica`.
+
+Os textos de cada obra (traduções em domínio público, documentos do vatican.va, PDFs de acesso aberto) são baixados pelo próprio servidor (`fontes.js`, rota `/api/classica/fontes`) e guardados em `/data/arquivos`, como os outros arquivos, com o campo `obra`. PDFs ficam como estão; páginas viram uma cópia de leitura em HTML limpo, sem scripts, servida com `Content-Security-Policy: sandbox`. Só os sites listados em `fontes.js` podem ser baixados. Os textos não vão para o GitHub: ficam só no disco do Railway. Na primeira visita à seção, o app pede os textos que faltam; o resto aparece na ficha como "Abrir no site".
 
 ## Eneida
 

@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.4.0",
+    "@mozilla/readability": "^0.6.0",
     "express": "^4.21.2",
+    "linkedom": "^0.18.12",
     "mespeak": "^2.0.2"
   }
 }

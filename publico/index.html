@@ -628,6 +628,14 @@ textarea.campo{min-height:70px;resize:vertical}
 .cls-conc{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:10px;background:var(--sup)}
 .cls-conc div{display:grid;gap:2px;min-width:0}
 .cls-conc span{font-size:.88rem;color:var(--tx2)}
+.cls-texto{align-items:flex-start}
+.cls-texto small{font-size:.82rem;color:var(--tx2);line-height:1.4}
+.cls-conc .cls-texto-acao{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.cls-texto-acao .btn svg{width:15px;height:15px}
+.cls-bib{margin-top:6px}
+.cls-girando{color:var(--ac-tx)}
+@media (max-width:560px){ .cls-texto{flex-direction:column;align-items:stretch} .cls-conc .cls-texto-acao{justify-content:flex-end} }
+.sala-area iframe.leitura{background:#fbf8f1}
 .cls-q-topo h3{margin:4px 0;font-family:var(--f-serif);font-style:italic;font-weight:400;font-size:1.5rem}
 .cls-art{display:grid;gap:8px;margin-bottom:10px}
 .cls-num{margin:0;font-weight:600;color:var(--tx2)}
@@ -1141,7 +1149,7 @@ function renderNav(){
   document.getElementById('nav').innerHTML=VISTAS.map(function(v,i){
     var q='';
     if(v[0]==='banco') q='<span class="qtd">'+filaAtiva().length+'</span>';
-    if(v[0]==='arquivos') q='<span class="qtd">'+S.arqs.length+'</span>';
+    if(v[0]==='arquivos') q='<span class="qtd">'+S.arqs.filter(function(a){ return !a.obra; }).length+'</span>';
     if(v[0]==='latim' && venc) q='<span class="qtd rubro">'+venc+'</span>';
     return (v[0]==='latim'?'<p class="nav-rotulo">Práticas diárias</p>':'')+'<button data-act="ver" data-v="'+v[0]+'" aria-current="'+(S.view===v[0])+'">'+I[v[2]]+'<span>'+v[1]+'</span>'+q+'</button>';
   }).join('');
@@ -1474,7 +1482,7 @@ document.addEventListener('change',function(ev){
 
 /* ---------- Arquivos: enviar, listar, editar ---------- */
 function fmtTam(b){ b=Number(b)||0; if(b<1048576) return Math.max(1,Math.round(b/1024))+' KB'; if(b<1073741824) return (b/1048576).toFixed(b<104857600?1:0).replace('.',',')+' MB'; return (b/1073741824).toFixed(1).replace('.',',')+' GB'; }
-function tipoVisor(a){ var t=String(a.tipo||''), n=String(a.nome||'').toLowerCase(); if(t==='application/pdf'||/\.pdf$/.test(n)) return 'pdf'; if(/^video\//.test(t)) return 'video'; if(/^audio\//.test(t)) return 'audio'; if(/^image\/(png|jpeg|gif|webp)$/.test(t)) return 'imagem'; if(/^text\//.test(t)||/\.(txt|md)$/.test(n)) return 'texto'; return 'outro'; }
+function tipoVisor(a){ var t=String(a.tipo||''), n=String(a.nome||'').toLowerCase(); if(t==='application/pdf'||/\.pdf$/.test(n)) return 'pdf'; if(/^video\//.test(t)) return 'video'; if(/^audio\//.test(t)) return 'audio'; if(/^image\/(png|jpeg|gif|webp)$/.test(t)) return 'imagem'; if(t==='text/html'&&a.origem) return 'leitura'; if(/^text\//.test(t)||/\.(txt|md)$/.test(n)) return 'texto'; return 'outro'; }
 function iconeArq(a){ return {pdf:I.artigo,video:I.video,audio:I.audio,imagem:I.imagem,texto:I.artigo,outro:I.outro}[tipoVisor(a)]; }
 function anexosDe(id){ return S.arqs.filter(function(a){ return a.item===id; }); }
 function minutosItem(id){ return soma(S.sess.filter(function(s){ return s.item===id; }),function(s){ return s.minutos; }); }
@@ -1514,7 +1522,7 @@ function botaoEnviar(rot,attrs,cls){
   return '<label class="btn '+(cls||'btn-claro')+' btn-p" style="display:inline-flex">'+rot+'<input class="oculto-arq" type="file" data-envio '+(attrs||'')+'></label>';
 }
 function vArquivos(){
-  var l=S.arqs.filter(function(a){ return !S.fArqArea || a.area===S.fArqArea; }).sort(function(a,b){ return String(b.criado||'').localeCompare(String(a.criado||'')) || String(a.nome).localeCompare(b.nome); });
+  var cls=S.arqs.filter(function(a){ return a.obra; }), l=S.arqs.filter(function(a){ return !a.obra && (!S.fArqArea || a.area===S.fArqArea); }).sort(function(a,b){ return String(b.criado||'').localeCompare(String(a.criado||'')) || String(a.nome).localeCompare(b.nome); });
   var e=S.espaco, esp=e?fmtTam(e.usado)+' guardados'+(e.total?' · '+fmtTam(e.livre)+' livres no disco':''):'';
   var linhas=l.map(function(a){
     var it=a.item?S.banco.filter(function(b){ return b.id===a.item; })[0]:null, livro=lat().livro===a.id;
@@ -1524,7 +1532,7 @@ function vArquivos(){
   return '<div class="pagina"><div><p class="rot">Arquivos</p><h2 class="h2">Sua <em>biblioteca</em></h2><p class="intro">PDFs, vídeos, áudios e imagens ficam guardados aqui e abrem dentro do Scriptorium, com notas ao lado. O app lembra a página onde você parou em cada PDF.</p></div>'+
     '<label class="zona-envio" id="zona-envio"><b>Escolha arquivos ou arraste para cá</b><small>PDF, vídeo MP4, áudio, imagem e texto abrem na tela. Outros formatos ficam para baixar.</small><input class="oculto-arq" type="file" multiple data-envio data-area="'+esc(S.fArqArea)+'"></label>'+
     '<section class="secao"><div class="secao-topo"><div class="chips" role="group" aria-label="Filtrar por tipo de estudo">'+chipsFiltro('f-arq-area',S.fArqArea)+'</div><p class="nota">'+esc(esp)+'</p></div>'+
-    '<div class="painel">'+(linhas||'<p class="vazio">'+(S.arqs.length?'Nenhum arquivo desse tipo.':'<em>A biblioteca está vazia.</em> Comece pelo PDF de um livro ou pela apostila de um curso.')+'</p>')+'</div></section></div>';
+    '<div class="painel">'+(linhas||'<p class="vazio">'+(S.arqs.length>cls.length?'Nenhum arquivo desse tipo.':'<em>A biblioteca está vazia.</em> Comece pelo PDF de um livro ou pela apostila de um curso.')+'</p>')+'</div>'+(cls.length?'<p class="nota">Além destes, '+cls.length+' textos da educação clássica ('+fmtTam(cls.reduce(function(t,a){ return t+(Number(a.tam)||0); },0))+') estão guardados nas fichas das obras. <button class="link" data-act="ver" data-v="classica">Abrir o mapa</button></p>':'')+'</section></div>';
 }
 ['dragover','dragleave','drop'].forEach(function(t){ document.addEventListener(t,function(ev){
   var z=ev.target.closest&&ev.target.closest('#zona-envio'); if(!z) return;
@@ -1629,7 +1637,7 @@ function abrirSala(o){
   if(!SERVIDOR) return;
   if(SALA) fecharVisor();
   if(T) cronParar(true);
-  SALA={tipo:o.tipo,id:o.id||null,cap:o.cap||null,fonte:null,ini:Date.now(),acum:0,rodando:true,alvo:(o.tipo==='latim'||o.tipo==='eneida')?meta('latim')*60:0,tocou:false};
+  SALA={tipo:o.tipo,id:o.id||null,cap:o.cap||null,fonte:o.fonte||null,ini:Date.now(),acum:0,rodando:true,alvo:(o.tipo==='latim'||o.tipo==='eneida')?meta('latim')*60:0,tocou:false};
   document.getElementById('sala').classList.toggle('eneida',o.tipo==='eneida');
   prepararSom();
   document.body.classList.add('em-sala'); document.getElementById('sala').hidden=false;
@@ -1667,6 +1675,7 @@ function fontesSala(){
   var b=S.banco.filter(function(x){ return x.id===SALA.id; })[0], out=[]; if(!b) return out;
   if(b.link) out.push({k:'link',rot:b.tipo==='video'?'Vídeo':hostDe(b.link),link:b.link});
   anexosDe(b.id).forEach(function(a){ out.push({k:'arq:'+a.id,rot:a.nome,arq:a}); });
+  if(b.classica) fontesObra(b.classica).forEach(function(f){ var a=arqFonte(b.classica,f.k); out.push(a?{k:'arq:'+a.id,rot:f.t,arq:a}:{k:'site:'+f.k,rot:f.t,link:f.u,cls:{obra:b.classica,f:f}}); });
   return out;
 }
 /* Sites que permitem assistir ou ler dentro de outra página. */
@@ -1692,6 +1701,11 @@ function renderVisor(){
   else if(SALA.tipo==='item'){ var b=S.banco.filter(function(x){ return x.id===SALA.id; })[0]; titulo.textContent=b?(b.titulo||hostDe(b.link)||'Estudo'):'Estudo'; sub.textContent=b?area_nome(b.area):''; }
   else { titulo.textContent=at?at.rot:'Arquivo'; sub.textContent=at&&at.arq?area_nome(at.arq.area):''; }
   if(!at){ area.innerHTML=SALA.tipo==='latim'?'<div class="sala-aviso"><h3>Falta só o livro</h3><p>Envie o PDF do Familia Romana uma vez. Ele fica guardado no seu Scriptorium e abre aqui, no capítulo em que você está.</p>'+botaoEnviar('Enviar o PDF do livro','accept="application/pdf" data-livro="1" data-area="intelectual"','btn-escuro')+'</div>':'<div class="sala-aviso"><h3>Nada para abrir ainda</h3><p>Anexe um arquivo ao lado, ou edite o item e cole o link da aula. Você também pode só escrever suas notas.</p></div>'; return; }
+  if(at.cls){
+    var fc=at.cls.f, erc=erroFonteCls(at.cls.obra,fc.k);
+    area.innerHTML='<div class="sala-aviso"><h3>'+(fc.ext?'Este texto só abre no site':erc?'Este texto não baixou':'Guardando este texto')+'</h3><p>'+(fc.ext?esc(hostDe(fc.u))+' não deixa guardar uma cópia. Abra em uma nova aba e use este lado para as notas e o tempo.':erc?esc(erc.msg):'O Scriptorium está baixando o texto do site. Ele aparece aqui sozinho em alguns segundos.')+'</p><div class="acoes">'+(erc?'<button class="btn btn-claro" data-act="cls-bib" data-id="'+at.cls.obra+'" data-forcar="1">Tentar de novo</button>':'')+'<a class="btn btn-escuro" href="'+esc(fc.u)+'" target="_blank" rel="noopener">Abrir no site</a></div></div>';
+    return;
+  }
   if(at.link){
     var em=urlEmbutir(at.link);
     area.innerHTML=em?'<iframe src="'+esc(em)+'" title="'+esc(at.rot)+'" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write" allowfullscreen></iframe>':'<div class="sala-aviso"><h3>Este site não abre aqui dentro</h3><p>'+esc(hostDe(at.link))+' não permite ser exibido em outra página. Abra em uma nova aba e use este lado para as notas e o tempo.</p><a class="btn btn-escuro" href="'+esc(at.link)+'" target="_blank" rel="noopener">Abrir em nova aba</a></div>';
@@ -1707,7 +1721,17 @@ function renderVisor(){
   else if(tv==='audio'){ area.innerHTML='<audio controls preload="metadata" src="'+u+'"></audio>'; ligarMidia(area.querySelector('audio'),a); }
   else if(tv==='imagem') area.innerHTML='<img src="'+u+'" alt="'+esc(a.nome)+'">';
   else if(tv==='texto') area.innerHTML='<iframe class="doc" src="'+u+'" title="'+esc(a.nome)+'"></iframe>';
+  else if(tv==='leitura'){ area.innerHTML='<iframe class="doc leitura" src="'+u+'" title="'+esc(a.nome)+'"></iframe>'; ligarLeitura(area.querySelector('iframe'),a); }
   else area.innerHTML='<div class="sala-aviso"><h3>Este formato não abre aqui</h3><p>O navegador não mostra arquivos assim dentro da página. Baixe para abrir no programa certo.</p><a class="btn btn-escuro" href="'+u+'?baixar=1">Baixar '+esc(a.nome)+'</a></div>';
+}
+/* Na cópia de leitura, volta ao ponto em que parou e guarda a rolagem. */
+function ligarLeitura(fr,a){
+  fr.addEventListener('load',function(){
+    var w; try{ w=fr.contentWindow; w.document; }catch(e){ return; }
+    var el=w.document.scrollingElement||w.document.documentElement;
+    if(a.rolagem>0) el.scrollTop=a.rolagem*(el.scrollHeight-el.clientHeight);
+    w.addEventListener('scroll',function(){ var max=el.scrollHeight-el.clientHeight; if(max>0) posicaoMudou(a.id,{rolagem:Math.round(el.scrollTop/max*1e4)/1e4}); },{passive:true});
+  });
 }
 function area_nome(id){ return id?area(id).nome:''; }
 function ligarMidia(m,a){
@@ -2150,7 +2174,7 @@ document.addEventListener('change',function(ev){
 
 
 /* ---------- Educação clássica: o mapa de estudos ---------- */
-var ETAPAS_CLS=[['raizes','Raízes antigas'],['medieval','Síntese cristã e medieval'],['magisterio','Magistério da Igreja'],['modernas','Defesas modernas'],['historia','Contexto histórico'],['adversario','O adversário']];
+var ETAPAS_CLS=[['raizes','Raízes antigas'],['medieval','Síntese cristã e medieval'],['renascimento','Renascimento e escola católica'],['magisterio','Magistério da Igreja'],['modernas','Defesas modernas'],['historia','Contexto histórico'],['adversario','O adversário']];
 var ARTES_CLS=[['gramatica','Gramática','trivium'],['logica','Lógica','trivium'],['retorica','Retórica','trivium'],['aritmetica','Aritmética','quadrivium'],['geometria','Geometria','quadrivium'],['musica','Música','quadrivium'],['astronomia','Astronomia','quadrivium'],['filosofia','Filosofia','alto'],['teologia','Teologia','alto']];
 var POS_CLS={favor:['A favor','#2f7a4b'],contra:['Contra','#b3322a'],contexto:['Contexto','#9a7413']};
 var STATUS_CLS={fila:'Na fila',lendo:'Lendo',lida:'Lida'};
@@ -2180,8 +2204,93 @@ var OBRAS_CLS=[
  {id:'adler',autor:'Mortimer Adler',curto:'Adler',titulo:'The Paideia Proposal',ano:1982,etapa:'modernas',pos:'favor',artes:['geral'],nota:'“A melhor educação para os melhores é a melhor educação para todos.”',inf:['maritain']},
  {id:'caldecott-verdade',autor:'Stratford Caldecott',curto:'Caldecott (Quadrivium)',titulo:'Beauty for Truth’s Sake',ano:2009,etapa:'modernas',pos:'favor',artes:['aritmetica','geometria','musica','astronomia'],nota:'Autor católico, sobre o Quadrivium. Provavelmente dos mais próximos do que você planeja.',inf:['boecio','pieper']},
  {id:'caldecott-palavra',autor:'Stratford Caldecott',curto:'Caldecott (Trivium)',titulo:'Beauty in the Word',ano:2012,etapa:'modernas',pos:'favor',artes:['gramatica','logica','retorica'],nota:'O mesmo autor católico, agora sobre o Trivium.',inf:['caldecott-verdade','sayers']},
- {id:'clark-jain',autor:'Clark & Jain',curto:'Clark & Jain',titulo:'The Liberal Arts Tradition',ano:2013,etapa:'modernas',pos:'favor',artes:['geral'],nota:'Uma filosofia cristã da educação clássica, muito usada por fundadores de escolas.',inf:['sayers','miriam']}
+ {id:'clark-jain',autor:'Clark & Jain',curto:'Clark & Jain',titulo:'The Liberal Arts Tradition',ano:2013,etapa:'modernas',pos:'favor',artes:['geral'],nota:'Uma filosofia cristã da educação clássica, muito usada por fundadores de escolas.',inf:['sayers','miriam']},
+ {id:'aristoteles-etica',autor:'Aristóteles',curto:'Aristóteles (Ética)',titulo:'Ética a Nicômaco',ano:-335,aprox:1,etapa:'raizes',pos:'contexto',artes:['filosofia'],nota:'A virtude como hábito (livro II) e a vida contemplativa como a mais alta (livro X, 6-8): o fundamento do ócio que a educação liberal supõe.',inf:['platao']},
+ {id:'isocrates',autor:'Isócrates',curto:'Isócrates',titulo:'Contra os sofistas e Antídose',ano:-390,aprox:1,etapa:'raizes',pos:'favor',artes:['retorica','geometria','astronomia'],nota:'O rival de Platão: a formação pela palavra. Na Antídose (§§ 261-280) diz que a geometria e a astronomia formam o aluno mesmo sem uso prático, uma das primeiras defesas do que viria a ser o Quadrivium.'},
+ {id:'cicero',autor:'Cícero',curto:'Cícero',titulo:'Do orador (De Oratore)',ano:-55,etapa:'raizes',pos:'favor',artes:['retorica','filosofia'],nota:'O orador ideal precisa saber de tudo: a eloquência unida à sabedoria. Daqui vem a ideia romana de humanitas.',inf:['isocrates','platao']},
+ {id:'seneca',autor:'Sêneca',curto:'Sêneca',titulo:'Carta 88 a Lucílio',ano:64,aprox:1,etapa:'raizes',pos:'contra',artes:['geral','filosofia'],nota:'Os estudos liberais se chamam assim por serem dignos do homem livre, mas só um estudo é de fato liberal: a sabedoria, que torna o homem livre. Os outros são preparação, não o trabalho de verdade.'},
+ {id:'quintiliano',autor:'Quintiliano',curto:'Quintiliano',titulo:'Instituição oratória',ano:95,aprox:1,etapa:'raizes',pos:'favor',artes:['gramatica','retorica'],nota:'O manual romano da formação do orador desde o berço: a ama, o gramático, a escola pública ou a casa. O livro XII pede o orador como “homem bom que sabe falar”.',inf:['cicero']},
+ {id:'marciano',autor:'Marciano Capela',curto:'Marciano Capela',titulo:'As núpcias de Filologia e Mercúrio',ano:420,aprox:1,etapa:'raizes',pos:'contexto',artes:['gramatica','logica','retorica','aritmetica','geometria','musica','astronomia'],nota:'Alegoria em que as sete artes aparecem como damas de honra, uma por livro (III a IX). Fixou o número sete para toda a Idade Média.',inf:['quintiliano']},
+ {id:'basilio',autor:'São Basílio',curto:'S. Basílio',titulo:'Aos jovens, sobre o proveito das letras gregas',ano:370,aprox:1,etapa:'medieval',pos:'favor',artes:['gramatica','retorica'],nota:'Como o cristão lê os poetas e oradores pagãos: como a abelha, que tira o mel sem pousar em todas as flores. Pio XI o cita na Divini Illius Magistri.'},
+ {id:'jeronimo',autor:'São Jerônimo',curto:'S. Jerônimo',titulo:'Cartas 107 a Leta e 22 a Eustóquio',ano:403,aprox:1,etapa:'medieval',pos:'contexto',artes:['gramatica','teologia'],nota:'A carta 107 é um plano de educação de uma menina, das letras de marfim aos livros da Escritura. Na carta 22 (§ 30) ele conta o sonho em que foi acusado de ser “ciceroniano, não cristão”.'},
+ {id:'crisostomo',autor:'São João Crisóstomo',curto:'S. J. Crisóstomo',titulo:'Sobre a vanglória e a educação dos filhos',ano:390,aprox:1,etapa:'medieval',pos:'contexto',artes:['teologia'],nota:'Os pais como escultores da alma do filho: a educação moral e cristã dentro de casa.'},
+ {id:'agostinho-mestre',autor:'Santo Agostinho',curto:'Agostinho (Mestre)',titulo:'O mestre (De magistro)',ano:389,etapa:'medieval',pos:'contexto',artes:['gramatica','logica','filosofia'],nota:'Diálogo com o filho Adeodato: as palavras não ensinam por si; o verdadeiro mestre é Cristo, que ensina por dentro.',inf:['platao']},
+ {id:'agostinho-confissoes',autor:'Santo Agostinho',curto:'Agostinho (Confissões)',titulo:'Confissões, livro I',ano:397,etapa:'medieval',pos:'contexto',artes:['gramatica'],nota:'A escola da infância de Agostinho vista por dentro: as varadas, o grego odiado, as lágrimas por Dido.'},
+ {id:'isidoro',autor:'Santo Isidoro de Sevilha',curto:'S. Isidoro',titulo:'Etimologias, livros I a III',ano:625,aprox:1,etapa:'medieval',pos:'contexto',artes:['gramatica','logica','retorica','aritmetica','geometria','musica','astronomia'],nota:'A enciclopédia que a Idade Média leu: as sete artes resumidas nos três primeiros livros.',inf:['cassiodoro','marciano']},
+ {id:'carlos-magno',autor:'Carlos Magno',curto:'Carlos Magno',titulo:'Carta sobre o cultivo das letras',ano:785,aprox:1,etapa:'medieval',pos:'favor',artes:['gramatica'],nota:'Uma página: manda os mosteiros ensinarem as letras, porque quem escreve mal também entende mal a Escritura. O documento mais útil da lista para quem pensa em fundar uma escola.'},
+ {id:'tomas-mestre',autor:'Santo Tomás de Aquino',curto:'Tomás (De Magistro)',titulo:'De Magistro (De Veritate, q. 11)',ano:1257,aprox:1,etapa:'medieval',pos:'contexto',artes:['filosofia','teologia'],nota:'Os quatro artigos sobre se um homem pode ensinar outro: o mestre ajuda a razão do aluno como o médico ajuda a natureza.',inf:['agostinho-mestre']},
+ {id:'tomas-trindade',autor:'Santo Tomás de Aquino',curto:'Tomás (De Trinitate)',titulo:'Comentário ao De Trinitate de Boécio, q. 5 e 6',ano:1258,aprox:1,etapa:'medieval',pos:'favor',artes:['geral','filosofia'],nota:'Por que as artes liberais vêm primeiro (q. 5, a. 1, ad 3) e qual a ordem do aprendizado (q. 6, a. 1).',inf:['boecio']},
+ {id:'tomas-artes',autor:'Santo Tomás de Aquino',curto:'Tomás (artes liberais)',titulo:'Suma I-II, q. 57, a. 3, ad 3, e Comentário à Ética, VI, lição 7',ano:1271,aprox:1,etapa:'medieval',pos:'favor',artes:['geral','filosofia'],nota:'Dois textos curtos: por que essas artes se chamam liberais, e a ordem dos estudos (lógica, matemática, filosofia natural, moral, metafísica).',inf:['aristoteles-etica']},
+ {id:'humanistas',autor:'Vergerio, Bruni, Piccolomini e Guarino',curto:'Humanistas',titulo:'Tratados de educação humanista',ano:1450,aprox:1,etapa:'renascimento',pos:'favor',artes:['gramatica','retorica'],nota:'Quatro tratados curtos do século XV; o de Piccolomini (futuro Pio II) segue Quintiliano de perto. Só impresso: Humanist Educational Treatises, I Tatti (Harvard, 2002), latim e inglês.',inf:['quintiliano']},
+ {id:'antoniano',autor:'Silvio Antoniano',curto:'Antoniano',titulo:'Três livros da educação cristã dos filhos',ano:1584,etapa:'renascimento',pos:'favor',artes:['geral','teologia'],nota:'Escrito a pedido de São Carlos Borromeu, aplica Trento à família e à escola. É a fonte que Pio XI cita na Divini Illius Magistri. Comece pelo livro I.',inf:['trento']},
+ {id:'ratio',autor:'Companhia de Jesus',curto:'Ratio Studiorum',titulo:'Ratio Studiorum',ano:1599,etapa:'renascimento',pos:'favor',artes:['gramatica','retorica','filosofia','teologia'],nota:'O plano de estudos dos colégios jesuítas: gramática, humanidades e retórica antes da filosofia. Para uma escola, comece pelas regras do prefeito dos estudos inferiores e pelas regras comuns dos professores das classes inferiores.',inf:['quintiliano']},
+ {id:'lasalle',autor:'São João Batista de La Salle',curto:'La Salle',titulo:'Guia das escolas cristãs',ano:1720,etapa:'renascimento',pos:'contexto',artes:['gramatica'],nota:'O manual mais concreto da lista: horários, silêncio, correção, formação dos mestres. Comece pela parte I.'},
+ {id:'gaume',autor:'Abbé Gaume e Mons. Dupanloup',curto:'Gaume × Dupanloup',titulo:'A querela dos clássicos',ano:1851,etapa:'renascimento',pos:'contra',artes:['gramatica'],nota:'Gaume queria tirar os autores pagãos do currículo (Le ver rongeur des sociétés modernes); Dupanloup os defendeu. O debate católico do século XIX sobre o lugar dos pagãos. Em francês, no Gallica e no archive.org.',inf:['basilio']},
+ {id:'dombosco',autor:'São João Bosco',curto:'Dom Bosco',titulo:'O sistema preventivo na educação da juventude',ano:1877,etapa:'renascimento',pos:'contexto',artes:['teologia'],nota:'O único escrito em que Dom Bosco expôs o próprio método: razão, religião e amorevolezza. Poucas páginas.'},
+ {id:'concilios',autor:'Latrão III, Latrão IV e Viena',curto:'Concílios medievais',titulo:'Cânones sobre as escolas',ano:1179,etapa:'magisterio',pos:'contexto',artes:['gramatica','teologia'],nota:'Latrão III (cân. 18) manda haver um mestre em cada catedral, com ensino gratuito aos pobres; Latrão IV (cân. 11) estende a ordem a todas as igrejas com recursos; Viena (decreto 24) cria escolas de hebraico, árabe e caldeu.'},
+ {id:'trento',autor:'Concílio de Trento',curto:'Trento',titulo:'Sessões V e XXIII: as lições e os seminários',ano:1546,etapa:'magisterio',pos:'contexto',artes:['gramatica','teologia'],nota:'Sessão V: onde não houver meios, ao menos um mestre que ensine gramática de graça. Sessão XXIII, cap. 18: os seminários, a partir dos 12 anos.',inf:['concilios']},
+ {id:'leao13',autor:'Pio IX e Leão XIII',curto:'Pio IX e Leão XIII',titulo:'Syllabus, Aeterni Patris, Spectata fides e Militantis Ecclesiae',ano:1879,etapa:'magisterio',pos:'contexto',artes:['filosofia','teologia'],nota:'O Syllabus (prop. 45-48) condena a escola separada da fé; a Aeterni Patris (n. 31) pede a volta à sabedoria de Santo Tomás; as outras duas tratam das escolas católicas.'},
+ {id:'pio10',autor:'São Pio X',curto:'S. Pio X',titulo:'Acerbo nimis e Pascendi',ano:1905,etapa:'magisterio',pos:'contexto',artes:['teologia','filosofia'],nota:'A ignorância religiosa como causa da crise e o catecismo em cada paróquia (Acerbo nimis, n. 18-24); a filosofia escolástica como base dos estudos (Pascendi, n. 45).',inf:['leao13']},
+ {id:'pio11-estudos',autor:'Pio XI',curto:'Pio XI (estudos)',titulo:'Officiorum omnium, Studiorum ducem e Deus scientiarum Dominus',ano:1923,etapa:'magisterio',pos:'contexto',artes:['gramatica','filosofia','teologia'],nota:'Os estudos do clero: o latim, Santo Tomás como guia e a lei das universidades eclesiásticas.'},
+ {id:'veterum',autor:'São João XXIII',curto:'Veterum Sapientia',titulo:'Veterum Sapientia',ano:1962,etapa:'magisterio',pos:'favor',artes:['gramatica'],nota:'O latim como língua da Igreja e dos estudos: manda restaurar o ensino do latim onde ele caiu (norma 4) e ensinar as ciências sagradas em latim (norma 5).',inf:['pio11-estudos']},
+ {id:'congregacao',autor:'Congregação para a Educação Católica',curto:'Congregação',titulo:'Documentos sobre a escola católica (1977-2022)',ano:1977,etapa:'magisterio',pos:'contexto',artes:['teologia'],nota:'Documentos curtos e numerados; leia inteiros. Comece por A Escola Católica (1977) e termine pela Instrução de 2022 sobre a identidade da escola católica.',inf:['gravissimum']},
+ {id:'jp2',autor:'São João Paulo II',curto:'João Paulo II',titulo:'Familiaris Consortio, Fides et Ratio e outros',ano:1981,etapa:'magisterio',pos:'contexto',artes:['teologia','filosofia'],nota:'Os pais como primeiros educadores (Familiaris Consortio, n. 36-41; Gratissimam Sane, n. 16), a catequese, as universidades católicas e a fé e a razão como “duas asas”.',inf:['gravissimum']},
+ {id:'codigo',autor:'Código de Direito Canônico',curto:'Código Canônico',titulo:'Da educação católica (1917 e 1983)',ano:1983,etapa:'magisterio',pos:'contexto',artes:['teologia'],nota:'Cân. 793-821 (1983): escolas, universidades católicas e eclesiásticas; e os cânones sobre os pais (226 e 1136). No Código de 1917, o cân. 1113 é o que Pio XI cita.'},
+ {id:'catecismo',autor:'Catecismo da Igreja Católica',curto:'Catecismo',titulo:'Os pais, primeiros educadores (n. 1653 e 2221-2230)',ano:1992,etapa:'magisterio',pos:'contexto',artes:['teologia'],nota:'O direito e o dever dos pais de educar e de escolher a escola (n. 2229). Na página em português, busque o número.'},
+ {id:'bento16',autor:'Bento XVI',curto:'Bento XVI',titulo:'A emergência educativa e o discurso no Collège des Bernardins',ano:2008,etapa:'magisterio',pos:'favor',artes:['gramatica','musica','teologia'],nota:'A crise da educação como crise de confiança na vida; e, aos Bernardins, a busca de Deus (quaerere Deum) como raiz da cultura monástica, da gramática e da música.'},
+ {id:'francisco',autor:'Francisco',curto:'Francisco',titulo:'Amoris Laetitia (cap. VII), Veritatis Gaudium e o Pacto Educativo',ano:2016,etapa:'magisterio',pos:'contexto',artes:['teologia'],nota:'A educação dos filhos (Amoris Laetitia, n. 259-290), as universidades eclesiásticas e a convocação do Pacto Educativo Global.'},
+ {id:'leao14',autor:'Leão XIV',curto:'Leão XIV',titulo:'Traçar novos mapas de esperança',ano:2025,etapa:'magisterio',pos:'contexto',artes:['teologia','geral'],nota:'Releitura da Gravissimum Educationis 60 anos depois; a família como “primeira escola de humanidade” (4.1).',inf:['gravissimum']},
+ {id:'curtius',autor:'Ernst Robert Curtius',curto:'Curtius',titulo:'Literatura europeia e Idade Média latina',ano:1948,etapa:'historia',pos:'contexto',artes:['gramatica','retorica'],nota:'Cap. 3, “Literatura e ensino”: como as artes passaram da escola antiga à medieval. Edição brasileira pela Edusp.'},
+ {id:'leclercq',autor:'Jean Leclercq',curto:'Leclercq',titulo:'O amor às letras e o desejo de Deus',ano:1957,etapa:'historia',pos:'contexto',artes:['gramatica','teologia'],nota:'Parte II, as fontes da cultura monástica: a gramática a serviço da oração. Edição brasileira pela Paulus.'},
+ {id:'wagner',autor:'David Wagner (org.)',curto:'Wagner',titulo:'The Seven Liberal Arts in the Middle Ages',ano:1983,etapa:'historia',pos:'contexto',artes:['gramatica','logica','retorica','aritmetica','geometria','musica','astronomia'],nota:'Um ensaio por arte: o melhor panorama de cada uma das sete na Idade Média.'},
+ {id:'kimball',autor:'Bruce Kimball',curto:'Kimball',titulo:'Orators and Philosophers',ano:1986,etapa:'historia',pos:'contexto',artes:['geral'],nota:'A tese central: a tradição liberal tem duas linhas, a dos oradores (Isócrates, Cícero) e a dos filósofos (Platão, Aristóteles).',inf:['isocrates','platao']}
 ];
+/* Onde ler cada obra. ext: só no site (não dá para baixar); o resto o servidor guarda como cópia de leitura. */
+var VA='https://www.vatican.va/', CT='https://www.corpusthomisticum.org/', QUI='https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Quintilian/Institutio_Oratoria/', ISI='https://penelope.uchicago.edu/Thayer/L/Roman/Texts/Isidore/', CEC=VA+'roman_curia/congregations/ccatheduc/documents/rc_con_ccatheduc_doc_', KOL='https://kolbefoundation.org/gbookswebsite/studentlibrary/greatestbooks/aaabooks/ignatiusloyola/';
+var FONTES_CLS={
+ platao:[{k:'jowett',t:'República (trad. Jowett)',u:'https://classics.mit.edu/Plato/republic.mb.txt',l:'en',ler:'Livros II (de 376c) e III (até 412b); IV (a alma tripartida); fim do VI (504-511, a linha dividida); VII inteiro.'},{k:'perseus',t:'Grego e inglês lado a lado (Perseus)',u:'https://catalog.perseus.org/catalog/urn:cts:greekLit:tlg0059.tlg030',l:'grc',ext:1}],
+ aristoteles:[{k:'l7',t:'Política, livro VII (trad. Jowett)',u:'https://classics.mit.edu/Aristotle/politics.7.seven.html',l:'en',ler:'Livro VII, cap. 13-17; livro VIII inteiro; livro I opcional.'},{k:'l8',t:'Política, livro VIII',u:'https://classics.mit.edu/Aristotle/politics.8.eight.html',l:'en'},{k:'l1',t:'Política, livro I',u:'https://classics.mit.edu/Aristotle/politics.1.one.html',l:'en'},{k:'perseus',t:'Grego e inglês (Perseus)',u:'https://atlas.perseus.tufts.edu/library/urn:cts:greekLit:tlg0086.tlg035/',l:'grc',ext:1}],
+ 'aristoteles-etica':[{k:'ross',t:'Ética a Nicômaco (trad. W. D. Ross)',u:'https://classics.mit.edu/Aristotle/nicomachaen.mb.txt',l:'en',ler:'Livro II (a virtude como hábito) e livro X, cap. 6-8 (contemplação e ócio).'}],
+ isocrates:[{k:'sofistas',t:'Contra os sofistas, §§ 1-20',u:'https://cts.perseids.org/read/greekLit/tlg0010/tlg008/perseus-eng2/1-20',l:'en',ler:'Texto inteiro (curto), em duas partes.'},{k:'sofistas2',t:'Contra os sofistas, §§ 21-22',u:'https://cts.perseids.org/read/greekLit/tlg0010/tlg008/perseus-eng2/21-22',l:'en'},{k:'antidose',t:'Antídose, §§ 261-280',u:'https://cts.perseids.org/read/greekLit/tlg0010/tlg019/perseus-eng2/261-280',l:'en',ler:'A geometria e a astronomia como formação.'}],
+ cicero:[{k:'1a',t:'Livro I, parte 1',u:'https://www.attalus.org/cicero/deoratore1A.html',l:'en',ler:'Livro I (sobretudo §§ 1-95) e livro III. Tradução de J. S. Watson (1860); cada seção tem link para o latim.'},{k:'1b',t:'Livro I, parte 2',u:'https://www.attalus.org/cicero/deoratore1B.html',l:'en'},{k:'1c',t:'Livro I, parte 3',u:'https://www.attalus.org/cicero/deoratore1C.html',l:'en'},{k:'3a',t:'Livro III, parte 1',u:'https://www.attalus.org/cicero/deoratore3A.html',l:'en'},{k:'3b',t:'Livro III, parte 2',u:'https://www.attalus.org/cicero/deoratore3B.html',l:'en'},{k:'3c',t:'Livro III, parte 3',u:'https://www.attalus.org/cicero/deoratore3C.html',l:'en'}],
+ seneca:[{k:'88',t:'Carta 88 (trad. Gummere)',u:'https://en.wikisource.org/wiki/Moral_letters_to_Lucilius/Letter_88',l:'en',ler:'Carta inteira (curta).'}],
+ quintiliano:[{k:'1a',t:'Livro I: prefácio e cap. 1-3',u:QUI+'1A*.html',l:'en',ler:'Livros I, II e XII. Tradução de H. E. Butler (Loeb, domínio público); o latim está no mesmo site.'},{k:'1b',t:'Livro I: cap. 4-6',u:QUI+'1B*.html',l:'en'},{k:'1c',t:'Livro I: cap. 7-12',u:QUI+'1C*.html',l:'en'},{k:'2a',t:'Livro II: cap. 1-5',u:QUI+'2A*.html',l:'en'},{k:'2b',t:'Livro II: cap. 6-13',u:QUI+'2B*.html',l:'en'},{k:'2c',t:'Livro II: cap. 14-21',u:QUI+'2C*.html',l:'en'},{k:'12a',t:'Livro XII, parte 1',u:QUI+'12A*.html',l:'en'},{k:'12b',t:'Livro XII, parte 2',u:QUI+'12B*.html',l:'en'},{k:'12c',t:'Livro XII, parte 3',u:QUI+'12C*.html',l:'en'},{k:'12d',t:'Livro XII, parte 4',u:QUI+'12D*.html',l:'en'},{k:'12e',t:'Livro XII, parte 5',u:QUI+'12E*.html',l:'en'}],
+ marciano:[{k:'perseus',t:'Latim (ed. Eyssenhardt, 1866), digitalização',u:'https://catalog.perseus.org/catalog/urn:cts:latinLit:stoa0192a.stoa001.opp-lat2',l:'la',ext:1,ler:'Livros III a IX, uma arte por livro. Sem tradução portuguesa; a inglesa é a de Stahl e Johnson (1977).'}],
+ basilio:[{k:'grego',t:'Aos jovens: grego e inglês',u:'https://earlychurchtexts.com/public/basil_greek_literature.htm',l:'en',ler:'Texto inteiro (curto). Tradução de F. M. Padelford (1902).'}],
+ jeronimo:[{k:'107',t:'Carta 107 a Leta',u:'https://www.newadvent.org/fathers/3001107.htm',l:'en',ler:'Carta inteira.'},{k:'22',t:'Carta 22 a Eustóquio',u:'https://www.newadvent.org/fathers/3001022.htm',l:'en',ler:'§ 30: o sonho do “ciceroniano”.'}],
+ crisostomo:[{k:'ucp',t:'Dissertação da Univ. Católica Portuguesa, com tradução',u:'https://repositorio.ucp.pt/bitstreams/71612db9-df6b-473c-8046-10f0307b6001/download',l:'pt',ext:1,ler:'O repositório só entrega o PDF pelo navegador.'},{k:'laistner',t:'Onde achar a tradução de Laistner (Fourth Century)',u:'https://www.fourthcentury.com/?p=14937',l:'en',ext:1}],
+ 'agostinho-ordem':[{k:'pl',t:'De ordine, latim (Patrologia Latina 32)',u:'https://bkv.unifr.ch/works/cpl-255/versions/de-ordine-pl/divisions',l:'la',ext:1,ler:'Livro II, sobretudo cap. 12-16: as artes liberais como degraus. O site só mostra o texto no navegador.'}],
+ 'agostinho-mestre':[{k:'uel',t:'O mestre, trad. Antonio Minghetti (UEL)',u:'https://projetos.uel.br/bibliotecacomum/bc-texto/obras/2021pack0009.pdf',l:'pt',ler:'Texto inteiro.'}],
+ 'agostinho-doutrina':[{k:'l2',t:'Livro II (trad. J. F. Shaw)',u:'https://www.newadvent.org/fathers/12022.htm',l:'en',ler:'O que aproveitar das ciências pagãs.'},{k:'l4',t:'Livro IV (trad. J. F. Shaw)',u:'https://www.newadvent.org/fathers/12024.htm',l:'en',ler:'O orador cristão.'}],
+ 'agostinho-confissoes':[{k:'l1',t:'Confissões, livro I',u:'https://www.newadvent.org/fathers/110101.htm',l:'en',ler:'A escola da infância.'}],
+ boecio:[{k:'zrc',t:'De institutione musica: latim e esloveno (acesso aberto)',u:'https://zalozba.zrc-sazu.si/en/publikacije/temelji-glasbe-1',l:'la',ext:1,ler:'Livro I, cap. 1-2: as três músicas. A aritmética está só na Patrologia Latina, vol. 63.'}],
+ isidoro:[{k:'1',t:'Livro I: a gramática (latim)',u:ISI+'1*.html',l:'la',ler:'Livro I (gramática), II (retórica e dialética), III (aritmética, geometria, música e astronomia). Texto latino de Lindsay (1911).'},{k:'2',t:'Livro II: retórica e dialética (latim)',u:ISI+'2*.html',l:'la'},{k:'3',t:'Livro III: o Quadrivium (latim)',u:ISI+'3*.html',l:'la'}],
+ 'carlos-magno':[{k:'baugulf',t:'Carta a Baugulfo de Fulda',u:'https://sourcebooks.web.fordham.edu/source/carol-baugulf.asp',l:'en',ler:'Uma página.'}],
+ salisbury:[{k:'hathi',t:'Metalogicon, trad. McGarry (HathiTrust)',u:'https://catalog.hathitrust.org/Record/001381658',l:'en',ext:1,ler:'Livro I (defesa do Trivium); I, 24 (Bernardo de Chartres); II, 10 (a formação do autor). A HathiTrust só mostra página por página.'}],
+ boaventura:[{k:'falbel',t:'Estudo de Nachman Falbel, parte II (Revista de História, USP)',u:'https://revistas.usp.br/revhistoria/en/article/download/131810/128019',l:'pt'}],
+ 'tomas-mestre':[{k:'latim',t:'De Veritate, q. 11 (latim)',u:CT+'qdv11.html',l:'la',ler:'Os 4 artigos.'}],
+ 'tomas-trindade':[{k:'latim',t:'Super De Trinitate (latim)',u:CT+'cbt.html',l:'la',ler:'q. 5, a. 1, ad 3 e q. 6, a. 1.'},{k:'tese',t:'Tese de Tiago Grande sobre a q. 5 (USP, 2022)',u:'https://www.teses.usp.br/teses/disponiveis/8/8133/tde-23052023-155630/publico/2022_TiagoGrande_VCorr.pdf',l:'pt'}],
+ 'tomas-artes':[{k:'suma',t:'Suma I-II, q. 57 (inglês)',u:'https://www.newadvent.org/summa/2057.htm',l:'en',ler:'Art. 3, resposta à 3ª objeção.'},{k:'suma-la',t:'Suma I-II, q. 55-70 (latim)',u:CT+'sth2055.html',l:'la',ler:'Procure a q. 57, a. 3.'},{k:'etica',t:'Comentário à Ética, livro VI (latim)',u:CT+'ctc06.html',l:'la',ler:'Lição 7: a ordem dos estudos.'}],
+ antoniano:[{k:'en',t:'On the Christian and Political Education of Children (inglês)',u:'https://archive.org/download/DelleducazioneCristianaEPoliticaDeFigliuoli/On%20the%20Christian%20and%20Political%20Education%20of%20Children%20-%20Antoniano%2C%20Cardinal%20Silvio.pdf',l:'en',ler:'Comece pelo livro I.'},{k:'it',t:'Edição italiana de 1821 (archive.org, 170 MB)',u:'https://archive.org/details/DelleducazioneCristianaEPoliticaDeFigliuoli',l:'it',ext:1}],
+ ratio:[{k:'pt',t:'Código Pedagógico dos Jesuítas (trad. Margarida Miranda)',u:'https://estudogeral.uc.pt/bitstream/10316/44738/1/C%C3%B3digo%20Pedag%C3%B3gico%20dos%20Jesu%C3%ADtas.%20Ratio%20Studiorum%20da%20Companhia%20de%20Jesus%20-%20MMiranda.pdf',l:'pt',ler:'Comece pelas regras do prefeito dos estudos inferiores e pelas regras comuns dos professores das classes inferiores.'},{k:'en3',t:'Regras do prefeito dos estudos inferiores (inglês)',u:KOL+'ratio3.html',l:'en'},{k:'en6',t:'Regras comuns dos professores das classes inferiores (inglês)',u:KOL+'ratio6.html',l:'en'}],
+ lasalle:[{k:'conduct',t:'The Conduct of the Christian Schools',u:'https://media.lasallianresources.org/storage/media/dls-writings/dls-the-conduct-of-the-christian-schools-1766410603.pdf',l:'en',ler:'Parte I: o funcionamento diário da escola.'}],
+ newman:[{k:'d5',t:'Discurso V: o conhecimento como fim em si mesmo',u:'https://www.newmanreader.org/works/idea/discourse5.html',l:'en',ler:'Discursos V, VI e VII. O V cabe numa tarde.'},{k:'d6',t:'Discurso VI: o conhecimento e o aprendizado',u:'https://www.newmanreader.org/works/idea/discourse6.html',l:'en'},{k:'d7',t:'Discurso VII: o conhecimento e a habilidade profissional',u:'https://www.newmanreader.org/works/idea/discourse7.html',l:'en'}],
+ concilios:[{k:'l3',t:'Latrão III (trad. Tanner)',u:'https://www.ewtn.com/catholicism/library/history-and-text-1464',l:'en',ler:'Cânon 18.'},{k:'l4',t:'Latrão IV, cânones escolhidos',u:'https://sourcebooks.web.fordham.edu/source/lat4-select.asp',l:'en',ler:'Cânon 11: dos mestres para os pobres.'},{k:'viena',t:'Concílio de Viena (trad. Tanner)',u:'https://www.ewtn.com/catholicism/library/council-of-vienne-1542',l:'en',ler:'Decreto 24, quase no fim.'}],
+ trento:[{k:'s5',t:'Sessão V (trad. Waterworth)',u:'https://history.hanover.edu/texts/trent/ct05.html',l:'en',ler:'Decreto de reforma, cap. I: lições de Escritura e das artes liberais.'},{k:'s23',t:'Sessão XXIII, decreto de reforma',u:'https://history.hanover.edu/texts/trent/ct23ref2.html',l:'en',ler:'Cap. XVIII: como fundar os seminários.'}],
+ leao13:[{k:'syllabus',t:'Syllabus (Catholic Encyclopedia)',u:'https://www.newadvent.org/cathen/14368b.htm',l:'en',ler:'Erros sobre a sociedade civil, proposições 45 a 48.'},{k:'ap',t:'Aeterni Patris (inglês)',u:VA+'content/leo-xiii/en/encyclicals/documents/hf_l-xiii_enc_04081879_aeterni-patris.html',l:'en',ler:'n. 31 (principal) e n. 26.'},{k:'sf',t:'Spectata fides',u:VA+'content/leo-xiii/en/encyclicals/documents/hf_l-xiii_enc_27111885_spectata-fides.html',l:'en',ler:'n. 4.'},{k:'me',t:'Militantis Ecclesiae',u:VA+'content/leo-xiii/en/encyclicals/documents/hf_l-xiii_enc_01081897_militantis-ecclesiae.html',l:'en',ler:'Escolas: n. 15 a 20.'}],
+ pio10:[{k:'an',t:'Acerbo nimis (inglês)',u:VA+'content/pius-x/en/encyclicals/documents/hf_p-x_enc_15041905_acerbo-nimis.html',l:'en',ler:'n. 1-3 e 16; regras práticas: n. 18 a 24.'},{k:'pascendi',t:'Pascendi (inglês)',u:'https://www.clerus.org/bibliaclerusonline/EN/gva.htm',l:'en',ler:'n. 45: o estudo da filosofia escolástica.'}],
+ 'pio11-estudos':[{k:'oo',t:'Officiorum omnium (inglês)',u:'https://lms.org.uk/node/2156',l:'en'},{k:'sd',t:'Studiorum ducem (inglês)',u:'https://www.ewtn.com/catholicism/library/on-st-thomas-aquinas-3526',l:'en',ler:'Texto inteiro (curto).'},{k:'dsd',t:'Deus scientiarum Dominus, latim com introdução',u:'https://revistas.comillas.edu/index.php/estudioseclesiasticos/article/download/22346/19657/54333',l:'la'}],
+ dim:[{k:'pt',t:'Divini Illius Magistri (português)',u:VA+'content/pius-xi/pt/encyclicals/documents/hf_p-xi_enc_31121929_divini-illius-magistri.html',l:'pt',ler:'Definição: n. 7 · Igreja: 15-28 · família: 30-41 · Estado: 42-54 · autores pagãos: 87 · professores: 88 · fim da educação: 93-96.'},{k:'en',t:'Divini Illius Magistri (inglês, numerada)',u:VA+'content/pius-xi/en/encyclicals/documents/hf_p-xi_enc_31121929_divini-illius-magistri.html',l:'en',ler:'A numeração dos parágrafos está nesta versão.'}],
+ veterum:[{k:'la',t:'Veterum Sapientia (latim)',u:VA+'content/john-xxiii/la/apost_constitutions/1962/documents/hf_j-xxiii_apc_19620222_veterum-sapientia.html',l:'la',ler:'Parte normativa, normas 1 a 8.'},{k:'en',t:'Veterum Sapientia (inglês)',u:'https://archive.wf-f.org/VeterumSapientia.html',l:'en'}],
+ gravissimum:[{k:'ge',t:'Gravissimum Educationis',u:VA+'archive/hist_councils/ii_vatican_council/documents/vat-ii_decl_19651028_gravissimum-educationis_po.html',l:'pt',ler:'n. 3: os pais, primeiros educadores · n. 6: liberdade de escolha · n. 8: a escola católica · n. 10: as universidades.'},{k:'ot',t:'Optatam Totius',u:VA+'archive/hist_councils/ii_vatican_council/documents/vat-ii_decree_19651028_optatam-totius_po.html',l:'pt',ler:'n. 13, 15 e 16: formação humanística, latim, filosofia e teologia.'},{k:'dh',t:'Dignitatis Humanae',u:VA+'archive/hist_councils/ii_vatican_council/documents/vat-ii_decl_19651207_dignitatis-humanae_po.html',l:'pt',ler:'n. 5: os pais escolhem livremente as escolas.'},{k:'gs',t:'Gaudium et Spes',u:VA+'archive/hist_councils/ii_vatican_council/documents/vat-ii_const_19651207_gaudium-et-spes_po.html',l:'pt',ler:'Parte II, cap. II (n. 53-62), sobretudo 59-62: a cultura.'},{k:'puc',t:'A declaração comentada (PUC-Campinas)',u:'https://www.puc-campinas.edu.br/wp-content/uploads/2016/03/NFC-Declaracao-gravissimum-educationis.pdf',l:'pt'}],
+ congregacao:[{k:'1977',t:'A Escola Católica (1977)',u:CEC+'19770319_catholic-school_po.html',l:'pt',ler:'O primeiro a ler.'},{k:'1982',t:'O leigo católico testemunha da fé na escola (1982)',u:CEC+'19821015_lay-catholics_po.html',l:'pt'},{k:'1988',t:'Dimensão religiosa da educação na escola católica (1988)',u:CEC+'19880407_catholic-school_po.html',l:'pt'},{k:'1998',t:'A escola católica no limiar do terceiro milênio (1997)',u:CEC+'27041998_school2000_po.html',l:'pt'},{k:'2002',t:'As pessoas consagradas e a sua missão na escola (2002)',u:CEC+'20021028_consecrated-persons_po.html',l:'pt'},{k:'2007',t:'Educar juntos na escola católica (2007)',u:CEC+'20070908_educare-insieme_po.html',l:'pt'},{k:'2009',t:'Carta circular sobre o ensino da religião na escola (2009)',u:CEC+'20090505_circ-insegn-relig_po.html',l:'pt'},{k:'2013',t:'Educar ao diálogo intercultural na escola católica (2013)',u:CEC+'20131028_dialogo-interculturale_en.html',l:'en'},{k:'2019',t:'“Homem e mulher os criou” (2019)',u:'https://press.vatican.va/roman_curia/congregations/ccatheduc/documents/rc_con_ccatheduc_doc_20190202_maschio-e-femmina_po.pdf',l:'pt'},{k:'2022',t:'A identidade da escola católica (2022)',u:CEC+'20220125_istruzione-identita-scuola-cattolica_po.html',l:'pt',ler:'Leitura obrigatória para quem vai fundar uma escola.'}],
+ jp2:[{k:'ct',t:'Catechesi Tradendae (1979)',u:VA+'content/john-paul-ii/pt/apost_exhortations/documents/hf_jp-ii_exh_16101979_catechesi-tradendae.html',l:'pt'},{k:'sc',t:'Sapientia Christiana (1979)',u:'https://w2.vatican.va/content/john-paul-ii/pt/apost_constitutions/documents/hf_jp-ii_apc_15041979_sapientia-christiana.html',l:'pt'},{k:'fc',t:'Familiaris Consortio (1981)',u:VA+'content/john-paul-ii/pt/apost_exhortations/documents/hf_jp-ii_exh_19811122_familiaris-consortio.html',l:'pt',ler:'Parte III, “A educação”, n. 36-41.'},{k:'cdf',t:'Carta dos Direitos da Família (1983, inglês)',u:VA+'roman_curia/pontifical_councils/family/documents/rc_pc_family_doc_19831022_family-rights_en.html',l:'en',ler:'Artigo 5.'},{k:'ece',t:'Ex Corde Ecclesiae (1990)',u:'https://www.vatican.va/holy_father/john_paul_ii/apost_constitutions/documents/hf_jp-ii_apc_15081990_ex-corde-ecclesiae_po.html',l:'pt'},{k:'gs',t:'Gratissimam Sane, carta às famílias (1994)',u:VA+'content/john-paul-ii/pt/letters/1994/documents/hf_jp-ii_let_02021994_families.html',l:'pt',ler:'n. 16, “A educação”.'},{k:'fr',t:'Fides et Ratio (1998)',u:VA+'content/john-paul-ii/pt/encyclicals/documents/hf_jp-ii_enc_14091998_fides-et-ratio.html',l:'pt'}],
+ codigo:[{k:'1983pt',t:'Código de 1983 (português, o Código inteiro)',u:VA+'archive/cod-iuris-canonici/portuguese/codex-iuris-canonici_po.pdf',l:'pt',ler:'Livro III, Título III: busque “Cân. 793”. Os pais: cân. 226 e 1136.'},{k:'1983en',t:'Cân. 793-821 (inglês)',u:VA+'archive/cod-iuris-canonici/eng/documents/cic_lib3-cann793-821_en.html',l:'en',ler:'Disposições gerais (793-795), escolas (796-806), universidades católicas (807-814), eclesiásticas (815-821).'},{k:'1983la',t:'Livro III (latim, texto oficial)',u:VA+'archive/cod-iuris-canonici/latin/documents/cic_liberIII_la.html',l:'la',ler:'Busque “Can. 793”.'},{k:'1983fieis',t:'Cân. 208-329 (inglês): fiéis, leigos e formação do clero',u:VA+'archive/cod-iuris-canonici/eng/documents/cic_lib2-cann208-329_en.html',l:'en',ler:'Cân. 217, 226, 229, 234, 249-252.'},{k:'1917',t:'Código de 1917 (latim, Acta Apostolicae Sedis)',u:'https://press.vatican.va/archive/aas/documents/AAS-09-II-1917-ocr.pdf',l:'la',ler:'Busque “Can. 1113” e “Can. 1372”.'}],
+ catecismo:[{k:'pt',t:'Catecismo, 3ª parte, 2ª seção, cap. 2',u:VA+'archive/cathechism_po/index_new/p3s2cap2_2196-2557_po.html',l:'pt',ler:'n. 2221 a 2230, no Artigo 4 (Quarto Mandamento).'},{k:'1653',t:'n. 1653 (inglês)',u:VA+'content/catechism/en/part_two/section_two/chapter_three/article_7/v_the_goods_and_requirements_of_conjugal_love.html',l:'en'}],
+ bento16:[{k:'carta',t:'Carta sobre a tarefa urgente da educação',u:VA+'content/benedict-xvi/pt/letters/2008/documents/hf_ben-xvi_let_20080121_educazione.html',l:'pt',ler:'Texto curto.'},{k:'bernardins',t:'Discurso no Collège des Bernardins',u:VA+'content/benedict-xvi/pt/speeches/2008/september/documents/hf_ben-xvi_spe_20080912_parigi-cultura.html',l:'pt',ler:'A parte sobre a Palavra, a gramática e a música dos salmos vem logo depois da introdução.'}],
+ francisco:[{k:'al',t:'Amoris Laetitia',u:VA+'content/francesco/pt/apost_exhortations/documents/papa-francesco_esortazione-ap_20160319_amoris-laetitia.html',l:'pt',ler:'Cap. VII, n. 259-290.'},{k:'vg',t:'Veritatis Gaudium',u:VA+'content/francesco/pt/apost_constitutions/documents/papa-francesco_costituzione-ap_20171208_veritatis-gaudium.html',l:'pt',ler:'Proêmio (n. 1-6).'},{k:'pacto',t:'Mensagem do Pacto Educativo Global',u:VA+'content/francesco/pt/messages/pont-messages/2019/documents/papa-francesco_20190912_messaggio-patto-educativo.html',l:'pt'}],
+ leao14:[{k:'mapas',t:'Traçar novos mapas de esperança',u:VA+'content/leo-xiv/pt/apost_letters/documents/20251027-disegnare-nuove-mappe.html',l:'pt',ler:'A família como primeira escola de humanidade: 4.1.'}]
+};
 var QUAESTIO_CLS={la:'Utrum omnis homo per artes liberales educandus sit',pt:'Se todo homem deve ser educado pelas artes liberais'};
 var SEMENTE_QUAESTIO={obj:[
  {id:'o1',t:'As artes se chamavam liberais porque eram próprias do homem livre, e na Antiguidade e na Idade Média formaram sobretudo uma minoria. Logo, a tradição não as propunha para todos.',fonte:'aristoteles',ad:''},
@@ -2197,6 +2306,58 @@ var SEMENTE_CITACOES=[
  {id:'cit-tomas',texto:'Pois a natureza não tem vista somente à geração da prole, mas também ao seu desenvolvimento e progresso até o perfeito estado de homem enquanto homem, isto é, até o estado de virtude.',autor:'Santo Tomás de Aquino',ref:'Suma Teológica, Suplemento, q. 41, a. 1 (tirado do Comentário às Sentenças, IV, d. 26, q. 1, a. 1)',status:'conferir',nota:'Pio XI cita esta passagem na Divini Illius Magistri. Conferir o texto latino original.',obra:'dim'},
  {id:'cit-codigo',texto:'Os pais são gravemente obrigados a cuidar, por todos os meios possíveis, da educação (que é religiosa e moral, que é física e civil) da prole e também a aproveitar o bem temporal da mesma.',autor:'Código de Direito Canônico de 1917',ref:'Cân. 1113, citado por Pio XI na Divini Illius Magistri (1929), logo depois da passagem de Santo Tomás',status:'conferir',nota:'A frase que circula junta este cânon com o trecho de Santo Tomás, como se fossem um texto só.',obra:'dim'}];
 var CLS={tab:'mapa',mapa:'perguntas',sel:null,arte:null,ia:{},iaEsp:{},iaErro:{}};
+/* ----- biblioteca: os textos de cada obra, guardados no servidor ----- */
+var LINGUA_CLS={pt:'Português',en:'Inglês',la:'Latim',grc:'Grego e inglês',it:'Italiano'};
+var BIB={estado:null,pedido:false,t:null};
+function fontesObra(id){ return FONTES_CLS[id]||[]; }
+function arqFonte(obra,k){ return S.arqs.filter(function(a){ return a.obra===obra&&a.fonte===k; })[0]; }
+function baixaveisCls(id){ var l=[]; OBRAS_CLS.forEach(function(o){ if(id&&o.id!==id) return; fontesObra(o.id).forEach(function(f){ if(!f.ext) l.push({obra:o.id,k:f.k,u:f.u,t:f.t,l:f.l}); }); }); return l; }
+function faltamCls(id){ return baixaveisCls(id).filter(function(x){ return !arqFonte(x.obra,x.k); }); }
+function erroFonteCls(obra,k){ var e=BIB.estado; return e&&e.erros.filter(function(x){ return x.obra===obra&&x.k===k; })[0]; }
+function baixandoCls(obra,k){ var e=BIB.estado; return !!(e&&e.fila>0&&!arqFonte(obra,k)&&!erroFonteCls(obra,k)); }
+function areaClassica(){
+  var l=copiaAreas(), ar=l.filter(function(a){ return a.nome==='Educação clássica'; })[0];
+  if(!ar){ ar={id:'t'+uid(),nome:'Educação clássica',cor:'#9a7413'}; l.push(ar); salvarAreas(l); }
+  return ar.id;
+}
+function bibPedir(lista,forcar){
+  if(!SERVIDOR||!lista.length) return;
+  api('POST','/api/classica/fontes',{itens:lista,area:areaClassica(),forcar:!!forcar}).then(function(e){ BIB.estado=e; bibAcompanhar(); pedirRender(); }).catch(function(e){ toast('Não consegui pedir os textos',e.message); });
+}
+function bibAcompanhar(){
+  clearTimeout(BIB.t);
+  if(BIB.estado&&BIB.estado.fila>0) BIB.t=setTimeout(function(){ api('GET','/api/classica/fontes').then(function(e){ BIB.estado=e; pedirRender(); bibAcompanhar(); }).catch(function(){ bibAcompanhar(); }); },3000);
+}
+/* Na primeira visita de cada sessão, guarda no servidor os textos que ainda faltam. */
+function bibAuto(){
+  if(!SERVIDOR||BIB.pedido||!S.ok.arqs) return;
+  BIB.pedido=true;
+  var f=faltamCls();
+  if(f.length) setTimeout(function(){ bibPedir(f); },0);
+  else api('GET','/api/classica/fontes').then(function(e){ BIB.estado=e; }).catch(function(){});
+}
+function resumoBibCls(){
+  var todos=baixaveisCls(), tem=todos.filter(function(x){ return arqFonte(x.obra,x.k); }).length, e=BIB.estado, err=e?e.erros.length:0;
+  if(!SERVIDOR) return '';
+  var h='<p class="nota cls-bib"><b>Biblioteca:</b> '+tem+' de '+todos.length+' textos guardados no Scriptorium';
+  if(e&&e.fila>0) h+=' · <span class="cls-girando">baixando '+e.fila+'…</span>';
+  else if(err) h+=' · '+err+' não '+(err>1?'baixaram':'baixou')+' <button class="link" data-act="cls-bib" data-forcar="1">Tentar de novo</button>';
+  else if(tem<todos.length) h+=' · <button class="link" data-act="cls-bib">Baixar os que faltam</button>';
+  return h+'</p>';
+}
+function linhaFonteCls(o,f){
+  var a=SERVIDOR&&!f.ext&&arqFonte(o.id,f.k), err=SERVIDOR&&!f.ext&&!a&&erroFonteCls(o.id,f.k), acao;
+  if(a) acao='<button class="btn btn-escuro btn-p" data-act="cls-ler" data-id="'+o.id+'" data-k="'+esc(f.k)+'">'+I.ler+'Ler</button>';
+  else if(SERVIDOR&&!f.ext&&!err&&baixandoCls(o.id,f.k)) acao='<span class="nota cls-girando">Baixando…</span>';
+  else acao=(err?'<button class="link" data-act="cls-bib" data-id="'+o.id+'" data-forcar="1" title="'+esc(err.msg)+'">Tentar de novo</button>':'')+'<a class="btn btn-claro btn-p" href="'+esc(f.u)+'" target="_blank" rel="noopener">Abrir no site</a>';
+  var meta=[LINGUA_CLS[f.l]||''].concat(f.ext?['só no site']:[]).concat(err?['não baixou: '+err.msg]:[]).filter(Boolean).join(' · ');
+  return '<div class="cls-conc cls-texto"><div><b data-sem-tr>'+esc(f.t)+'</b><span>'+esc(meta)+'</span>'+(f.ler?'<small data-sem-tr>'+esc(f.ler)+'</small>':'')+'</div><div class="cls-texto-acao">'+acao+'</div></div>';
+}
+function blocoTextosCls(o){
+  var l=fontesObra(o.id);
+  return '<div class="cls-bloco"><div class="cls-bloco-topo"><h4>Textos</h4>'+(l.length?'<small class="nota">'+l.length+(l.length>1?' textos':' texto')+'</small>':'')+'</div>'+
+    (l.length?l.map(function(f){ return linhaFonteCls(o,f); }).join(''):'<p class="nota">Não há texto livre desta obra na internet. A nota acima diz qual edição procurar.</p>')+'</div>';
+}
 function obraCls(id){ return OBRAS_CLS.filter(function(o){ return o.id===id; })[0]; }
 function clsDoc(id){ return S.cls[id]||{}; }
 function clsGravar(id,d){ d=JSON.parse(JSON.stringify(d)); delete d.id; S.cls[id]=d; gravar('classica/'+id,d); }
@@ -2214,10 +2375,10 @@ function semearCls(){
   clsGravar('config',{semeado:true});
 }
 function vClassica(){
-  semearCls();
+  semearCls(); bibAuto();
   var lidas=OBRAS_CLS.filter(function(o){ return statusObra(o.id)==='lida'; }).length, lendo=OBRAS_CLS.filter(function(o){ return statusObra(o.id)==='lendo'; }).length;
   var abas=[['mapa','Mapa'],['questao','A questão'],['itinerario','Itinerário'],['citacoes','Citações'],['caderno','Caderno do fundador']];
-  var h='<div class="pagina cls"><div><p class="rot">Educação clássica</p><h2 class="h2">O Trivium, o Quadrivium e <em>a sua questão</em></h2><p class="intro">'+lidas+' de '+OBRAS_CLS.length+' obras lidas'+(lendo?', '+lendo+' em leitura':'')+'. Comece por Hugo de São Vítor, Newman e Maritain.</p></div>'+
+  var h='<div class="pagina cls"><div><p class="rot">Educação clássica</p><h2 class="h2">O Trivium, o Quadrivium e <em>a sua questão</em></h2><p class="intro">'+lidas+' de '+OBRAS_CLS.length+' obras lidas'+(lendo?', '+lendo+' em leitura':'')+'. Comece por Hugo de São Vítor, Newman e Maritain.</p>'+resumoBibCls()+'</div>'+
     '<div class="seg cls-abas" role="tablist" aria-label="Partes do estudo">'+abas.map(function(a){ return '<button role="tab" data-act="cls-aba" data-a="'+a[0]+'" aria-pressed="'+(CLS.tab===a[0])+'">'+a[1]+'</button>'; }).join('')+'</div>';
   if(CLS.tab==='mapa') h+=abaMapaCls();
   else if(CLS.tab==='questao') h+=abaQuestaoCls();
@@ -2316,7 +2477,7 @@ function fichaObraCls(id){
   var ia=function(m){ return CLS.ia[m+':'+id]; }, esp=function(m){ return CLS.iaEsp[m+':'+id]; }, err=function(m){ return CLS.iaErro[m+':'+id]; };
   var perg=e.perguntas||(ia('perguntas')||{}).perguntas, conc=(ia('conceitos')||{}).conceitos, conf=ia('sintese');
   var h='<article class="painel pad cls-ficha" id="cls-ficha"><div class="cls-ficha-topo"><div><p class="rot">'+esc(et?et[1]:'')+' · '+esc(anoTxt(o))+(o.inicio?' · <span class="pill rubro">Começo sugerido</span>':'')+'</p><h3 data-sem-tr>'+esc(o.titulo)+'</h3><p class="cls-autor" data-sem-tr>'+esc(o.autor)+'</p></div><button class="icone-btn" data-act="cls-fechar" aria-label="Fechar a ficha">'+I.x+'</button></div>'+
-    '<p class="cls-nota" data-sem-tr>'+esc(o.nota)+'</p>'+
+    '<p class="cls-nota" data-sem-tr>'+esc(o.nota)+'</p>'+blocoTextosCls(o)+
     '<div class="cls-linha"><span class="rotulo">Leitura</span><div class="seg" role="group" aria-label="Situação da leitura">'+Object.keys(STATUS_CLS).map(function(k){ return '<button data-act="cls-status" data-id="'+id+'" data-s="'+k+'" aria-pressed="'+(st===k)+'">'+STATUS_CLS[k]+'</button>'; }).join('')+'</div></div>'+
     '<div class="cls-linha"><span class="rotulo">Na questão</span><div class="seg" role="group" aria-label="Posição na questão">'+Object.keys(POS_CLS).map(function(k){ return '<button data-act="cls-pos" data-id="'+id+'" data-p="'+k+'" aria-pressed="'+(pos===k)+'">'+POS_CLS[k][0]+'</button>'; }).join('')+'</div>'+(e.pos?'':'<small class="nota">Posição inicial sugerida. Mude conforme a sua leitura.</small>')+'</div>'+
     '<label>O que esta obra responde à questão<textarea class="campo" data-cls-campo="contribuicao" data-id="'+id+'" rows="3" placeholder="O argumento do autor, com as suas palavras">'+esc(e.contribuicao||'')+'</textarea></label>'+
@@ -2338,7 +2499,7 @@ function abaItinerarioCls(){
     var l=OBRAS_CLS.filter(function(o){ return o.etapa===et[0]; }).sort(function(a,b){ return a.ano-b.ano; });
     h+='<section class="secao"><p class="rot">'+et[1]+' · '+l.filter(function(o){ return statusObra(o.id)==='lida'; }).length+'/'+l.length+'</p><div class="painel">'+l.map(function(o){
       var st=statusObra(o.id);
-      return '<div class="it cls-it'+(st==='lida'?' feito':'')+'"><span class="cls-st '+st+'" title="'+STATUS_CLS[st]+'"></span><div class="it-t" data-act="cls-obra" data-id="'+o.id+'"><b data-sem-tr>'+esc(o.autor)+' · '+esc(o.titulo)+'</b><div class="it-meta"><span>'+esc(anoTxt(o))+'</span><span class="pill" style="color:'+POS_CLS[posObra(o)][1]+'">'+POS_CLS[posObra(o)][0]+'</span>'+(o.inicio?'<span class="pill rubro">Começo sugerido</span>':'')+'<span>'+STATUS_CLS[st]+'</span></div></div></div>';
+      return '<div class="it cls-it'+(st==='lida'?' feito':'')+'"><span class="cls-st '+st+'" title="'+STATUS_CLS[st]+'"></span><div class="it-t" data-act="cls-obra" data-id="'+o.id+'"><b data-sem-tr>'+esc(o.autor)+' · '+esc(o.titulo)+'</b><div class="it-meta"><span>'+esc(anoTxt(o))+'</span><span class="pill" style="color:'+POS_CLS[posObra(o)][1]+'">'+POS_CLS[posObra(o)][0]+'</span>'+(o.inicio?'<span class="pill rubro">Começo sugerido</span>':'')+'<span>'+STATUS_CLS[st]+'</span>'+(fontesObra(o.id).length?'<span>'+fontesObra(o.id).length+(fontesObra(o.id).length>1?' textos':' texto')+'</span>':'')+'</div></div></div>';
     }).join('')+'</div></section>';
   });
   return h;
@@ -2420,16 +2581,16 @@ function clsCampo(el){
   var id=el.dataset.id, k=el.dataset.clsCampo, e=estadoObra(id); e=JSON.parse(JSON.stringify(e)); e[k]=el.value; S.cls['obra-'+id]=e;
   clearTimeout(clsCT[id]); clsCT[id]=setTimeout(function(){ clsGravar('obra-'+id,S.cls['obra-'+id]); },800);
 }
-function clsAbrirSala(id){
-  var o=obraCls(id), b=S.banco.filter(function(x){ return x.classica===id; })[0];
+function clsAbrirSala(id,k){
+  var o=obraCls(id), b=S.banco.filter(function(x){ return x.classica===id; })[0], f=faltamCls(id);
+  if(f.length) bibPedir(f);
   if(!b){
-    var l=copiaAreas(), ar=l.filter(function(a){ return a.nome==='Educação clássica'; })[0];
-    if(!ar){ ar={id:'t'+uid(),nome:'Educação clássica',cor:'#9a7413'}; l.push(ar); salvarAreas(l); }
-    b={titulo:o.autor+' · '+o.titulo,link:'',area:ar.id,tipo:'livro',prioridade:o.inicio?'alta':'media',status:'estudando',notas:'',semana:false,criado:hoje(),classica:id};
+    b={titulo:o.autor+' · '+o.titulo,link:'',area:areaClassica(),tipo:'livro',prioridade:o.inicio?'alta':'media',status:'estudando',notas:'',semana:false,criado:hoje(),classica:id};
     b.id=uid(); S.banco.push(b); gravar('banco/'+b.id,b);
   }
   if(statusObra(id)==='fila'){ var e=estadoObra(id); e.status='lendo'; clsGravar('obra-'+id,e); }
-  abrirSala({tipo:'item',id:b.id});
+  var a=k&&arqFonte(id,k);
+  abrirSala({tipo:'item',id:b.id,fonte:a?'arq:'+a.id:null});
 }
 
 /* ---------- Toast ---------- */
@@ -2552,6 +2713,8 @@ document.addEventListener('click',function(ev){
     case 'cls-ia': clsIA(el.dataset.m,el.dataset.id); break;
     case 'cls-flash': var cf=(CLS.ia['conceitos:'+el.dataset.id]||{}).conceitos, ci=cf&&cf[Number(el.dataset.i)]; if(ci){ var vf={latim:ci.termo,pt:ci.definicao,cap:-1,idioma:'pt',origem:'Educação clássica · '+obraCls(el.dataset.id).curto,caixa:0,proxima:hoje(),criado:hoje()}; vf.id=uid(); S.vocab.push(vf); gravar('vocab/'+vf.id,vf); toast('<em>'+esc(ci.termo)+'</em> no vocabulário'); render(); } break;
     case 'cls-sala': clsAbrirSala(el.dataset.id); break;
+    case 'cls-ler': clsAbrirSala(el.dataset.id,el.dataset.k); break;
+    case 'cls-bib': var fl=el.dataset.id?faltamCls(el.dataset.id):faltamCls(); bibPedir(fl,!!el.dataset.forcar); break;
     case 'cls-nova-cit': CLS.citObra=el.dataset.id; CLS.tab='citacoes'; render(); var fc2=document.querySelector('[data-form=cls-cit] textarea'); if(fc2){ fc2.scrollIntoView({block:'center'}); fc2.focus(); } break;
     case 'cls-q-mais': flushClsQ(); var qm=quaestio(); qm[el.dataset.l].push(el.dataset.l==='obj'?{id:'o'+uid(),t:'',fonte:'',ad:''}:{id:'s'+uid(),t:'',fonte:''}); clsGravar('quaestio',qm); render(); break;
     case 'cls-q-tirar': flushClsQ(); var qt=quaestio(); qt[el.dataset.l].splice(Number(el.dataset.i),1); clsGravar('quaestio',qt); render(); break;

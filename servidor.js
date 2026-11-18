@@ -248,9 +248,11 @@ app.get('/api/arquivos/:id', exigir, (req, res) => {
   if (!SEG.test(req.params.id)) return res.status(404).type('text').send('Arquivo não encontrado.');
   const reg = db.docs['arquivos/' + req.params.id], arq = path.join(ARQUIVOS, req.params.id);
   if (!reg || !fs.existsSync(arq)) return res.status(404).type('text').send('Arquivo não encontrado.');
-  const tipo = String(reg.d.tipo || ''), texto = /^text\//.test(tipo) || /\.(txt|md)$/i.test(reg.d.nome || ''), naTela = !req.query.baixar && (TIPO_NA_TELA.test(tipo) || texto);
+  const tipo = String(reg.d.tipo || ''), leitura = tipo === 'text/html' && !!reg.d.origem, texto = !leitura && (/^text\//.test(tipo) || /\.(txt|md)$/i.test(reg.d.nome || '')), naTela = !req.query.baixar && (TIPO_NA_TELA.test(tipo) || texto || leitura);
+  /* As cópias de leitura são HTML limpo feito pelo próprio servidor; mesmo assim, nada de scripts. */
+  if (leitura) res.set('Content-Security-Policy', "sandbox allow-same-origin; default-src 'none'; style-src 'unsafe-inline'");
   res.set({ 'Cache-Control': 'private, max-age=86400', 'X-Frame-Options': 'SAMEORIGIN', 'Content-Disposition': (naTela ? 'inline' : 'attachment') + "; filename*=UTF-8''" + encodeURIComponent(reg.d.nome || 'arquivo') });
-  res.set('Content-Type', !naTela ? 'application/octet-stream' : texto ? 'text/plain; charset=utf-8' : tipo);
+  res.set('Content-Type', !naTela ? 'application/octet-stream' : texto ? 'text/plain; charset=utf-8' : leitura ? 'text/html; charset=utf-8' : tipo);
   res.sendFile(req.params.id, { root: ARQUIVOS, cacheControl: false }, err => { if (err && !res.headersSent) res.status(err.status || 500).end(); });
 });
 app.delete('/api/arquivos/:id', exigir, rota((req, res) => {
@@ -509,6 +511,54 @@ app.post('/api/classica/claude', exigir, rota(async (req, res) => {
   if (k) { db.classicaCache[k] = d; gravar(); }
   res.json(d);
 }));
+/* ---------- Biblioteca da educação clássica: baixa os textos de cada obra ---------- */
+const { baixarFonte, permitido: fontePermitida } = require('./fontes');
+const FONTES = { fila: [], atual: null, erros: {}, feitos: 0 };
+const ID_FONTE = /^[\w-]{1,60}$/;
+function fonteGuardada(u) { for (const p in db.docs) if (p.startsWith('arquivos/') && db.docs[p] && db.docs[p].d && db.docs[p].d.origem === u) return true; return false; }
+function estadoFontes() {
+  return { fila: FONTES.fila.length + (FONTES.atual ? 1 : 0), atual: FONTES.atual ? { obra: FONTES.atual.obra, k: FONTES.atual.k } : null, feitos: FONTES.feitos,
+    erros: Object.values(FONTES.erros).map(e => ({ obra: e.obra, k: e.k, msg: e.msg })) };
+}
+async function trabalharFontes() {
+  if (FONTES.atual) return;
+  while (FONTES.fila.length) {
+    const it = FONTES.atual = FONTES.fila.shift();
+    try {
+      if (!fonteGuardada(it.u)) {
+        const r = await baixarFonte(it.u, it.t, it.l), esp = espacoArquivos();
+        if (esp.total && r.buf.length + 10485760 > esp.livre) throw new Error('Não há espaço no disco.');
+        const id = novoId('a');
+        fs.writeFileSync(path.join(ARQUIVOS, id), r.buf);
+        escrever(caminho('arquivos', id), { nome: it.t, tipo: r.tipo, tam: r.buf.length, criado: hojeNoFuso(), area: it.area, item: '', notas: '', obra: it.obra, fonte: it.k, origem: it.u, lingua: it.l }, it.uid);
+        FONTES.feitos++;
+      }
+      delete FONTES.erros[it.u];
+    } catch (e) {
+      FONTES.erros[it.u] = { obra: it.obra, k: it.k, msg: String(e && e.message || e).slice(0, 200), quando: Date.now() };
+      console.error('[fontes] ' + it.obra + '/' + it.k + ': ' + (e && e.message));
+    }
+    await new Promise(r => setTimeout(r, 400));
+  }
+  FONTES.atual = null;
+}
+app.get('/api/classica/fontes', exigir, (req, res) => res.json(estadoFontes()));
+app.post('/api/classica/fontes', exigir, rota((req, res) => {
+  const b = req.body || {}, itens = Array.isArray(b.itens) ? b.itens.slice(0, 300) : [], area = limpar(b.area, 60);
+  const naFila = new Set(FONTES.fila.map(x => x.u).concat(FONTES.atual ? [FONTES.atual.u] : []));
+  for (const x of itens) {
+    const u = String(x && x.u || '').slice(0, 600);
+    if (!fontePermitida(u) || !ID_FONTE.test(String(x.obra || '')) || !ID_FONTE.test(String(x.k || ''))) continue;
+    const err = FONTES.erros[u];
+    if (naFila.has(u) || fonteGuardada(u) || (err && !b.forcar && Date.now() - err.quando < 6 * 3600e3)) continue;
+    if (b.forcar) delete FONTES.erros[u];
+    FONTES.fila.push({ u, obra: x.obra, k: x.k, t: limpar(x.t, 200) || 'Texto', l: limpar(x.l, 5), area, uid: req.u.id });
+    naFila.add(u);
+  }
+  trabalharFontes();
+  res.json(estadoFontes());
+}));
+
 
 app.get('/api/contas', exigir, (req, res) => res.json({ contas: db.usuarios.map(perfil) }));
 app.post('/api/contas', exigir, exigirAdmin, rota((req, res) => {
