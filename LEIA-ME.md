@@ -20,6 +20,10 @@ Na sala de estudo e na página Latim, digitar uma palavra traz o significado pel
 
 Palavras em português também vão para o vocabulário: o Claude busca a definição sozinho. Quando a palavra nomeia algo concreto (objeto, animal, planta, lugar), o servidor pega a foto principal do artigo da Wikipédia indicado pelo Claude e mostra com o link para a página da imagem.
 
+## Educação clássica
+
+A seção Educação clássica é um mapa de estudos do Trivium e do Quadrivium: 25 obras (de Platão a Clark & Jain) em seis etapas, com três formatos de mapa (a questão, linha do tempo e as sete artes), ficha de cada obra (situação, posição na questão, perguntas-guia, síntese conferida pelo Claude, conceitos que viram flashcards), uma quaestio disputata, um cofre de citações e o caderno do fundador. O catálogo fica em `OBRAS_CLS` no `publico/index.html`; o que o aluno escreve fica na coleção `classica`.
+
 ## Eneida
 
 A sala da Eneida (página Latim) traz os doze livros em latim, em `publico/eneida`. O texto é o da edição de J. B. Greenough (1900), de domínio público, preparado pela Perseus Digital Library.

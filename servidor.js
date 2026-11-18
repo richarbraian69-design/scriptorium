@@ -18,7 +18,7 @@ const ARQ = path.join(DADOS, 'scriptorium.json');
 const BACKUPS = path.join(DADOS, 'backups');
 const ARQUIVOS = path.join(DADOS, 'arquivos');
 const FUSO = process.env.FUSO || 'America/Sao_Paulo';
-const COLECOES = new Set(['banco', 'sessoes', 'vocab', 'estado', 'arquivos', 'eneida']);
+const COLECOES = new Set(['banco', 'sessoes', 'vocab', 'estado', 'arquivos', 'eneida', 'classica']);
 const SEG = /^[A-Za-z0-9_\-.~:@+]{1,120}$/;
 const DIAS_SESSAO = 90;
 const COPIAS = 30;
@@ -478,6 +478,36 @@ app.get('/api/eneida/canto/:livro/:verso', exigir, rota(async (req, res) => {
   if (!fs.existsSync(arq)) { fs.mkdirSync(CANTO_DIR, { recursive: true }); fs.writeFileSync(arq + '.tmp', c.cantar(d.silabas)); fs.renameSync(arq + '.tmp', arq); }
   res.set({ 'Content-Type': 'audio/wav', 'Cache-Control': 'private, max-age=86400', 'X-Tempos': c.tempos(d.silabas).join(',') });
   res.send(fs.readFileSync(arq));
+}));
+
+/* Educação clássica: perguntas-guia, conferência da síntese, conceitos, objeções, crítica e fontes de citações. */
+const CONTEXTO_CLS = 'O estudante é um católico brasileiro que estuda a educação clássica (artes liberais, Trivium e Quadrivium) porque planeja abrir uma escola. Ele ainda não está convencido de que todo ser humano deve ser educado por essa via, e quer testar essa convicção. Responda em português do Brasil, com precisão. Não invente números de página, citações literais nem detalhes de que não tenha certeza; quando não souber, diga.';
+const FORMATOS_CLS = {
+  perguntas: { s: { type: 'object', additionalProperties: false, required: ['perguntas'], properties: { perguntas: { type: 'array', items: { type: 'string' } } } },
+    p: o => 'Escreva de 5 a 7 perguntas-guia para ler com atenção esta obra, pensando na questão das artes liberais e da educação: ' + o.titulo + '. As perguntas devem apontar para as teses centrais e para o que a obra diz sobre quem deve ser educado e para quê.' },
+  conceitos: { s: { type: 'object', additionalProperties: false, required: ['conceitos'], properties: { conceitos: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['termo', 'definicao'], properties: { termo: { type: 'string' }, definicao: { type: 'string' } } } } } },
+    p: o => 'Liste de 4 a 6 conceitos-chave desta obra para virar flashcards: ' + o.titulo + '. termo é o conceito (com o termo original entre parênteses quando for latim ou grego); definicao é uma definição curta, como o autor o entende.' },
+  sintese: { s: { type: 'object', additionalProperties: false, required: ['bom', 'faltou', 'cuidado'], properties: { bom: { type: 'string' }, faltou: { type: 'array', items: { type: 'string' } }, cuidado: { type: 'array', items: { type: 'string' } } } },
+    p: o => 'O estudante leu ' + o.titulo + ' e escreveu a síntese abaixo. Diga em bom o que ele captou bem (uma ou duas frases); em faltou, as ideias centrais da obra que ficaram de fora (no máximo quatro, só as importantes); em cuidado, afirmações que não correspondem ao que o autor diz (vazio se não houver).\n\nSíntese:\n' + o.texto },
+  objecao: { s: { type: 'object', additionalProperties: false, required: ['objecao'], properties: { objecao: { type: 'string' } } },
+    p: o => 'O estudante monta uma quaestio disputata: "Se todo homem deve ser educado pelas artes liberais". Leia o estado atual (JSON abaixo) e escreva a objeção mais forte contra a educação liberal para todos que ainda não esteja na lista, no estilo de uma objeção escolástica, em duas a quatro frases, citando o autor ou a corrente de onde ela vem.\n\n' + o.texto },
+  critica: { s: { type: 'object', additionalProperties: false, required: ['pontos_fortes', 'fragilidades', 'sugestao'], properties: { pontos_fortes: { type: 'array', items: { type: 'string' } }, fragilidades: { type: 'array', items: { type: 'string' } }, sugestao: { type: 'string' } } },
+    p: o => 'O estudante montou uma quaestio disputata: "Se todo homem deve ser educado pelas artes liberais". Avalie o Respondeo e as respostas às objeções (JSON abaixo) como um bom professor de filosofia: pontos fortes (até três), fragilidades (até quatro: objeções não respondidas, saltos lógicos, distinções que faltam) e uma sugestão concreta do próximo passo, de leitura ou de argumento.\n\n' + o.texto },
+  fonte: { s: { type: 'object', additionalProperties: false, required: ['referencia', 'explicacao', 'confianca'], properties: { referencia: { type: 'string' }, explicacao: { type: 'string' }, confianca: { type: 'string', enum: ['alta', 'média', 'baixa'] } } },
+    p: o => 'De onde vem esta citação? Dê a referência mais exata que puder (obra, livro, capítulo, questão, artigo ou parágrafo) e explique em poucas frases, inclusive se o texto mistura fontes ou é atribuído de forma errada. Se não souber, diga com confiança baixa.\n\nCitação: ' + o.texto + (o.titulo ? '\nAtribuída a: ' + o.titulo : '') }
+};
+app.post('/api/classica/claude', exigir, rota(async (req, res) => {
+  const b = req.body || {}, f = FORMATOS_CLS[b.modo];
+  if (!f) throw new Erro('Pedido desconhecido.');
+  const o = { titulo: limpar(b.titulo, 300), texto: limpar(b.texto, 8000) };
+  db.classicaCache = db.classicaCache || {};
+  const fixo = (b.modo === 'perguntas' || b.modo === 'conceitos') && SEG.test(String(b.obra || '')), k = fixo ? b.modo + ':' + b.obra : null;
+  if (k && !b.novo && db.classicaCache[k]) return res.json(db.classicaCache[k]);
+  if (!claude) throw new Erro('O Claude ainda não foi ligado: falta a chave ANTHROPIC_API_KEY no Railway.', 503);
+  contarUso();
+  const d = await comClaude(() => chamarClaude(CONTEXTO_CLS, f.p(o), f.s, 'medium', 6000));
+  if (k) { db.classicaCache[k] = d; gravar(); }
+  res.json(d);
 }));
 
 app.get('/api/contas', exigir, (req, res) => res.json({ contas: db.usuarios.map(perfil) }));
