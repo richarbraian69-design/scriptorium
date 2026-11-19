@@ -253,6 +253,9 @@ app.get('/api/arquivos/:id', exigir, (req, res) => {
   if (leitura) res.set('Content-Security-Policy', "sandbox allow-same-origin; default-src 'none'; style-src 'unsafe-inline'");
   res.set({ 'Cache-Control': 'private, max-age=86400', 'X-Frame-Options': 'SAMEORIGIN', 'Content-Disposition': (naTela ? 'inline' : 'attachment') + "; filename*=UTF-8''" + encodeURIComponent(reg.d.nome || 'arquivo') });
   res.set('Content-Type', !naTela ? 'application/octet-stream' : texto ? 'text/plain; charset=utf-8' : leitura ? 'text/html; charset=utf-8' : tipo);
+  if (leitura && naTela) {
+    try { return res.send(restilizar(fs.readFileSync(arq, 'utf8'))); } catch (e) { return res.status(500).end(); }
+  }
   res.sendFile(req.params.id, { root: ARQUIVOS, cacheControl: false }, err => { if (err && !res.headersSent) res.status(err.status || 500).end(); });
 });
 app.delete('/api/arquivos/:id', exigir, rota((req, res) => {
@@ -512,7 +515,7 @@ app.post('/api/classica/claude', exigir, rota(async (req, res) => {
   res.json(d);
 }));
 /* ---------- Biblioteca da educação clássica: baixa os textos de cada obra ---------- */
-const { baixarFonte, permitido: fontePermitida } = require('./fontes');
+const { baixarFonte, permitido: fontePermitida, restilizar } = require('./fontes');
 const FONTES = { fila: [], atual: null, erros: {}, feitos: 0 };
 const ID_FONTE = /^[\w-]{1,60}$/;
 function fonteGuardada(u) { for (const p in db.docs) if (p.startsWith('arquivos/') && db.docs[p] && db.docs[p].d && db.docs[p].d.origem === u) return true; return false; }

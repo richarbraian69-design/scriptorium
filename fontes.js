@@ -81,14 +81,20 @@ const AVISOS = [/Please help support the mission of New Advent/i, /^Contact info
 function semAvisos(html) { return html.replace(/<(p|li|h\d)>([\s\S]*?)<\/\1>/g, (m, t, d) => AVISOS.some(r => r.test(textoDe(d))) ? '' : m); }
 function textoDe(html) { return html.replace(/<[^>]+>/g, ' ').replace(/&\w+;/g, ' ').replace(/\s+/g, ' ').trim(); }
 
+/* A cópia de leitura na identidade das ilhas pretas: preto, texto branco, a fonte do Mac. */
+const CSS_LEITURA = ':root{color-scheme:dark}html{background:#000}' +
+  'body{margin:0 auto;max-width:42rem;padding:26px 24px 80px;font:17px/1.7 -apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",system-ui,sans-serif;color:#fff;background:#000;overflow-wrap:break-word;-webkit-font-smoothing:antialiased}' +
+  'header{border-bottom:1px solid rgba(255,255,255,.10);margin-bottom:22px;padding-bottom:12px}header h1{font-size:20px;line-height:1.25;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}header p{margin:0;font-size:12.5px;line-height:1.5;color:#8e8e93}' +
+  'h2{font-size:17px;font-weight:700;margin:1.8em 0 .6em}h3{font-size:16px;font-weight:700;margin:1.5em 0 .5em}h4{font-size:15px;font-weight:700;margin:1.3em 0 .4em}p{margin:0 0 1em}' +
+  'blockquote{margin:1em 0;padding-left:1em;border-left:2px solid rgba(255,255,255,.14);color:#d1d1d6}em{font-style:italic}' +
+  'table{border-collapse:collapse;width:100%;margin:1em 0}td,th{vertical-align:top;padding:4px 8px;border-bottom:1px solid rgba(255,255,255,.10)}pre{white-space:pre-wrap;font:inherit}sup{font-size:.7em;color:#8e8e93}hr{border:0;border-top:1px solid rgba(255,255,255,.10);margin:2em 0}::selection{background:rgba(255,159,10,.35)}';
+/* Troca o estilo de uma cópia guardada antes (servida sempre com o visual atual). */
+function restilizar(html) { return html.replace(/<style>[\s\S]*?<\/style>/, () => '<style>' + CSS_LEITURA + '</style>'); }
+
 function documento(titulo, corpo, origem, lingua) {
   const hoje = new Date().toISOString().slice(0, 10);
   return '<!doctype html><html lang="' + esc(lingua || 'pt') + '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + esc(titulo) + '</title><style>' +
-    ':root{color-scheme:light dark;--fd:#fbf8f1;--tx:#2b2620;--tx2:#7a6f60;--li:#e4dccb}@media (prefers-color-scheme:dark){:root{--fd:#1d1a16;--tx:#e9e2d4;--tx2:#a39886;--li:#3a342b}}' +
-    'html{background:var(--fd)}body{margin:0 auto;max-width:44rem;padding:28px 22px 80px;font:18px/1.7 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;color:var(--tx);background:var(--fd);overflow-wrap:break-word}' +
-    'header{border-bottom:1px solid var(--li);margin-bottom:24px;padding-bottom:12px}header h1{font-size:1.5rem;line-height:1.25;margin:0 0 6px;font-weight:600}header p{margin:0;font:13px/1.5 -apple-system,system-ui,sans-serif;color:var(--tx2)}' +
-    'h2{font-size:1.25rem;margin:1.8em 0 .6em}h3{font-size:1.1rem;margin:1.5em 0 .5em}h4{font-size:1rem;margin:1.3em 0 .4em}p{margin:0 0 1em}blockquote{margin:1em 0;padding-left:1em;border-left:3px solid var(--li)}' +
-    'table{border-collapse:collapse;width:100%;margin:1em 0}td,th{vertical-align:top;padding:4px 8px;border-bottom:1px solid var(--li)}pre{white-space:pre-wrap;font:inherit}sup{font-size:.7em;color:var(--tx2)}hr{border:0;border-top:1px solid var(--li);margin:2em 0}' +
+    CSS_LEITURA +
     '</style></head><body><header><h1>' + esc(titulo) + '</h1><p>Cópia de leitura guardada no Scriptorium em ' + hoje + '. Original: ' + esc(origem) + '</p></header><main>' + corpo + '</main></body></html>';
 }
 
@@ -133,4 +139,4 @@ async function baixarFonte(url, titulo, lingua) {
   return { tipo: 'text/html', buf: Buffer.from(documento(titulo || pagina.titulo || 'Texto', pagina.corpo, url, lingua), 'utf-8'), letras };
 }
 
-module.exports = { baixarFonte, permitido };
+module.exports = { baixarFonte, permitido, restilizar };
