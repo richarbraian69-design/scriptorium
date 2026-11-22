@@ -913,6 +913,36 @@ select.campo option{background:#1c1c1e;color:#fff}
 .ent-marca{font-family:var(--f-ui);font-weight:800;font-size:28px;letter-spacing:-.02em}
 .ent-aviso{border-radius:13px}
 
+
+/* Memória */
+.mem-hoje{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 16px}
+.mem-rot{margin:0;font-size:12px;font-weight:600;color:var(--tx2)}
+.mem-hoje-t{margin:2px 0 0;font-size:16px;font-weight:700}
+.mem-hoje-t em{font-style:normal;color:var(--tx2);font-weight:600}
+.mem-pecas{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.mem-peca{display:grid;gap:10px;align-content:start}
+.mem-peca.pausada{opacity:.6}
+.mem-peca-topo{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.mem-peca h3{margin:0;font-size:16px;font-weight:700}
+.mem-num{display:flex;align-items:baseline;gap:8px}
+.mem-num b{font-size:22px;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.mem-num span{font-size:13px;color:var(--tx2)}
+.mem-ajustes{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.mem-ajustes .rotulo{display:inline;font-size:12px}
+.mem-ajustes .passo b{min-width:96px}
+.mem-ir{display:flex;align-items:center;gap:8px;font-size:12px}
+.mem-ir select{width:auto;padding:5px 12px;font-size:13px}
+.mem-sessao{display:grid;gap:14px;max-width:760px;width:100%;justify-self:center}
+.mem-sessao-topo{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.mem-ref{margin:6px 0 0;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--tx3)}
+.mem-texto{font-size:20px;line-height:1.6;font-weight:500;white-space:pre-line;overflow-wrap:anywhere}
+.mem-texto p{margin:0 0 .6em}
+.mem-texto sup{font-size:11px;font-weight:700;color:var(--tx3);margin-right:6px;vertical-align:.5em}
+.mem-texto.cue{letter-spacing:.06em;color:var(--tx2)}
+.vazio-mem{min-height:120px;border:1px dashed var(--linha);border-radius:15px}
+.mem-dica{margin:0}
+.mem-acoes{gap:8px}
+.mem-fim{text-align:left}
 /* Telas estreitas: a ilha ocupa a largura e os botões viram uma fileira presa embaixo */
 @media (max-width:860px){
   .app{grid-template-columns:minmax(0,1fr);padding:0 12px calc(78px + env(safe-area-inset-bottom,0px))}
@@ -926,9 +956,10 @@ select.campo option{background:#1c1c1e;color:#fff}
   .envios{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 }
 @media (max-width:480px){
-  .lateral{justify-content:flex-start;gap:7px;padding-inline:10px}
-  .nav{gap:7px}
-  .nav button,#config-btn{width:40px;height:40px}
+  .lateral{justify-content:center;gap:5px;padding-inline:8px}
+  .nav{gap:5px}
+  .nav-rotulo{margin:0}
+  .nav button,#config-btn{width:38px;height:38px}
   .nav svg,#config-btn svg{width:19px;height:19px}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
@@ -1056,15 +1087,16 @@ var I = {
   artigo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
   curso:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg>',
   tema:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/></svg>',
+  memoria:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>',
   outro:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg>'
 };
 var SERVIDOR = !!window.SCRIPTORIUM_SERVIDOR;
 var LANG = lsGet('scr-idioma')==='la' ? 'la' : 'pt';
-var VISTAS = [['hoje','Hoje','hoje'],['banco','Banco de estudos','banco']].concat(SERVIDOR?[['arquivos','Arquivos','arquivos']]:[]).concat([['classica','Educação clássica','classica']]).concat([['latim','Latim','latim'],['violino','Violino','violino']]);
+var VISTAS = [['hoje','Hoje','hoje'],['banco','Banco de estudos','banco']].concat(SERVIDOR?[['arquivos','Arquivos','arquivos']]:[]).concat([['classica','Educação clássica','classica']]).concat([['latim','Latim','latim'],['violino','Violino','violino']]).concat(SERVIDOR?[['memoria','Memória','memoria']]:[]);
 
 /* ---------- Estado ---------- */
 var S = {
-  db:null, semDb:false, ok:{banco:false,sess:false,vocab:false,arqs:false,ene:false,cls:false,lat:false,vio:false,ger:false},
+  db:null, semDb:false, ok:{banco:false,sess:false,vocab:false,arqs:false,ene:false,cls:false,lat:false,vio:false,ger:false,mem:false},
   banco:[], sess:[], vocab:[], arqs:[], ene:{}, cls:{}, fArqArea:'', espaco:null, lat:null, vio:null, ger:null,
   view:'hoje', vocIdioma:'la', fStatus:'fila', fArea:'', busca:'', buscaVoc:'', capVer:null,
   area:lsGet('scr-area')||'intelectual', modal:null, rev:null, confirmar:null, renderPendente:false
@@ -1187,7 +1219,7 @@ function conectar(db){
   db.collection('arquivos').onSnapshot(function(s){ S.arqs=lista(s); S.ok.arqs=true; pedirRender(); }, erroLer);
   db.collection('classica').onSnapshot(function(s){ var o={}; lista(s).forEach(function(d){ o[d.id]=d; }); if(typeof clsQPend!=='undefined'&&clsQPend) o.quaestio=JSON.parse(JSON.stringify(clsQPend)); S.cls=o; S.ok.cls=true; pedirRender(); }, erroLer);
   db.collection('eneida').onSnapshot(function(s){ var o={}; lista(s).forEach(function(d){ o[d.id]=d; }); if(typeof eneTradPend!=='undefined'&&eneTradPend&&S.ene[eneTradPend]) o[eneTradPend]=S.ene[eneTradPend]; S.ene=o; S.ok.ene=true; pedirRender(); }, erroLer);
-  [['lat','estado/latim'],['vio','estado/violino'],['ger','estado/geral']].forEach(function(p){
+  [['lat','estado/latim'],['vio','estado/violino'],['ger','estado/geral'],['mem','estado/memoria']].forEach(function(p){
     db.doc(p[1]).onSnapshot(function(s){ S[p[0]] = s.exists ? JSON.parse(JSON.stringify(s.data())) : null; S.ok[p[0]]=true; pedirRender(); }, erroLer);
   });
 }
@@ -1334,7 +1366,7 @@ function pedirRender(){
 }
 document.addEventListener('focusout',function(){ setTimeout(function(){ if(S.renderPendente){ var a=document.activeElement; if(!(a && /INPUT|TEXTAREA|SELECT/.test(a.tagName))){ S.renderPendente=false; render(); } } },0); });
 
-function carregado(){ var o=S.ok; return o.banco&&o.sess&&o.vocab&&o.arqs&&o.ene&&o.cls&&o.lat&&o.vio&&o.ger; }
+function carregado(){ var o=S.ok; return o.banco&&o.sess&&o.vocab&&o.arqs&&o.ene&&o.cls&&o.lat&&o.vio&&o.ger&&o.mem; }
 function render(){
   conferirIdioma();
   aplicarCor();
@@ -1343,7 +1375,7 @@ function render(){
   renderNav();
   var v=document.getElementById('vista');
   if(!S.semDb && !carregado()){ v.innerHTML='<div class="carregando">'+estante({dias:[],label:'Estante vazia'})+'<p>Abrindo o scriptorium…</p></div>'; return; }
-  var fn={hoje:vHoje,banco:vBanco,arquivos:vArquivos,classica:vClassica,latim:vLatim,violino:vViolino}[S.view]||vHoje;
+  var fn={hoje:vHoje,banco:vBanco,arquivos:vArquivos,classica:vClassica,latim:vLatim,violino:vViolino,memoria:vMemoria}[S.view]||vHoje;
   v.innerHTML=(S.semDb?'<div class="faixa" style="max-width:1160px;margin:0 auto 18px"><span>Este painel guarda seus estudos no Claude. Abra o Scriptorium pelo link do artifact, dentro do Claude, para salvar.</span></div>':'')+fn();
   if(S.view==='hoje') iniciarBanner();
   if(S.view==='classica'&&CLS.tab==='mapa'){ desenharMapaCls(); var cm=document.getElementById('cls-mapa'); if(cm) clsLarg=cm.clientWidth; }
@@ -1379,13 +1411,168 @@ function iniciarBanner(){
   },15000);
 }
 
+/* ---------- Memória: Lucas na Vulgata e Os Lusíadas, de cor ---------- */
+/* Cada dia: 1) revisar o que vence (revisão espaçada, como no vocabulário); 2) aprender o trecho novo,
+   lendo, depois só com as iniciais, depois em branco; 3) encadear o novo com o trecho anterior.
+   A avaliação é sempre sua: De cor, Com ajuda ou Esqueci. O estado fica em estado/memoria. */
+var PECAS_MEM=[
+  {id:'lucas',arq:'lucas',nome:'Evangelho de Lucas',sub:'Vulgata Clementina, em latim',lang:'la',unid:['versículo','versículos'],metaPadrao:2,grupo:'Capítulo'},
+  {id:'lusiadas',arq:'lusiadas',nome:'Os Lusíadas',sub:'Luís de Camões',lang:'pt',unid:['estrofe','estrofes'],metaPadrao:1,grupo:'Canto'}
+];
+var MEMT={}, MEMT_ESP={}, MEM=null;
+function mem(){ return S.mem || {pecas:{},metas:{}}; }
+function pecaMem(id){ return PECAS_MEM.filter(function(p){ return p.id===id; })[0]; }
+function estPeca(id){ var m=mem(); return (m.pecas&&m.pecas[id]) || {prox:0,itens:{},novos:{}}; }
+function metaMem(id){ var m=mem(); return (m.metas&&m.metas[id]) || pecaMem(id).metaPadrao; }
+function salvarMem(m){ S.mem=m; gravar('estado/memoria',m); }
+function mudarPeca(id,fn){ var m=JSON.parse(JSON.stringify(mem())); m.pecas=m.pecas||{}; m.metas=m.metas||{}; var p=m.pecas[id]||{prox:0,itens:{},novos:{}}; p.itens=p.itens||{}; p.novos=p.novos||{}; fn(p,m); m.pecas[id]=p; salvarMem(m); }
+/* Os textos vêm de publico/memoria/<peça>.json e ficam na memória do navegador. */
+function textoMem(id,cb){
+  if(MEMT[id]){ if(cb) cb(MEMT[id]); return MEMT[id]; }
+  if(!MEMT_ESP[id]){
+    MEMT_ESP[id]=fetch('/memoria/'+pecaMem(id).arq+'.json').then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); }).then(function(d){
+      d.idx={}; d.unidades.forEach(function(u,i){ d.idx[u.id]=i; }); MEMT[id]=d; pedirRender(); return d;
+    }).catch(function(){ MEMT_ESP[id]=null; MEMT[id+':erro']=true; pedirRender(); });
+  }
+  if(cb) MEMT_ESP[id]&&MEMT_ESP[id].then(function(d){ if(d) cb(d); });
+  return null;
+}
+function ordemId(id){ var p=String(id).split(':'); return Number(p[0])*10000+Number(p[1]||0); }
+function memVencidos(id){
+  var h=hoje(), out=[];
+  PECAS_MEM.forEach(function(pc){ if(id&&pc.id!==id) return; var e=estPeca(pc.id); if(e.pausada) return;
+    Object.keys(e.itens||{}).forEach(function(k){ if((e.itens[k].p||h)<=h) out.push({peca:pc.id,id:k}); }); });
+  return out.sort(function(a,b){ return a.peca===b.peca ? ordemId(a.id)-ordemId(b.id) : (a.peca<b.peca?-1:1); });
+}
+function novosFeitos(id){ var n=estPeca(id).novos||{}; return n.data===hoje()?(n.n||0):0; }
+function novosFaltam(id){ var e=estPeca(id), t=MEMT[id]; if(e.pausada) return 0; var f=Math.max(0,metaMem(id)-novosFeitos(id)); return t?Math.min(f,t.unidades.length-(e.prox||0)):f; }
+function deCor(id){ return Object.keys(estPeca(id).itens||{}).length; }
+function memFeitoHoje(){ return !memVencidos().length && PECAS_MEM.every(function(p){ return novosFaltam(p.id)<=0; }); }
+function memAtivas(){ return PECAS_MEM.filter(function(p){ return !estPeca(p.id).pausada; }); }
+/* "Quoniam quidem multi" → "Q q m": as iniciais, com a pontuação e as quebras de linha. */
+function iniciais(t){ return String(t).replace(/([A-Za-zÀ-ÖØ-öø-ÿæœÆŒ])[A-Za-zÀ-ÖØ-öø-ÿæœÆŒ'’]*/g,'$1'); }
+function inicio(t){ var p=String(t).split(/\s+/); return p.slice(0,2).join(' ')+(p.length>2?'…':''); }
+function refFaixa(id,ids){ var t=MEMT[id]; if(!t||!ids.length) return ''; var a=t.unidades[t.idx[ids[0]]], b=t.unidades[t.idx[ids[ids.length-1]]]; if(ids.length===1) return a.ref;
+  var pa=a.id.split(':'), pb=b.id.split(':'); return pa[0]===pb[0] ? a.ref+(id==='lucas'?'-':' a ')+pb[1] : a.ref+' a '+b.ref; }
+function proximosNovos(id){ var e=estPeca(id), t=MEMT[id]; if(!t) return []; var n=novosFaltam(id); return t.unidades.slice(e.prox||0,(e.prox||0)+n).map(function(u){ return u.id; }); }
+
+/* Monta a sessão de hoje a partir do que está guardado: dá para parar e voltar. */
+function montarSessaoMem(){
+  var passos=[];
+  memVencidos().forEach(function(v){ passos.push({tipo:'rev',peca:v.peca,id:v.id}); });
+  memAtivas().forEach(function(pc){
+    var t=MEMT[pc.id]; if(!t) return;
+    var novos=proximosNovos(pc.id); if(!novos.length) return;
+    novos.forEach(function(id){ passos.push({tipo:'ler',peca:pc.id,id:id},{tipo:'letras',peca:pc.id,id:id},{tipo:'branco',peca:pc.id,id:id}); });
+    var i0=t.idx[novos[0]], ant=t.unidades.slice(Math.max(0,i0-metaMem(pc.id)),i0).map(function(u){ return u.id; });
+    if(ant.length+novos.length>1) passos.push({tipo:'encadear',peca:pc.id,ids:ant.concat(novos),ant:ant});
+  });
+  return passos;
+}
+function comecarMem(){
+  var falta=PECAS_MEM.filter(function(p){ return !MEMT[p.id]; });
+  if(falta.length){ falta.forEach(function(p){ textoMem(p.id,function(){ if(PECAS_MEM.every(function(x){ return MEMT[x.id]; })) comecarMem(); }); }); return; }
+  MEM={passos:montarSessaoMem(),i:0,mostrar:false,ini:Date.now(),feitos:0};
+  if(S.view!=='memoria') ir('memoria'); else render();
+}
+function encerrarMem(fim){
+  if(!MEM) return;
+  var min=Math.round((Date.now()-MEM.ini)/6000)/10;
+  if(MEM.feitos && min>=0.5){ var s={pratica:'memoria',data:hoje(),minutos:Math.max(1,Math.round(min)),notas:'',criado:new Date().toISOString(),passos:MEM.feitos}; var id=uid(); s.id=id; S.sess.push(s); gravar('sessoes/'+id,s); }
+  MEM=fim?{fim:true,min:Math.max(1,Math.round(min)),feitos:MEM.feitos}:null; render();
+}
+function avancarMem(){ MEM.i++; MEM.mostrar=false; MEM.feitos++; if(MEM.i>=MEM.passos.length) encerrarMem(true); else render(); }
+function avaliarMem(nota){
+  var ps=MEM.passos[MEM.i], h=hoje();
+  if(ps.tipo==='rev') mudarPeca(ps.peca,function(p){ var it=p.itens[ps.id]||{c:0}; if(nota==='cor'){ it.c=Math.min(6,(it.c||0)+1); it.p=somaDias(h,INTERVALOS[it.c]); } else if(nota==='ajuda'){ it.p=somaDias(h,1); } else { it.c=0; it.p=somaDias(h,1); } it.v=h; p.itens[ps.id]=it; });
+  else if(ps.tipo==='branco'){
+    if(nota==='esqueci'){ MEM.passos.splice(MEM.i+1,0,{tipo:'ler',peca:ps.peca,id:ps.id},{tipo:'letras',peca:ps.peca,id:ps.id},{tipo:'branco',peca:ps.peca,id:ps.id,de_novo:true}); }
+    else mudarPeca(ps.peca,function(p){ var t=MEMT[ps.peca], i=t.idx[ps.id]; if(!p.itens[ps.id]){ p.itens[ps.id]={c:0,p:somaDias(h,1),a:h}; p.novos=p.novos&&p.novos.data===h?{data:h,n:(p.novos.n||0)+1}:{data:h,n:1}; } p.prox=Math.max(p.prox||0,i+1); });
+  }
+  else if(ps.tipo==='encadear' && nota==='tropecei') mudarPeca(ps.peca,function(p){ ps.ant.forEach(function(k){ if(p.itens[k]){ p.itens[k].c=0; p.itens[k].p=somaDias(h,1); } }); });
+  avancarMem();
+}
+
+function cardMemoria(){
+  var venc=memVencidos().length, feito=memFeitoHoje();
+  PECAS_MEM.forEach(function(p){ textoMem(p.id); });
+  var pill=feito?'<span class="pill ok">Feito hoje</span>':'<span class="pill">'+(venc?venc+' para revisar':'Trecho novo')+'</span>';
+  var linhas=memAtivas().map(function(pc){ var nv=proximosNovos(pc.id), r=nv.length?refFaixa(pc.id,nv):novosFeitos(pc.id)?'novo de hoje feito':(MEMT[pc.id]?'tudo de cor':'…');
+    return '<div><span>'+esc(pc.nome)+'</span><small data-sem-tr>'+esc(r)+'</small></div>'; }).join('');
+  return '<article class="pratica"><div class="pratica-topo"><h3>'+I.memoria+'Memória</h3>'+pill+'</div>'+
+    '<div class="plano-lista">'+linhas+'</div>'+
+    '<div class="acoes">'+(feito?'<button class="btn btn-claro" data-act="ver" data-v="memoria">Ver o que já sei</button>':'<button class="btn btn-escuro" data-act="mem-comecar">'+I.memoria+'Começar a sessão</button>')+'</div></article>';
+}
+
+function vMemoria(){
+  PECAS_MEM.forEach(function(p){ textoMem(p.id); });
+  var h='<div class="pagina mem"><div><p class="rot">Memória</p><h2 class="h2">De cor</h2><p class="intro">Cada dia: revisar o que vence, aprender o trecho novo e recitá-lo junto com o anterior. A avaliação é sua.</p></div>';
+  if(MEM&&MEM.fim) h+=fimMem();
+  else if(MEM) h+=passoMem();
+  else h+=resumoMem();
+  return h+'</div>';
+}
+function resumoMem(){
+  var venc=memVencidos().length, feito=memFeitoHoje(), erro=PECAS_MEM.some(function(p){ return MEMT[p.id+':erro']; });
+  var novos=memAtivas().map(function(pc){ var nv=proximosNovos(pc.id); return nv.length?refFaixa(pc.id,nv):''; }).filter(Boolean);
+  var h='<section class="painel pad mem-hoje"><div><p class="mem-rot">Hoje</p><p class="mem-hoje-t">'+(feito?'Sessão de hoje feita. <em>Deo gratias.</em>':(venc?venc+(venc===1?' trecho para revisar':' trechos para revisar'):'Nada para revisar')+(novos.length?' · novo: <span data-sem-tr>'+esc(novos.join(' · '))+'</span>':''))+'</p></div>'+
+    (erro?'<p class="nota">Não consegui abrir os textos. Confira a internet e recarregue.</p>':feito?'':'<button class="btn btn-ac" data-act="mem-comecar">'+I.memoria+'Começar a sessão</button>')+'</section>';
+  h+='<div class="mem-pecas">'+PECAS_MEM.map(cartaoPeca).join('')+'</div>';
+  return h;
+}
+function cartaoPeca(pc){
+  var e=estPeca(pc.id), t=MEMT[pc.id], tot=t?t.unidades.length:0, n=deCor(pc.id), mt=metaMem(pc.id);
+  var prox=t&&e.prox<tot?t.unidades[e.prox].ref:t?'Tudo aprendido':'…';
+  var grupos=t?t.unidades.reduce(function(a,u,i){ var g=u.id.split(':')[0]; if(!a.length||a[a.length-1].g!==g) a.push({g:g,i:i,ref:u.ref}); return a; },[]):[];
+  return '<article class="painel pad mem-peca'+(e.pausada?' pausada':'')+'"><div class="mem-peca-topo"><div><h3>'+esc(pc.nome)+'</h3><p class="nota">'+esc(pc.sub)+(e.pausada?' · pausada':'')+'</p></div><button class="link" data-act="mem-pausa" data-p="'+pc.id+'">'+(e.pausada?'Retomar':'Pausar')+'</button></div>'+
+    '<div class="mem-num"><b>'+n+'</b><span>de '+(tot||'…')+' '+pc.unid[1]+' de cor</span></div>'+
+    '<div class="barra"><i style="width:'+(tot?Math.max(n?1:0,n/tot*100):0).toFixed(1)+'%"></i></div>'+
+    '<p class="nota">Próximo: <b data-sem-tr>'+esc(prox)+'</b> · '+memVencidos(pc.id).length+' para revisar hoje</p>'+
+    '<div class="mem-ajustes"><span class="rotulo">Por dia</span><span class="passo"><button class="icone-btn" data-act="mem-meta" data-p="'+pc.id+'" data-d="-1" aria-label="Menos">−</button><b>'+mt+' '+(mt===1?pc.unid[0]:pc.unid[1])+'</b><button class="icone-btn" data-act="mem-meta" data-p="'+pc.id+'" data-d="1" aria-label="Mais">+</button></span>'+
+    (grupos.length?'<label class="mem-ir">Começar em<select class="campo" data-mem-ir="'+pc.id+'"><option value="">'+esc(pc.grupo)+'…</option>'+grupos.map(function(g){ return '<option value="'+g.i+'">'+esc(pc.grupo)+' '+(pc.id==='lucas'?g.g:romano(Number(g.g)))+'</option>'; }).join('')+'</select></label>':'')+'</div></article>';
+}
+function textoUnid(pc,id){ var t=MEMT[pc]; return t?t.unidades[t.idx[id]]:null; }
+function passoMem(){
+  var ps=MEM.passos[MEM.i];
+  if(!ps) return resumoMem();
+  var pc=pecaMem(ps.peca), tot=MEM.passos.length, lang=' lang="'+pc.lang+'"';
+  var etapa={rev:'Revisar',ler:'Aprender · ler',letras:'Aprender · só as iniciais',branco:'Aprender · de cor',encadear:'Encadear'}[ps.tipo];
+  var topo='<div class="mem-sessao-topo"><div><p class="mem-rot">'+etapa+' · '+esc(pc.nome)+'</p><p class="nota">Passo '+(MEM.i+1)+' de '+tot+'</p></div><button class="btn btn-claro btn-p" data-act="mem-parar">Parar por hoje</button></div>'+
+    '<div class="barra"><i style="width:'+((MEM.i)/tot*100).toFixed(1)+'%"></i></div>';
+  var corpo='', acoes='';
+  var notas='<button class="btn btn-escuro" data-act="mem-nota" data-n="cor">De cor</button><button class="btn btn-claro" data-act="mem-nota" data-n="ajuda">Com ajuda</button><button class="btn btn-claro" data-act="mem-nota" data-n="esqueci">Esqueci</button>';
+  if(ps.tipo==='encadear'){
+    var us=ps.ids.map(function(k){ return textoUnid(ps.peca,k); }).filter(Boolean);
+    corpo='<p class="mem-ref" data-sem-tr>'+esc(refFaixa(ps.peca,ps.ids))+'</p><div class="mem-texto'+(MEM.mostrar?'':' cue')+'"'+lang+' data-sem-tr>'+us.map(function(u){ return '<p><sup>'+esc(u.id.split(':')[1])+'</sup>'+esc(MEM.mostrar?u.t:iniciais(u.t))+'</p>'; }).join('')+'</div>'+
+      '<p class="nota mem-dica">'+(MEM.mostrar?'Como foi?':'Recite tudo seguido, do trecho anterior até o novo, olhando só as iniciais.')+'</p>';
+    acoes=MEM.mostrar?'<button class="btn btn-escuro" data-act="mem-nota" data-n="fluiu">Fluiu</button><button class="btn btn-claro" data-act="mem-nota" data-n="tropecei">Tropecei</button>':'<button class="btn btn-escuro" data-act="mem-mostrar">Conferir o texto</button>';
+  } else {
+    var u=textoUnid(ps.peca,ps.id); if(!u){ return topo+'<p class="nota">Abrindo o texto…</p>'; }
+    var txt=ps.tipo==='ler'||MEM.mostrar?u.t:ps.tipo==='letras'?iniciais(u.t):ps.tipo==='rev'?inicio(u.t):'';
+    corpo='<p class="mem-ref" data-sem-tr>'+esc(u.ref)+(ps.de_novo?' · de novo':'')+'</p>'+
+      (txt?'<div class="mem-texto'+(ps.tipo==='letras'&&!MEM.mostrar?' cue':'')+'"'+lang+' data-sem-tr><p>'+esc(txt)+'</p></div>':'<div class="mem-texto vazio-mem" aria-hidden="true"><p>&nbsp;</p></div>');
+    var dica={ler:'Leia devagar, em voz alta, três vezes.',letras:'Recite olhando só as iniciais. Se travar, pode conferir.',branco:'Agora sem nada: recite de cor e depois confira.',rev:'Recite o trecho inteiro a partir do começo. Depois confira.'}[ps.tipo];
+    corpo+='<p class="nota mem-dica">'+(MEM.mostrar?'Como foi?':dica)+'</p>';
+    if(ps.tipo==='ler') acoes='<button class="btn btn-escuro" data-act="mem-seguir">Li três vezes</button>';
+    else if(ps.tipo==='letras') acoes=MEM.mostrar?'<button class="btn btn-escuro" data-act="mem-seguir">Seguir</button>':'<button class="btn btn-escuro" data-act="mem-seguir">Recitei com as iniciais</button><button class="btn btn-claro" data-act="mem-mostrar">Ver o texto</button>';
+    else acoes=MEM.mostrar?notas:'<button class="btn btn-escuro" data-act="mem-mostrar">Conferir o texto</button>';
+  }
+  return '<section class="painel pad mem-sessao">'+topo+corpo+'<div class="acoes mem-acoes">'+acoes+'</div></section>';
+}
+function fimMem(){
+  var n=memAtivas().reduce(function(a,p){ return a+novosFeitos(p.id); },0);
+  return '<section class="painel pad mem-sessao mem-fim"><p class="mem-rot">Sessão de hoje</p><p class="mem-hoje-t">Feita em '+MEM.min+' min'+(n?', com '+n+(n===1?' trecho novo':' trechos novos'):'')+'. <em>Deo gratias.</em></p>'+
+    '<div class="acoes"><button class="btn btn-escuro" data-act="mem-fechar">Ver o que já sei</button>'+(PECAS_MEM.some(function(p){ return MEMT[p.id]&&estPeca(p.id).prox<MEMT[p.id].unidades.length; })?'<button class="btn btn-claro" data-act="mem-mais">Aprender mais um trecho</button>':'')+'</div></section>';
+}
+
 /* ---------- Vista: Hoje ---------- */
 function vHoje(){
   var d12=ultimos12(), n12=d12.filter(Boolean).length, seq=sequencia(), venc=vocabVencido().length;
   var fl=Math.min(1,minutosHoje('latim')/meta('latim')), fv=Math.min(1,minutosHoje('violino')/meta('violino')), fr=(fl+fv)/2, circ=2*Math.PI*24;
-  var feitas=(fl>=1?1:0)+(fv>=1?1:0);
-  var anel='<div class="anel-dia"><div class="meio"><svg viewBox="0 0 58 58" aria-hidden="true"><circle class="trilho" cx="29" cy="29" r="24" fill="none" stroke-width="6"/><circle class="feito" cx="29" cy="29" r="24" fill="none" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+(circ*(1-fr)).toFixed(1)+'" transform="rotate(-90 29 29)"/></svg><i>'+feitas+'/2</i></div>'+
-    '<div><b>'+(feitas===2?'Dia completo':feitas===1?'Falta uma prática':'Práticas de hoje')+'</b><span>'+fmtMin(minutosHoje('latim')+minutosHoje('violino'))+' de '+fmtMin(meta('latim')+meta('violino'))+' min</span></div></div>';
+  var comMem=SERVIDOR, fm=comMem&&memFeitoHoje()?1:0, np=comMem?3:2; fr=(fl+fv+(comMem?fm:0))/np;
+  var feitas=(fl>=1?1:0)+(fv>=1?1:0)+fm;
+  var anel='<div class="anel-dia"><div class="meio"><svg viewBox="0 0 58 58" aria-hidden="true"><circle class="trilho" cx="29" cy="29" r="24" fill="none" stroke-width="6"/><circle class="feito" cx="29" cy="29" r="24" fill="none" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+(circ*(1-fr)).toFixed(1)+'" transform="rotate(-90 29 29)"/></svg><i>'+feitas+'/'+np+'</i></div>'+
+    '<div><b>'+(feitas===np?'Dia completo':feitas===np-1?'Falta uma prática':'Práticas de hoje')+'</b><span>'+fmtMin(minutosHoje('latim')+minutosHoje('violino'))+' de '+fmtMin(meta('latim')+meta('violino'))+' min'+(comMem?' · memória '+(fm?'feita':'por fazer'):'')+'</span></div></div>';
   var lado='<aside class="lado"><div class="numeros">'+anel+
     '<div class="num"><small>Dias seguidos</small><b>'+seq+'</b><span>'+(seq===1?'dia':'dias')+' com estudo, sem falhar</span></div>'+
     '<div class="num"><small>Nesta semana</small><b>'+fmtMin(minutosSemana())+' min</b><span>latim '+fmtMin(minutosSemana('latim'))+' · violino '+fmtMin(minutosSemana('violino'))+(minutosSemana('estudo')?' · outros '+fmtMin(minutosSemana('estudo')):'')+'</span></div>'+
@@ -1401,7 +1588,7 @@ function vHoje(){
     '<div class="painel"><p class="vazio">Nada escolhido para esta semana. No <button class="link" data-act="ver" data-v="banco">Banco de estudos</button>, marque com a estrela 1 ou 2 itens da fila.</p></div>';
   return '<div class="conteudo">'+htmlBanner()+lado+'<div class="vista">'+
     (revisaoPendente()?faixaRevisao():'')+
-    '<section class="secao"><div class="secao-topo"><p class="rot">Práticas de hoje</p><p class="nota">'+fmtMin(meta('latim'))+' min de latim · '+fmtMin(meta('violino'))+' min de violino</p></div><div class="praticas">'+cardLatim()+cardViolino()+'</div></section>'+
+    '<section class="secao"><div class="secao-topo"><p class="rot">Práticas de hoje</p><p class="nota">'+fmtMin(meta('latim'))+' min de latim · '+fmtMin(meta('violino'))+' min de violino</p></div><div class="praticas">'+cardLatim()+cardViolino()+(SERVIDOR?cardMemoria():'')+'</div></section>'+
     '<section class="secao"><div class="secao-topo"><p class="rot">Anotar para estudar depois</p></div>'+captura('h')+'</section>'+
     '<section class="secao"><div class="secao-topo"><p class="rot">Para esta semana</p><button class="link" data-act="ver" data-v="banco">Ver o banco todo</button></div>'+listaSemana+'</section>'+
   '</div></div>';
@@ -1553,7 +1740,7 @@ function somarMinutosEx(){
   f.querySelectorAll('input[name=ex]:checked').forEach(function(x){ var i=f.querySelector('[name="min-'+x.value+'"]'); t+=numOu(i&&i.value)||0; });
   if(t>0) c.value=fmtMin(t);
 }
-document.addEventListener('change',function(ev){ if(ev.target.name==='ex') somarMinutosEx(); if(ev.target.tagName==='SELECT'&&ev.target.dataset.clsQ) clsQEditar(ev.target); });
+document.addEventListener('change',function(ev){ if(ev.target.name==='ex') somarMinutosEx(); if(ev.target.tagName==='SELECT'&&ev.target.dataset.clsQ) clsQEditar(ev.target); if(ev.target.dataset.memIr&&ev.target.value!==''){ var pid=ev.target.dataset.memIr, ix=Number(ev.target.value), ref=MEMT[pid].unidades[ix].ref; mudarPeca(pid,function(p){ p.prox=ix; }); toast('Próximo trecho novo: '+ref); render(); } });
 function ordemSess(a,b){ return (b.data+(b.criado||'')).localeCompare(a.data+(a.criado||'')); }
 function linhaSess(s){
   var det='';
@@ -2920,6 +3107,15 @@ document.addEventListener('click',function(ev){
     case 'cls-ia': clsIA(el.dataset.m,el.dataset.id); break;
     case 'cls-flash': var cf=(CLS.ia['conceitos:'+el.dataset.id]||{}).conceitos, ci=cf&&cf[Number(el.dataset.i)]; if(ci){ var vf={latim:ci.termo,pt:ci.definicao,cap:-1,idioma:'pt',origem:'Educação clássica · '+obraCls(el.dataset.id).curto,caixa:0,proxima:hoje(),criado:hoje()}; vf.id=uid(); S.vocab.push(vf); gravar('vocab/'+vf.id,vf); toast('<em>'+esc(ci.termo)+'</em> no vocabulário'); render(); } break;
     case 'cls-sala': clsAbrirSala(el.dataset.id); break;
+    case 'mem-comecar': comecarMem(); break;
+    case 'mem-mostrar': if(MEM){ MEM.mostrar=true; render(); } break;
+    case 'mem-seguir': if(MEM) avancarMem(); break;
+    case 'mem-nota': if(MEM) avaliarMem(el.dataset.n); break;
+    case 'mem-parar': encerrarMem(false); break;
+    case 'mem-fechar': MEM=null; render(); break;
+    case 'mem-mais': var pm=memAtivas().filter(function(p){ return MEMT[p.id]&&estPeca(p.id).prox<MEMT[p.id].unidades.length; })[0]; if(pm){ var tm=MEMT[pm.id], im=estPeca(pm.id).prox, um=tm.unidades[im].id, am=im>0?[tm.unidades[im-1].id]:[]; MEM={passos:[{tipo:'ler',peca:pm.id,id:um},{tipo:'letras',peca:pm.id,id:um},{tipo:'branco',peca:pm.id,id:um}].concat(am.length?[{tipo:'encadear',peca:pm.id,ids:am.concat([um]),ant:am}]:[]),i:0,mostrar:false,ini:Date.now(),feitos:0}; render(); } break;
+    case 'mem-pausa': mudarPeca(el.dataset.p,function(p){ p.pausada=!p.pausada; }); render(); break;
+    case 'mem-meta': var mm=JSON.parse(JSON.stringify(mem())); mm.metas=mm.metas||{}; mm.metas[el.dataset.p]=Math.max(1,Math.min(10,metaMem(el.dataset.p)+Number(el.dataset.d))); salvarMem(mm); render(); break;
     case 'cls-ler': clsAbrirSala(el.dataset.id,el.dataset.k); break;
     case 'cls-bib': var fl=el.dataset.id?faltamCls(el.dataset.id):faltamCls(); bibPedir(fl,!!el.dataset.forcar); break;
     case 'cls-nova-cit': CLS.citObra=el.dataset.id; CLS.tab='citacoes'; render(); var fc2=document.querySelector('[data-form=cls-cit] textarea'); if(fc2){ fc2.scrollIntoView({block:'center'}); fc2.focus(); } break;

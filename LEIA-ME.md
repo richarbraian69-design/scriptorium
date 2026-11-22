@@ -26,6 +26,10 @@ A seção Educação clássica é um mapa de estudos do Trivium e do Quadrivium:
 
 Os textos de cada obra (traduções em domínio público, documentos do vatican.va, PDFs de acesso aberto) são baixados pelo próprio servidor (`fontes.js`, rota `/api/classica/fontes`) e guardados em `/data/arquivos`, como os outros arquivos, com o campo `obra`. PDFs ficam como estão; páginas viram uma cópia de leitura em HTML limpo, sem scripts, servida com `Content-Security-Policy: sandbox`. Só os sites listados em `fontes.js` podem ser baixados. Os textos não vão para o GitHub: ficam só no disco do Railway. Na primeira visita à seção, o app pede os textos que faltam; o resto aparece na ficha como "Abrir no site".
 
+## Memória
+
+A prática diária de memorização: o Evangelho de Lucas na Vulgata Clementina (`publico/memoria/lucas.json`, 1151 versículos, do Clementine Vulgate Project via eBible.org, domínio público) e Os Lusíadas (`publico/memoria/lusiadas.json`, 1102 estrofes, do Projeto Gutenberg n.º 3333, domínio público; as estrofes VII, 15, III, 130 e VIII, 61 foram corrigidas pela edição de 1572, n.º 27236). Cada dia: revisar o que vence (os intervalos do vocabulário), aprender o trecho novo (ler, só as iniciais, de cor) e encadear com o trecho anterior; a avaliação é do próprio aluno. Meta padrão: 2 versículos e 1 estrofe por dia. O estado fica em `estado/memoria`.
+
 ## Eneida
 
 A sala da Eneida (página Latim) traz os doze livros em latim, em `publico/eneida`. O texto é o da edição de J. B. Greenough (1900), de domínio público, preparado pela Perseus Digital Library.
