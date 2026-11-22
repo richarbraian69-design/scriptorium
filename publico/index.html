@@ -930,8 +930,9 @@ select.campo option{background:#1c1c1e;color:#fff}
 .mem-ajustes{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
 .mem-ajustes .rotulo{display:inline;font-size:12px}
 .mem-ajustes .passo b{min-width:96px}
-.mem-ir{display:flex;align-items:center;gap:8px;font-size:12px}
-.mem-ir select{width:auto;padding:5px 12px;font-size:13px}
+.mem-peca{min-width:0}
+.mem-ir{display:flex;align-items:center;gap:8px;font-size:12px;min-width:0;max-width:100%;flex:1 1 200px;white-space:nowrap}
+.mem-ir select{width:0;min-width:0;flex:1 1 0;padding:5px 12px;font-size:13px;text-overflow:ellipsis}
 .mem-sessao{display:grid;gap:14px;max-width:760px;width:100%;justify-self:center}
 .mem-sessao-topo{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .mem-ref{margin:6px 0 0;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--tx3)}
@@ -1417,8 +1418,13 @@ function iniciarBanner(){
    A avaliação é sempre sua: De cor, Com ajuda ou Esqueci. O estado fica em estado/memoria. */
 var PECAS_MEM=[
   {id:'lucas',arq:'lucas',nome:'Evangelho de Lucas',sub:'Vulgata Clementina, em latim',lang:'la',unid:['versículo','versículos'],metaPadrao:2,grupo:'Capítulo'},
-  {id:'lusiadas',arq:'lusiadas',nome:'Os Lusíadas',sub:'Luís de Camões',lang:'pt',unid:['estrofe','estrofes'],metaPadrao:1,grupo:'Canto'}
+  {id:'lusiadas',arq:'lusiadas',nome:'Os Lusíadas',sub:'Luís de Camões',lang:'pt',unid:['estrofe','estrofes'],metaPadrao:1,grupo:'Canto'},
+  {id:'poemas-la',arq:'poemas-latim',nome:'Poemas em latim',sub:'Hinos da Igreja, Horácio, Catulo e Virgílio',lang:'la',unid:['estrofe','estrofes'],metaPadrao:1,grupo:'Poema',porPoema:true},
+  {id:'poemas-en',arq:'poemas-ingles',nome:'Poemas em inglês',sub:'Hopkins, Newman, Donne, Herbert, Keats e outros',lang:'en',unid:['estrofe','estrofes'],metaPadrao:1,grupo:'Poema',porPoema:true},
+  {id:'poemas-pt',arq:'poemas-portugues',nome:'Poemas em português',sub:'Camões, Bilac, Antero, Pessoa e outros',lang:'pt',unid:['estrofe','estrofes'],metaPadrao:1,grupo:'Poema',porPoema:true}
 ];
+/* Nos poemas, o encadeamento fica dentro do mesmo poema. */
+function mesmoGrupo(a,b){ return String(a).split(':')[0]===String(b).split(':')[0]; }
 var MEMT={}, MEMT_ESP={}, MEM=null;
 function mem(){ return S.mem || {pecas:{},metas:{}}; }
 function pecaMem(id){ return PECAS_MEM.filter(function(p){ return p.id===id; })[0]; }
@@ -1464,7 +1470,7 @@ function montarSessaoMem(){
     var t=MEMT[pc.id]; if(!t) return;
     var novos=proximosNovos(pc.id); if(!novos.length) return;
     novos.forEach(function(id){ passos.push({tipo:'ler',peca:pc.id,id:id},{tipo:'letras',peca:pc.id,id:id},{tipo:'branco',peca:pc.id,id:id}); });
-    var i0=t.idx[novos[0]], ant=t.unidades.slice(Math.max(0,i0-metaMem(pc.id)),i0).map(function(u){ return u.id; });
+    var i0=t.idx[novos[0]], ant=t.unidades.slice(Math.max(0,i0-metaMem(pc.id)),i0).map(function(u){ return u.id; }).filter(function(k){ return !pc.porPoema||mesmoGrupo(k,novos[0]); });
     if(ant.length+novos.length>1) passos.push({tipo:'encadear',peca:pc.id,ids:ant.concat(novos),ant:ant});
   });
   return passos;
@@ -1523,13 +1529,13 @@ function resumoMem(){
 function cartaoPeca(pc){
   var e=estPeca(pc.id), t=MEMT[pc.id], tot=t?t.unidades.length:0, n=deCor(pc.id), mt=metaMem(pc.id);
   var prox=t&&e.prox<tot?t.unidades[e.prox].ref:t?'Tudo aprendido':'…';
-  var grupos=t?t.unidades.reduce(function(a,u,i){ var g=u.id.split(':')[0]; if(!a.length||a[a.length-1].g!==g) a.push({g:g,i:i,ref:u.ref}); return a; },[]):[];
+  var grupos=t?t.unidades.reduce(function(a,u,i){ var g=u.id.split(':')[0]; if(!a.length||a[a.length-1].g!==g) a.push({g:g,i:i,ref:u.ref,tit:u.g}); return a; },[]):[];
   return '<article class="painel pad mem-peca'+(e.pausada?' pausada':'')+'"><div class="mem-peca-topo"><div><h3>'+esc(pc.nome)+'</h3><p class="nota">'+esc(pc.sub)+(e.pausada?' · pausada':'')+'</p></div><button class="link" data-act="mem-pausa" data-p="'+pc.id+'">'+(e.pausada?'Retomar':'Pausar')+'</button></div>'+
     '<div class="mem-num"><b>'+n+'</b><span>de '+(tot||'…')+' '+pc.unid[1]+' de cor</span></div>'+
     '<div class="barra"><i style="width:'+(tot?Math.max(n?1:0,n/tot*100):0).toFixed(1)+'%"></i></div>'+
     '<p class="nota">Próximo: <b data-sem-tr>'+esc(prox)+'</b> · '+memVencidos(pc.id).length+' para revisar hoje</p>'+
     '<div class="mem-ajustes"><span class="rotulo">Por dia</span><span class="passo"><button class="icone-btn" data-act="mem-meta" data-p="'+pc.id+'" data-d="-1" aria-label="Menos">−</button><b>'+mt+' '+(mt===1?pc.unid[0]:pc.unid[1])+'</b><button class="icone-btn" data-act="mem-meta" data-p="'+pc.id+'" data-d="1" aria-label="Mais">+</button></span>'+
-    (grupos.length?'<label class="mem-ir">Começar em<select class="campo" data-mem-ir="'+pc.id+'"><option value="">'+esc(pc.grupo)+'…</option>'+grupos.map(function(g){ return '<option value="'+g.i+'">'+esc(pc.grupo)+' '+(pc.id==='lucas'?g.g:romano(Number(g.g)))+'</option>'; }).join('')+'</select></label>':'')+'</div></article>';
+    (grupos.length?'<label class="mem-ir">Começar em<select class="campo" data-mem-ir="'+pc.id+'"><option value="">'+esc(pc.grupo)+'…</option>'+grupos.map(function(g){ return '<option value="'+g.i+'">'+(pc.porPoema?esc(g.tit):esc(pc.grupo)+' '+(pc.id==='lucas'?g.g:romano(Number(g.g))))+'</option>'; }).join('')+'</select></label>':'')+'</div></article>';
 }
 function textoUnid(pc,id){ var t=MEMT[pc]; return t?t.unidades[t.idx[id]]:null; }
 function passoMem(){
@@ -1549,7 +1555,7 @@ function passoMem(){
   } else {
     var u=textoUnid(ps.peca,ps.id); if(!u){ return topo+'<p class="nota">Abrindo o texto…</p>'; }
     var txt=ps.tipo==='ler'||MEM.mostrar?u.t:ps.tipo==='letras'?iniciais(u.t):ps.tipo==='rev'?inicio(u.t):'';
-    corpo='<p class="mem-ref" data-sem-tr>'+esc(u.ref)+(ps.de_novo?' · de novo':'')+'</p>'+
+    corpo='<p class="mem-ref" data-sem-tr>'+esc(u.ref)+(u.a?' · '+esc(u.a):'')+(ps.de_novo?' · de novo':'')+'</p>'+
       (txt?'<div class="mem-texto'+(ps.tipo==='letras'&&!MEM.mostrar?' cue':'')+'"'+lang+' data-sem-tr><p>'+esc(txt)+'</p></div>':'<div class="mem-texto vazio-mem" aria-hidden="true"><p>&nbsp;</p></div>');
     var dica={ler:'Leia devagar, em voz alta, três vezes.',letras:'Recite olhando só as iniciais. Se travar, pode conferir.',branco:'Agora sem nada: recite de cor e depois confira.',rev:'Recite o trecho inteiro a partir do começo. Depois confira.'}[ps.tipo];
     corpo+='<p class="nota mem-dica">'+(MEM.mostrar?'Como foi?':dica)+'</p>';
@@ -3113,7 +3119,7 @@ document.addEventListener('click',function(ev){
     case 'mem-nota': if(MEM) avaliarMem(el.dataset.n); break;
     case 'mem-parar': encerrarMem(false); break;
     case 'mem-fechar': MEM=null; render(); break;
-    case 'mem-mais': var pm=memAtivas().filter(function(p){ return MEMT[p.id]&&estPeca(p.id).prox<MEMT[p.id].unidades.length; })[0]; if(pm){ var tm=MEMT[pm.id], im=estPeca(pm.id).prox, um=tm.unidades[im].id, am=im>0?[tm.unidades[im-1].id]:[]; MEM={passos:[{tipo:'ler',peca:pm.id,id:um},{tipo:'letras',peca:pm.id,id:um},{tipo:'branco',peca:pm.id,id:um}].concat(am.length?[{tipo:'encadear',peca:pm.id,ids:am.concat([um]),ant:am}]:[]),i:0,mostrar:false,ini:Date.now(),feitos:0}; render(); } break;
+    case 'mem-mais': var pm=memAtivas().filter(function(p){ return MEMT[p.id]&&estPeca(p.id).prox<MEMT[p.id].unidades.length; })[0]; if(pm){ var tm=MEMT[pm.id], im=estPeca(pm.id).prox, um=tm.unidades[im].id, am=im>0&&(!pm.porPoema||mesmoGrupo(tm.unidades[im-1].id,um))?[tm.unidades[im-1].id]:[]; MEM={passos:[{tipo:'ler',peca:pm.id,id:um},{tipo:'letras',peca:pm.id,id:um},{tipo:'branco',peca:pm.id,id:um}].concat(am.length?[{tipo:'encadear',peca:pm.id,ids:am.concat([um]),ant:am}]:[]),i:0,mostrar:false,ini:Date.now(),feitos:0}; render(); } break;
     case 'mem-pausa': mudarPeca(el.dataset.p,function(p){ p.pausada=!p.pausada; }); render(); break;
     case 'mem-meta': var mm=JSON.parse(JSON.stringify(mem())); mm.metas=mm.metas||{}; mm.metas[el.dataset.p]=Math.max(1,Math.min(10,metaMem(el.dataset.p)+Number(el.dataset.d))); salvarMem(mm); render(); break;
     case 'cls-ler': clsAbrirSala(el.dataset.id,el.dataset.k); break;
