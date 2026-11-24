@@ -1451,7 +1451,8 @@ function memVencidos(id){
   return out.sort(function(a,b){ return a.peca===b.peca ? ordemId(a.id)-ordemId(b.id) : (a.peca<b.peca?-1:1); });
 }
 function novosFeitos(id){ var n=estPeca(id).novos||{}; return n.data===hoje()?(n.n||0):0; }
-function novosFaltam(id){ var e=estPeca(id), t=MEMT[id]; if(e.pausada) return 0; var f=Math.max(0,metaMem(id)-novosFeitos(id)); return t?Math.min(f,t.unidades.length-(e.prox||0)):f; }
+function adiadosHoje(id){ var a=estPeca(id).adiados||{}; return a.data===hoje()?(a.n||0):0; }
+function novosFaltam(id){ var e=estPeca(id), t=MEMT[id]; if(e.pausada) return 0; var f=Math.max(0,metaMem(id)-novosFeitos(id)-adiadosHoje(id)); return t?Math.min(f,t.unidades.length-(e.prox||0)):f; }
 function deCor(id){ return Object.keys(estPeca(id).itens||{}).length; }
 function memFeitoHoje(){ return !memVencidos().length && PECAS_MEM.every(function(p){ return novosFaltam(p.id)<=0; }); }
 function memAtivas(){ return PECAS_MEM.filter(function(p){ return !estPeca(p.id).pausada; }); }
@@ -1487,15 +1488,40 @@ function encerrarMem(fim){
   if(MEM.feitos && min>=0.5){ var s={pratica:'memoria',data:hoje(),minutos:Math.max(1,Math.round(min)),notas:'',criado:new Date().toISOString(),passos:MEM.feitos}; var id=uid(); s.id=id; S.sess.push(s); gravar('sessoes/'+id,s); }
   MEM=fim?{fim:true,min:Math.max(1,Math.round(min)),feitos:MEM.feitos}:null; render();
 }
-function avancarMem(){ MEM.i++; MEM.mostrar=false; MEM.feitos++; if(MEM.i>=MEM.passos.length) encerrarMem(true); else render(); }
+function avancarMem(){ MEM.i++; MEM.mostrar=false; MEM.escolha=false; MEM.feitos++; if(MEM.i>=MEM.passos.length) encerrarMem(true); else render(); }
+/* "Esqueci" ou "Ainda não decorei" não repete à força: pergunta se quer tentar de novo agora ou deixar para amanhã. */
 function avaliarMem(nota){
   var ps=MEM.passos[MEM.i], h=hoje();
-  if(ps.tipo==='rev') mudarPeca(ps.peca,function(p){ var it=p.itens[ps.id]||{c:0}; if(nota==='cor'){ it.c=Math.min(6,(it.c||0)+1); it.p=somaDias(h,INTERVALOS[it.c]); } else if(nota==='ajuda'){ it.p=somaDias(h,1); } else { it.c=0; it.p=somaDias(h,1); } it.v=h; p.itens[ps.id]=it; });
-  else if(ps.tipo==='branco'){
-    if(nota==='esqueci'){ MEM.passos.splice(MEM.i+1,0,{tipo:'ler',peca:ps.peca,id:ps.id},{tipo:'letras',peca:ps.peca,id:ps.id},{tipo:'branco',peca:ps.peca,id:ps.id,de_novo:true}); }
-    else mudarPeca(ps.peca,function(p){ var t=MEMT[ps.peca], i=t.idx[ps.id]; if(!p.itens[ps.id]){ p.itens[ps.id]={c:0,p:somaDias(h,1),a:h}; p.novos=p.novos&&p.novos.data===h?{data:h,n:(p.novos.n||0)+1}:{data:h,n:1}; } p.prox=Math.max(p.prox||0,i+1); });
+  if(nota==='esqueci' && (ps.tipo==='rev'||ps.tipo==='branco')){
+    if(ps.tipo==='rev') mudarPeca(ps.peca,function(p){ var it=p.itens[ps.id]||{c:0}; it.c=0; it.p=somaDias(h,1); it.v=h; p.itens[ps.id]=it; });
+    MEM.escolha=true; render(); return;
   }
+  if(ps.tipo==='rev') mudarPeca(ps.peca,function(p){ var it=p.itens[ps.id]||{c:0}; if(nota==='cor'){ it.c=Math.min(6,(it.c||0)+1); it.p=somaDias(h,INTERVALOS[it.c]); } else { it.p=somaDias(h,1); } it.v=h; p.itens[ps.id]=it; });
+  else if(ps.tipo==='branco' && !ps.treino) mudarPeca(ps.peca,function(p){ var t=MEMT[ps.peca], i=t.idx[ps.id]; if(!p.itens[ps.id]){ p.itens[ps.id]={c:0,p:somaDias(h,1),a:h}; p.novos=p.novos&&p.novos.data===h?{data:h,n:(p.novos.n||0)+1}:{data:h,n:1}; } p.prox=Math.max(p.prox||0,i+1); });
   else if(ps.tipo==='encadear' && nota==='tropecei') mudarPeca(ps.peca,function(p){ ps.ant.forEach(function(k){ if(p.itens[k]){ p.itens[k].c=0; p.itens[k].p=somaDias(h,1); } }); });
+  avancarMem();
+}
+/* Tentar de novo agora: ler, só as iniciais e de cor outra vez. Na revisão é só treino: o trecho já volta amanhã. */
+function tentarDeNovoMem(){
+  var ps=MEM.passos[MEM.i], treino=ps.tipo==='rev'||!!ps.treino;
+  MEM.passos.splice(MEM.i+1,0,{tipo:'ler',peca:ps.peca,id:ps.id,treino:treino},{tipo:'letras',peca:ps.peca,id:ps.id,treino:treino},{tipo:'branco',peca:ps.peca,id:ps.id,de_novo:true,treino:treino});
+  avancarMem();
+}
+/* Passar para amanhã: o trecho novo (e os seguintes da mesma obra nesta sessão) fica para o primeiro trecho de amanhã. */
+function amanhaMem(){
+  var ps=MEM.passos[MEM.i], h=hoje();
+  if(ps.tipo==='branco' && !ps.treino){
+    var t=MEMT[ps.peca], i0=t.idx[ps.id], adiar={}; adiar[ps.id]=1;
+    MEM.passos.forEach(function(q,k){ if(k>MEM.i&&q.peca===ps.peca&&q.id&&!q.treino&&q.tipo!=='rev'&&t.idx[q.id]>=i0) adiar[q.id]=1; });
+    MEM.passos=MEM.passos.filter(function(q,k){
+      if(k<=MEM.i||q.peca!==ps.peca) return true;
+      if(q.tipo==='encadear'){ q.ids=q.ids.filter(function(x){ return !adiar[x]; }); return q.ids.length>1&&q.ids.some(function(x){ return q.ant.indexOf(x)<0; }); }
+      return q.tipo==='rev'||q.treino||!adiar[q.id];
+    });
+    var n=Object.keys(adiar).length;
+    mudarPeca(ps.peca,function(p){ p.adiados=p.adiados&&p.adiados.data===h?{data:h,n:(p.adiados.n||0)+n}:{data:h,n:n}; });
+    toast(n>1?n+' trechos ficaram para amanhã':'Fica para amanhã',refFaixa(ps.peca,Object.keys(adiar).sort(function(a,b){ return ordemId(a)-ordemId(b); })));
+  }
   avancarMem();
 }
 
@@ -1503,7 +1529,7 @@ function cardMemoria(){
   var venc=memVencidos().length, feito=memFeitoHoje();
   PECAS_MEM.forEach(function(p){ textoMem(p.id); });
   var pill=feito?'<span class="pill ok">Feito hoje</span>':'<span class="pill">'+(venc?venc+' para revisar':'Trecho novo')+'</span>';
-  var linhas=memAtivas().map(function(pc){ var nv=proximosNovos(pc.id), r=nv.length?refFaixa(pc.id,nv):novosFeitos(pc.id)?'novo de hoje feito':(MEMT[pc.id]?'tudo de cor':'…');
+  var linhas=memAtivas().map(function(pc){ var nv=proximosNovos(pc.id), r=nv.length?refFaixa(pc.id,nv):novosFeitos(pc.id)?'novo de hoje feito':adiadosHoje(pc.id)?'novo fica para amanhã':(MEMT[pc.id]?'tudo de cor':'…');
     return '<div><span>'+esc(pc.nome)+'</span><small data-sem-tr>'+esc(r)+'</small></div>'; }).join('');
   return '<article class="pratica"><div class="pratica-topo"><h3>'+I.memoria+'Memória</h3>'+pill+'</div>'+
     '<div class="plano-lista">'+linhas+'</div>'+
@@ -1546,7 +1572,7 @@ function passoMem(){
   var topo='<div class="mem-sessao-topo"><div><p class="mem-rot">'+etapa+' · '+esc(pc.nome)+'</p><p class="nota">Passo '+(MEM.i+1)+' de '+tot+'</p></div><button class="btn btn-claro btn-p" data-act="mem-parar">Parar por hoje</button></div>'+
     '<div class="barra"><i style="width:'+((MEM.i)/tot*100).toFixed(1)+'%"></i></div>';
   var corpo='', acoes='';
-  var notas='<button class="btn btn-escuro" data-act="mem-nota" data-n="cor">De cor</button><button class="btn btn-claro" data-act="mem-nota" data-n="ajuda">Com ajuda</button><button class="btn btn-claro" data-act="mem-nota" data-n="esqueci">Esqueci</button>';
+  var notas='<button class="btn btn-escuro" data-act="mem-nota" data-n="cor">De cor</button><button class="btn btn-claro" data-act="mem-nota" data-n="ajuda">Com ajuda</button><button class="btn btn-claro" data-act="mem-nota" data-n="esqueci">'+(ps.tipo==='rev'?'Esqueci':'Ainda não decorei')+'</button>';
   if(ps.tipo==='encadear'){
     var us=ps.ids.map(function(k){ return textoUnid(ps.peca,k); }).filter(Boolean);
     corpo='<p class="mem-ref" data-sem-tr>'+esc(refFaixa(ps.peca,ps.ids))+'</p><div class="mem-texto'+(MEM.mostrar?'':' cue')+'"'+lang+' data-sem-tr>'+us.map(function(u){ return '<p><sup>'+esc(u.id.split(':')[1])+'</sup>'+esc(MEM.mostrar?u.t:iniciais(u.t))+'</p>'; }).join('')+'</div>'+
@@ -1558,10 +1584,10 @@ function passoMem(){
     corpo='<p class="mem-ref" data-sem-tr>'+esc(u.ref)+(u.a?' · '+esc(u.a):'')+(ps.de_novo?' · de novo':'')+'</p>'+
       (txt?'<div class="mem-texto'+(ps.tipo==='letras'&&!MEM.mostrar?' cue':'')+'"'+lang+' data-sem-tr><p>'+esc(txt)+'</p></div>':'<div class="mem-texto vazio-mem" aria-hidden="true"><p>&nbsp;</p></div>');
     var dica={ler:'Leia devagar, em voz alta, três vezes.',letras:'Recite olhando só as iniciais. Se travar, pode conferir.',branco:'Agora sem nada: recite de cor e depois confira.',rev:'Recite o trecho inteiro a partir do começo. Depois confira.'}[ps.tipo];
-    corpo+='<p class="nota mem-dica">'+(MEM.mostrar?'Como foi?':dica)+'</p>';
+    corpo+='<p class="nota mem-dica">'+(MEM.escolha?(ps.tipo==='rev'?'Sem problema: este trecho volta amanhã na revisão. Quer treinar de novo agora?':ps.treino?'Quer tentar mais uma vez ou deixar o treino para amanhã?':'Sem problema. Quer tentar de novo agora ou deixar este trecho para amanhã?'):MEM.mostrar?'Como foi?':dica)+'</p>';
     if(ps.tipo==='ler') acoes='<button class="btn btn-escuro" data-act="mem-seguir">Li três vezes</button>';
     else if(ps.tipo==='letras') acoes=MEM.mostrar?'<button class="btn btn-escuro" data-act="mem-seguir">Seguir</button>':'<button class="btn btn-escuro" data-act="mem-seguir">Recitei com as iniciais</button><button class="btn btn-claro" data-act="mem-mostrar">Ver o texto</button>';
-    else acoes=MEM.mostrar?notas:'<button class="btn btn-escuro" data-act="mem-mostrar">Conferir o texto</button>';
+    else acoes=MEM.escolha?'<button class="btn btn-escuro" data-act="mem-denovo">Tentar de novo</button><button class="btn btn-claro" data-act="mem-amanha">Passar para amanhã</button>':MEM.mostrar?notas:'<button class="btn btn-escuro" data-act="mem-mostrar">Conferir o texto</button>';
   }
   return '<section class="painel pad mem-sessao">'+topo+corpo+'<div class="acoes mem-acoes">'+acoes+'</div></section>';
 }
@@ -3117,6 +3143,8 @@ document.addEventListener('click',function(ev){
     case 'mem-mostrar': if(MEM){ MEM.mostrar=true; render(); } break;
     case 'mem-seguir': if(MEM) avancarMem(); break;
     case 'mem-nota': if(MEM) avaliarMem(el.dataset.n); break;
+    case 'mem-denovo': if(MEM) tentarDeNovoMem(); break;
+    case 'mem-amanha': if(MEM) amanhaMem(); break;
     case 'mem-parar': encerrarMem(false); break;
     case 'mem-fechar': MEM=null; render(); break;
     case 'mem-mais': var pm=memAtivas().filter(function(p){ return MEMT[p.id]&&estPeca(p.id).prox<MEMT[p.id].unidades.length; })[0]; if(pm){ var tm=MEMT[pm.id], im=estPeca(pm.id).prox, um=tm.unidades[im].id, am=im>0&&(!pm.porPoema||mesmoGrupo(tm.unidades[im-1].id,um))?[tm.unidades[im-1].id]:[]; MEM={passos:[{tipo:'ler',peca:pm.id,id:um},{tipo:'letras',peca:pm.id,id:um},{tipo:'branco',peca:pm.id,id:um}].concat(am.length?[{tipo:'encadear',peca:pm.id,ids:am.concat([um]),ant:am}]:[]),i:0,mostrar:false,ini:Date.now(),feitos:0}; render(); } break;
