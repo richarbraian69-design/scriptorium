@@ -3100,7 +3100,8 @@ function responder(ok){
   var r=S.rev, v=S.vocab.filter(function(x){ return x.id===r.fila[r.i]; })[0];
   if(v){
     if(ok){ v.caixa=Math.min(6,(v.caixa||0)+1); v.proxima=somaDias(hoje(),INTERVALOS[v.caixa]); if(!r.errou[v.id]) r.certas++; }
-    else { v.caixa=0; v.proxima=somaDias(hoje(),1); if(!r.errou[v.id]){ r.erradas++; r.errou[v.id]=1; r.fila.push(v.id); } }
+    /* Errou: volta para a primeira caixa e só aparece de novo amanhã, não nesta mesma revisão. */
+    else { v.caixa=0; v.proxima=somaDias(hoje(),1); if(!r.errou[v.id]){ r.erradas++; r.errou[v.id]=1; } }
     v.revisado=hoje(); gravar('vocab/'+v.id,v);
   }
   r.i++; r.mostrar=false; renderModal();
